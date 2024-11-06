@@ -446,155 +446,153 @@ export namespace UIFactory {
     );
   }
 
-export function superModernMobileAdsUI() {
-  return new UIContainer({});
-}
+  export function superModernMobileAdsUI() {
+    return new UIContainer({});
+  }
 
-export function superModernAdsUI() {
-  return new UIContainer({});
-}
+  export function superModernAdsUI() {
+    return new UIContainer({});
+  }
 
-export function superModernMobileUI() {
-  let subtitleOverlay = new SubtitleOverlay();
+  export function superModernMobileUI() {
+    let subtitleOverlay = new SubtitleOverlay();
 
-  let mainSettingsPanelPage = new ModernSettingsPanelPage({
-    components: [
-      new ModernSettingsPanelItem(i18n.getLocalizer('settings.video.quality'), new VideoQualitySelectBox()),
-      new ModernSettingsPanelItem(i18n.getLocalizer('speed'), new PlaybackSpeedSelectBox()),
-      new ModernSettingsPanelItem(i18n.getLocalizer('settings.audio.track'), new AudioTrackSelectBox()),
-      new ModernSettingsPanelItem(i18n.getLocalizer('settings.audio.quality'), new AudioQualitySelectBox()),
-    ],
-  });
+    let mainSettingsPanelPage = new ModernSettingsPanelPage({
+      components: [
+        new ModernSettingsPanelItem(i18n.getLocalizer('settings.video.quality'), new VideoQualitySelectBox()),
+        new ModernSettingsPanelItem(i18n.getLocalizer('speed'), new PlaybackSpeedSelectBox()),
+        new ModernSettingsPanelItem(i18n.getLocalizer('settings.audio.track'), new AudioTrackSelectBox()),
+        new ModernSettingsPanelItem(i18n.getLocalizer('settings.audio.quality'), new AudioQualitySelectBox()),
+      ],
+    });
 
-  let settingsPanel = new ModernSettingsPanel({
-    components: [mainSettingsPanelPage],
-    hidden: true,
-    pageTransitionAnimation: false,
-    hideDelay: -1,
-  });
+    let settingsPanel = new ModernSettingsPanel({
+      components: [mainSettingsPanelPage],
+      hidden: true,
+      pageTransitionAnimation: false,
+      hideDelay: -1,
+    });
 
-  const subtitleSelectBox = new SubtitleSelectBox();
-  let subtitleSelectItem = new ModernSettingsPanelItem(
-    new Label({ text: i18n.getLocalizer('settings.subtitles') } as LabelConfig),
-    subtitleSelectBox,
-    null,
-    {
-      role: 'menubar',
-    },
-  );
-  mainSettingsPanelPage.addComponent(subtitleSelectItem);
+    const subtitleSelectBox = new SubtitleSelectBox();
+    let subtitleSelectItem = new ModernSettingsPanelItem(
+      new Label({ text: i18n.getLocalizer('settings.subtitles') } as LabelConfig),
+      subtitleSelectBox,
+      null,
+      {
+        role: 'menubar',
+      },
+    );
+    mainSettingsPanelPage.addComponent(subtitleSelectItem);
 
-  let controlBar = new ControlBar({
-    components: [
-      new Container({
-        components: [
-          new PlaybackTimeLabel({
-            timeLabelMode: PlaybackTimeLabelMode.CurrentTime,
-            hideInLivePlayback: true,
-          }),
-          new SeekBar({ label: new SeekBarLabel(), renderSeekBarPlaybackPositionMarkerInOuterSeekBar: true }),
-          new PlaybackTimeLabel({
-            timeLabelMode: PlaybackTimeLabelMode.TotalTime,
-            cssClasses: ['text-right'],
-          }),
-        ],
-        cssClasses: ['controlbar-top'],
-      }),
-      new Container({
-        components: [
-          new PlaybackToggleButton(),
-          new VolumeToggleButton(),
-          new Spacer(),
-          new SettingsToggleButton({ settingsPanel: settingsPanel }),
-          new SubtitleToggleButton(subtitleSelectItem, subtitleSelectBox),
-          new FullscreenToggleButton(),
-        ],
-        cssClasses: ['controlbar-bottom'],
-      }),
-    ],
-  });
+    let controlBar = new ControlBar({
+      components: [
+        new Container({
+          components: [
+            new PlaybackTimeLabel({
+              timeLabelMode: PlaybackTimeLabelMode.CurrentTime,
+              hideInLivePlayback: true,
+            }),
+            new SeekBar({ label: new SeekBarLabel(), renderSeekBarPlaybackPositionMarkerInOuterSeekBar: true }),
+            new PlaybackTimeLabel({
+              timeLabelMode: PlaybackTimeLabelMode.TotalTime,
+              cssClasses: ['text-right'],
+            }),
+          ],
+          cssClasses: ['controlbar-top'],
+        }),
+        new Container({
+          components: [
+            new PlaybackToggleButton(),
+            new VolumeToggleButton(),
+            new Spacer(),
+            new SettingsToggleButton({ settingsPanel: settingsPanel }),
+            new SubtitleToggleButton(subtitleSelectItem, subtitleSelectBox),
+            new FullscreenToggleButton(),
+          ],
+          cssClasses: ['controlbar-bottom'],
+        }),
+      ],
+    });
 
+    return new UIContainer({
+      components: [
+        subtitleOverlay,
 
-  return new UIContainer({
-    components: [
-      subtitleOverlay,
+        new CastStatusOverlay(),
+        // TODO: make an overlay for the quickseek buttons/double tab
+        new TouchControlOverlay(),
+        // TODO: make a new buffer overlay
+        // new BufferingOverlay(),
+        new RecommendationOverlay(),
+        controlBar,
+        new TitleBar({
+          components: [
+            new MetadataLabel({ content: MetadataLabelContent.Title }),
+            new CastToggleButton(),
+            new AirPlayToggleButton(),
+            new VRToggleButton(),
+            // TODO: make a Share button
+          ],
+        }),
+        settingsPanel,
+        new ErrorMessageOverlay(),
+      ],
+      cssClasses: ['ui-skin-modern-smallscreen', 'ui-skin-super-modern'],
+      hideDelay: 2000,
+      hidePlayerStateExceptions: [
+        PlayerUtils.PlayerState.Prepared,
+        PlayerUtils.PlayerState.Paused,
+        PlayerUtils.PlayerState.Finished,
+      ],
+    });
+  }
 
-      new CastStatusOverlay(),
-      // TODO: make an overlay for the quickseek buttons/double tab
-      new TouchControlOverlay(),
-      // TODO: make a new buffer overlay
-      // new BufferingOverlay(),
-      new RecommendationOverlay(),
-      controlBar,
-      new TitleBar({
-        components: [
-          new MetadataLabel({ content: MetadataLabelContent.Title }),
-          new CastToggleButton(),
-          new AirPlayToggleButton(),
-          new VRToggleButton(),
-          // TODO: make a Share button
-        ],
-      }),
-      settingsPanel,
-      new ErrorMessageOverlay(),
-    ],
-    cssClasses: ['ui-skin-modern-smallscreen', 'ui-skin-super-modern'],
-    hideDelay: 2000,
-    hidePlayerStateExceptions: [
-      PlayerUtils.PlayerState.Prepared,
-      PlayerUtils.PlayerState.Paused,
-      PlayerUtils.PlayerState.Finished,
-    ],
-  });
-}
-
-export function superModerUI() {
-  return new UIContainer({});
-}
+  export function superModerUI() {
+    return new UIContainer({});
+  }
 
   export function buildSuperModernUI(player: PlayerAPI, config: UIConfig = {}): UIManager {
     // show smallScreen UI only on mobile/handheld devices
     let smallScreenSwitchWidth = 600;
 
-  return new UIManager(
-    player,
-    [
-      {
-        ui: superModernMobileAdsUI(),
-        condition: (context: UIConditionContext) => {
-          return (
-            context.isMobile && context.documentWidth < smallScreenSwitchWidth && context.isAd && context.adRequiresUi
-          );
+    return new UIManager(
+      player,
+      [
+        {
+          ui: superModernMobileAdsUI(),
+          condition: (context: UIConditionContext) => {
+            return (
+              context.isMobile && context.documentWidth < smallScreenSwitchWidth && context.isAd && context.adRequiresUi
+            );
+          },
         },
-      },
-      {
-        ui: superModernAdsUI(),
-        condition: (context: UIConditionContext) => {
-          return context.isAd && context.adRequiresUi;
+        {
+          ui: superModernAdsUI(),
+          condition: (context: UIConditionContext) => {
+            return context.isAd && context.adRequiresUi;
+          },
         },
-      },
-      {
-        ui: superModernMobileUI(),
-        condition: (context: UIConditionContext) => {
-          return (
-            !context.isAd &&
-            !context.adRequiresUi &&
-            context.isMobile &&
-            context.documentWidth < smallScreenSwitchWidth
-          );
+        {
+          ui: superModernMobileUI(),
+          condition: (context: UIConditionContext) => {
+            return (
+              !context.isAd &&
+              !context.adRequiresUi &&
+              context.isMobile &&
+              context.documentWidth < smallScreenSwitchWidth
+            );
+          },
         },
-      },
-      {
-        ui: modernUI(config),
-        condition: (context: UIConditionContext) => {
-          return !context.isAd && !context.adRequiresUi;
+        {
+          ui: modernUI(config),
+          condition: (context: UIConditionContext) => {
+            return !context.isAd && !context.adRequiresUi;
+          },
         },
-      },
-    ],
-    config,
-  );
-}
-
+      ],
+      config,
+    );
+  }
 
   export function buildModernSmallScreenUI(player: PlayerAPI, config: UIConfig = {}): UIManager {
     return new UIManager(
@@ -632,7 +630,7 @@ export function superModerUI() {
           condition: (context: UIConditionContext) => {
             return !context.isAd && !context.adRequiresUi;
           },
-        }
+        },
       ],
       config,
     );
