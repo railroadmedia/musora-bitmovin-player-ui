@@ -420,6 +420,24 @@ export class DOM {
   }
 
   /**
+   * Returns the width of the first element.
+   * @returns {number} the width of the first element
+   */
+  offsetWidth(): number {
+    // TODO check if this is the same as jQuery's width() (probably not)
+    return this.elements[0].offsetWidth;
+  }
+
+  /**
+   * Returns the height of the first element.
+   * @returns {number} the height of the first element
+   */
+  offsetHeight(): number {
+    // TODO check if this is the same as jQuery's height() (probably not)
+    return this.elements[0].offsetHeight;
+  }
+
+  /**
    * Returns the size of the first element.
    * @return {Size} the size of the first element
    */
