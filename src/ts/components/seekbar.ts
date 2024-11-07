@@ -487,7 +487,11 @@ export class SeekBar extends Component<SeekBarConfig> {
       cssPrefix: this.config.cssPrefix,
       snappingRange: this.config.snappingRange,
     };
-    this.timelineMarkersHandler = new TimelineMarkersHandler(timelineMarkerConfig, () => this.seekBar.width(), this.seekBarMarkersContainer);
+    this.timelineMarkersHandler = new TimelineMarkersHandler(
+      timelineMarkerConfig,
+      () => this.seekBar.offsetWidth(),
+      this.seekBarMarkersContainer,
+    );
     this.timelineMarkersHandler.initialize(player, uimanager);
   }
 
@@ -891,10 +895,12 @@ export class SeekBar extends Component<SeekBarConfig> {
     this.setPosition(this.seekBarPlaybackPosition, percent);
 
     // Set position of the marker
-    let totalSize = (this.config.vertical ? (this.seekBar.height() - this.seekBarPlaybackPositionMarker.height()) : this.seekBar.width());
+    let totalSize = this.config.vertical
+      ? (this.seekBar.offsetHeight() - this.seekBarPlaybackPositionMarker.height())
+      : this.seekBar.offsetWidth();
     let px = (totalSize) / 100 * percent;
     if (this.config.vertical) {
-      px = this.seekBar.height() - px - this.seekBarPlaybackPositionMarker.height();
+      px = this.seekBar.offsetHeight() - px - this.seekBarPlaybackPositionMarker.offsetHeight();
     }
 
     let style = this.config.vertical ?
