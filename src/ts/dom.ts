@@ -407,7 +407,7 @@ export class DOM {
    */
   width(): number {
     // TODO check if this is the same as jQuery's width() (probably not)
-    return this.elements[0].offsetWidth;
+    return this.elements[0].getBoundingClientRect().width;
   }
 
   /**
@@ -416,7 +416,7 @@ export class DOM {
    */
   height(): number {
     // TODO check if this is the same as jQuery's height() (probably not)
-    return this.elements[0].offsetHeight;
+    return this.elements[0].getBoundingClientRect().height;
   }
 
   /**
