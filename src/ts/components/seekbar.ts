@@ -242,10 +242,17 @@ export class SeekBar extends Component<SeekBarConfig> {
 
     uimanager.onControlsShow.subscribe(() => {
       this.isUiShown = true;
+      if (!player.isLive() && !this.smoothPlaybackPositionUpdater.isActive()) {
+        playbackPositionHandler(null, true);
+        this.smoothPlaybackPositionUpdater.start();
+      }
     });
 
     uimanager.onControlsHide.subscribe(() => {
       this.isUiShown = false;
+      if (this.smoothPlaybackPositionUpdater.isActive()) {
+        this.smoothPlaybackPositionUpdater.clear();
+      }
     });
 
     let isPlaying = false;
@@ -323,12 +330,12 @@ export class SeekBar extends Component<SeekBarConfig> {
       scrubbing = false;
     };
 
-    let onPlayerSeeked = (event: PlayerEventBase = null, forceUpdate: boolean = false ) => {
+    let onPlayerSeeked = (event: PlayerEventBase = null) => {
       isPlayerSeeking = false;
       this.setSeeking(false);
 
       // update playback position when a seek has finished
-      playbackPositionHandler(event, forceUpdate);
+      playbackPositionHandler(event, true);
     };
 
     let restorePlayingState = function () {
