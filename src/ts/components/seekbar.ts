@@ -316,12 +316,12 @@ export class SeekBar extends Component<SeekBarConfig> {
       scrubbing = false;
     };
 
-    let onPlayerSeeked = (event: PlayerEventBase = null, forceUpdate: boolean = false ) => {
+    let onPlayerSeeked = (event: PlayerEventBase = null) => {
       isPlayerSeeking = false;
       this.setSeeking(false);
 
       // update playback position when a seek has finished
-      playbackPositionHandler(event, forceUpdate);
+      playbackPositionHandler(event, true);
     };
 
     let restorePlayingState = function () {
