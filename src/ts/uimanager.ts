@@ -1,6 +1,6 @@
 import {UIContainer} from './components/uicontainer';
 import {DOM} from './dom';
-import {Component, ComponentConfig} from './components/component';
+import { Component, ComponentConfig, ViewModeChangedEventArgs } from './components/component';
 import {Container} from './components/container';
 import { SeekBar, SeekBarMarker } from './components/seekbar';
 import {NoArgs, EventDispatcher, CancelEventArgs} from './eventdispatcher';
@@ -14,7 +14,12 @@ import { i18n, CustomVocabulary, Vocabularies } from './localization/i18n';
 import { FocusVisibilityTracker } from './focusvisibilitytracker';
 import { isMobileV3PlayerAPI, MobileV3PlayerAPI, MobileV3PlayerEvent } from './mobilev3playerapi';
 import { SpatialNavigation } from './spatialnavigation/spatialnavigation';
+import { SubtitleSettingsManager } from './components/subtitlesettings/subtitlesettingsmanager';
+import { StorageUtils } from './storageutils';
 
+/**
+ * @category Configs
+ */
 export interface LocalizationConfig {
   /**
    * Sets the desired language, and falls back to 'en' if there is no vocabulary for the desired language. Setting it
@@ -28,6 +33,9 @@ export interface LocalizationConfig {
   vocabularies?: Vocabularies;
 }
 
+/**
+ * @category Configs
+ */
 export interface InternalUIConfig extends UIConfig {
   events: {
     /**
@@ -111,6 +119,7 @@ export class UIManager {
   private config: InternalUIConfig; // Conjunction of provided uiConfig and sourceConfig from the player
   private managerPlayerWrapper: PlayerWrapper;
   private focusVisibilityTracker: FocusVisibilityTracker;
+  private subtitleSettingsManager: SubtitleSettingsManager;
 
   private events = {
     onUiVariantResolve: new EventDispatcher<UIManager, UIConditionContext>(),
@@ -154,6 +163,7 @@ export class UIManager {
       this.uiVariants = <UIVariant[]>playerUiOrUiVariants;
     }
 
+    this.subtitleSettingsManager = new SubtitleSettingsManager();
     this.player = player;
     this.managerPlayerWrapper = new PlayerWrapper(player);
 
@@ -198,9 +208,12 @@ export class UIManager {
       this.config.metadata.description = playerSourceUiConfig.metadata.description || uiconfig.metadata.description;
       this.config.metadata.markers = playerSourceUiConfig.metadata.markers || uiconfig.metadata.markers || [];
       this.config.recommendations = playerSourceUiConfig.recommendations || uiconfig.recommendations || [];
+
+      StorageUtils.setStorageApiDisabled(uiconfig);
     };
 
     updateConfig();
+    this.subtitleSettingsManager.initialize();
 
     // Update the source configuration when a new source is loaded and dispatch onUpdated
     const updateSource = () => {
@@ -242,6 +255,7 @@ export class UIManager {
         player,
         uiVariant.ui,
         this.config,
+        this.subtitleSettingsManager,
         uiVariant.spatialNavigation,
       ));
     }
@@ -375,6 +389,10 @@ export class UIManager {
     i18n.setConfig(localizationConfig);
   }
 
+  getSubtitleSettingsManager() {
+    return this.subtitleSettingsManager;
+  }
+
   getConfig(): UIConfig {
     return this.config;
   }
@@ -493,6 +511,7 @@ export class UIManager {
     // When the UI is loaded after a source was loaded, we need to tell the components to initialize themselves
     if (player.getSource()) {
       this.config.events.onUpdated.dispatch(this);
+
     }
 
     // Fire onConfigured after UI DOM elements are successfully added. When fired immediately, the DOM elements
@@ -598,6 +617,7 @@ export class UIInstanceManager {
   private playerWrapper: PlayerWrapper;
   private ui: UIContainer;
   private config: InternalUIConfig;
+  private subtitleSettingsManager: SubtitleSettingsManager;
   protected spatialNavigation?: SpatialNavigation;
 
   private events = {
@@ -607,17 +627,23 @@ export class UIInstanceManager {
     onSeeked: new EventDispatcher<SeekBar, NoArgs>(),
     onComponentShow: new EventDispatcher<Component<ComponentConfig>, NoArgs>(),
     onComponentHide: new EventDispatcher<Component<ComponentConfig>, NoArgs>(),
+    onComponentViewModeChanged: new EventDispatcher<Component<ComponentConfig>, ViewModeChangedEventArgs>(),
     onControlsShow: new EventDispatcher<UIContainer, NoArgs>(),
     onPreviewControlsHide: new EventDispatcher<UIContainer, CancelEventArgs>(),
     onControlsHide: new EventDispatcher<UIContainer, NoArgs>(),
     onRelease: new EventDispatcher<UIContainer, NoArgs>(),
   };
 
-  constructor(player: PlayerAPI, ui: UIContainer, config: InternalUIConfig, spatialNavigation?: SpatialNavigation) {
+  constructor(player: PlayerAPI, ui: UIContainer, config: InternalUIConfig, subtitleSettingsManager: SubtitleSettingsManager, spatialNavigation?: SpatialNavigation) {
     this.playerWrapper = new PlayerWrapper(player);
     this.ui = ui;
     this.config = config;
+    this.subtitleSettingsManager = subtitleSettingsManager;
     this.spatialNavigation = spatialNavigation;
+  }
+
+  getSubtitleSettingsManager() {
+    return this.subtitleSettingsManager;
   }
 
   getConfig(): InternalUIConfig {
@@ -710,6 +736,10 @@ export class UIInstanceManager {
    */
   get onRelease(): EventDispatcher<UIContainer, NoArgs> {
     return this.events.onRelease;
+  }
+
+  get onComponentViewModeChanged(): EventDispatcher<Component<ComponentConfig>, ViewModeChangedEventArgs> {
+    return this.events.onComponentViewModeChanged;
   }
 
   protected clearEventHandlers(): void {
@@ -821,6 +851,8 @@ export interface WrappedPlayer extends PlayerAPI {
 /**
  * Wraps the player to track event handlers and provide a simple method to remove all registered event
  * handlers from the player.
+ *
+ * @category Utils
  */
 export class PlayerWrapper {
 

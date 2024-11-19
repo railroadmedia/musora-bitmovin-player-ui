@@ -4,7 +4,131 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [3.74.0] - 2024-10-24
+
+### Changed
+- Dpad keymap for Android devices
+
+## [3.73.0] - 2024-09-06
+
+### Added
+- `Component` now has a `ViewMode` that can either be `Persistent` or `Temporary`
+
+### Fixed
+- `selectbox` dropdown not closing in Safari when the UI is hidden
+
+### Changed
+- `selectbox` now sets its `ViewMode` to `Persistent` whenever and as long as the select-dropdown is shown
+- `uicontainer` and `settingspanel` will no longer auto-hide if there are any components that are in the `Persistent` view mode
+
+## [3.72.0] - 2024-08-30
+
+### Added
+- Dutch (nl) subtitles
+
+## [3.71.0] - 2024-08-28
+
+### Added
+- Link to API docs in README
+
+## [3.70.0] - 2024-08-21
+
+### Added
+- Support for a new placeholder `{adBreakRemainingTime}` in [AdMessageLabel](https://cdn.bitmovin.com/player/ui/3/docs/classes/AdMessageLabel.html) that displays the remaining time in an ad break. [Documentation](https://cdn.bitmovin.com/player/ui/3/docs/functions/StringUtils.replaceAdMessagePlaceholders.html) on usage.
+
+## [3.69.0] - 2024-08-14
+
+### Added
+- API doc generation and publishing. The API doc from the UI can be found [here](https://cdn.bitmovin.com/player/ui/3/docs/index.html)
+
+## [3.67.0] - 2024-07-03
+
+### Added
+- Missing changelog entries of `3.65.0` and `3.66.0` release versions
+
+## [3.66.0] - 2024-07-01
+
+### Changed
+- Playground demo page to include checkbox to enable/disbale ads
+- Store basic configuration of playground demo page in localStorage
+
+## [3.65.0] - 2024-06-24
+
+### Added
+- Eco Mode toggle button
+
+## [3.64.0] - 2024-05-28
+
+### Added
+- `Component` instances are now assigned to their `HTMLElements` for easier accessing
+
+### Fixed
+- Two touch interactions needed to skip an ad or open the click through link
+
+## [3.63.0] - 2024-05-17
+
+### Added
+- `QuickSeekButton` control bar component for jumping +/- a configurable number of seconds (10 second default)
+
+## [3.62.0] - 2024-05-06
+
+### Fixed
+- No subtitle is shown when switching between different tracks
+
+## [3.61.0] - 2024-04-23
+
+### Fixed
+- `ControlBar` not auto-hiding when `UIConfig.disableAutoHideWhenHovered` is set to `true` on some touch screen devices
+
+## [3.60.0] - 2024-04-16
+
+### Added
+- Type export for `UIVariant` interface
+
+## [3.59.0] - 2024-04-12
+
+### Added
+- `UIContainerConfig.hideImmediatelyOnMouseLeave` to immediately hide the UI when mouse leaves it
+
+### Fixed
+- Triggering UI release after merging a PR from a fork
+
+## [3.58.0] - 2024-04-08
+
+### Added
+- `UIConfig#seekbarSnappingEnabled` config option to enable/disable the play head snapping to markers on the seek bar when seeking near them. Default is `true`.
+
+## [3.57.0] - 2024-03-28
+
+### Added
+- `disableStorageApi` config option
+
+### Fixed
+- Subtitle settings not being retained when the UI variant switches
+
+## [3.56.0] - 2024-03-26
+
+### Changed
+- `localStorage` availability check to not create a test-entry anymore
+
+## [3.55.0] - 2024-03-21
+
+### Added
+- Automatically add compare link in changelog file in relase workflow
+
+### Fixed
+- Missing compare link in the changelog file
+
+## [3.54.0] - 2024-02-01
+
+### Fixed
+- FCC subtitle settings menu showing two options with the same value
+- Invalid release workflow file
+
+## [3.53.0] - 2024-01-03
+
+### Added
+- Automate release on every PR merge to develop
 
 ## [3.52.2] - 2023-11-23
 
@@ -889,6 +1013,28 @@ Version 2.0 of the UI framework is built for player 7.1. If absolutely necessary
 ## 1.0.0 (2017-02-03)
 - First release
 
+[3.74.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.73.0...v3.74.0
+[3.73.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.72.0...v3.73.0
+[3.72.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.71.0...v3.72.0
+[3.71.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.70.0...v3.71.0
+[3.70.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.69.0...v3.70.0
+[3.69.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.67.0...v3.69.0
+[3.68.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.67.0...v3.68.0
+[3.67.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.66.0...v3.67.0
+[3.66.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.65.0...v3.66.0
+[3.65.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.64.0...v3.65.0
+[3.64.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.63.0...v3.64.0
+[3.63.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.62.0...v3.63.0
+[3.62.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.61.0...v3.62.0
+[3.61.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.60.0...v3.61.0
+[3.60.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.59.0...v3.60.0
+[3.59.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.58.0...v3.59.0
+[3.58.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.57.0...v3.58.0
+[3.57.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.56.0...v3.57.0
+[3.56.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.55.0...v3.56.0
+[3.55.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.54.0...v3.55.0
+[3.54.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.53.0...v3.54.0
+[3.53.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.52.2...v3.53.0
 [3.52.2]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.52.1...v3.52.2
 [3.52.1]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.52.0...v3.52.1
 [3.52.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.51.0...v3.52.0
