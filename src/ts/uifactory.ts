@@ -469,7 +469,7 @@ export namespace UIFactory {
     let settingsPanel = new ModernSettingsPanel({
       components: [mainSettingsPanelPage],
       hidden: true,
-      pageTransitionAnimation: false,
+      pageTransitionAnimation: true,
       hideDelay: -1,
     });
 
@@ -553,53 +553,49 @@ export namespace UIFactory {
     let mainSettingsPanelPage: SettingsPanelPage;
 
     const components: Container<ContainerConfig>[] = [
-      new SettingsPanelItem(i18n.getLocalizer('settings.video.quality'), new VideoQualitySelectBox()),
-      new SettingsPanelItem(i18n.getLocalizer('speed'), new PlaybackSpeedSelectBox()),
-      new SettingsPanelItem(i18n.getLocalizer('settings.audio.track'), new AudioTrackSelectBox()),
-      new SettingsPanelItem(i18n.getLocalizer('settings.audio.quality'), new AudioQualitySelectBox()),
+      new ModernSettingsPanelItem(i18n.getLocalizer('settings.video.quality'), new VideoQualitySelectBox()),
+      new ModernSettingsPanelItem(i18n.getLocalizer('speed'), new PlaybackSpeedSelectBox()),
+      new ModernSettingsPanelItem(i18n.getLocalizer('settings.audio.track'), new AudioTrackSelectBox()),
+      new ModernSettingsPanelItem(i18n.getLocalizer('settings.audio.quality'), new AudioQualitySelectBox()),
     ];
 
-    mainSettingsPanelPage = new SettingsPanelPage({
+    mainSettingsPanelPage = new ModernSettingsPanelPage({
       components,
     });
 
-    let settingsPanel = new SettingsPanel({
+    let settingsPanel = new ModernSettingsPanel({
       components: [mainSettingsPanelPage],
       hidden: true,
+      pageTransitionAnimation: true,
     });
 
-    let subtitleSettingsPanelPage = new SubtitleSettingsPanelPage({
-      settingsPanel: settingsPanel,
-      overlay: subtitleOverlay,
-    });
+    // let subtitleSettingsPanelPage = new SubtitleSettingsPanelPage({
+    //   settingsPanel: settingsPanel,
+    //   overlay: subtitleOverlay,
+    // });
+    //
+    // let subtitleSettingsOpenButton = new SettingsPanelPageOpenButton({
+    //   targetPage: subtitleSettingsPanelPage,
+    //   container: settingsPanel,
+    //   ariaLabel: i18n.getLocalizer('settings.subtitles'),
+    //   text: i18n.getLocalizer('open'),
+    // });
 
     const subtitleSelectBox = new SubtitleSelectBox();
-
-    let subtitleSettingsOpenButton = new SettingsPanelPageOpenButton({
-      targetPage: subtitleSettingsPanelPage,
-      container: settingsPanel,
-      ariaLabel: i18n.getLocalizer('settings.subtitles'),
-      text: i18n.getLocalizer('open'),
-    });
-
-    mainSettingsPanelPage.addComponent(
-      new SettingsPanelItem(
-        new SubtitleSettingsLabel({
-          text: i18n.getLocalizer('settings.subtitles'),
-          opener: subtitleSettingsOpenButton,
-        }),
-        subtitleSelectBox,
-        {
-          role: 'menubar',
-        },
-      ),
+    let subtitleSelectItem = new ModernSettingsPanelItem(
+      new Label({ text: i18n.getLocalizer('settings.subtitles') } as LabelConfig),
+      subtitleSelectBox,
+      null,
+      {
+        role: 'menubar',
+      },
     );
+    mainSettingsPanelPage.addComponent(subtitleSelectItem);
 
-    settingsPanel.addComponent(subtitleSettingsPanelPage);
+    // settingsPanel.addComponent(subtitleSettingsPanelPage);
 
     let controlBar = new ControlBar({
       components: [
-        settingsPanel,
         new Container({
           components: [
             new PlaybackTimeLabel({
@@ -642,6 +638,7 @@ export namespace UIFactory {
         new TitleBar(),
         new RecommendationOverlay(),
         new Watermark(),
+        settingsPanel,
         new ErrorMessageOverlay(),
       ],
       hideDelay: 2000,
@@ -650,7 +647,7 @@ export namespace UIFactory {
         PlayerUtils.PlayerState.Paused,
         PlayerUtils.PlayerState.Finished,
       ],
-      cssClasses: ['ui-skin-modern', 'ui-skin-super-modern'],
+      cssClasses: ['ui-skin-super-modern'],
     });
   }
 
