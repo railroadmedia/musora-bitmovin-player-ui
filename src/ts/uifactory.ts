@@ -602,7 +602,7 @@ export namespace UIFactory {
               timeLabelMode: PlaybackTimeLabelMode.CurrentTime,
               hideInLivePlayback: true,
             }),
-            new SeekBar({ label: new SeekBarLabel() }),
+            new SeekBar({ label: new SeekBarLabel(), renderSeekBarPlaybackPositionMarkerInOuterSeekBar: true }),
             new PlaybackTimeLabel({
               timeLabelMode: PlaybackTimeLabelMode.TotalTime,
               cssClasses: ['text-right'],
@@ -614,7 +614,7 @@ export namespace UIFactory {
           components: [
             new PlaybackToggleButton(),
             new VolumeToggleButton(),
-            new VolumeSlider(),
+            new VolumeSlider({ renderSeekBarPlaybackPositionMarkerInOuterSeekBar: true }),
             new Spacer(),
             new PictureInPictureToggleButton(),
             new AirPlayToggleButton(),
