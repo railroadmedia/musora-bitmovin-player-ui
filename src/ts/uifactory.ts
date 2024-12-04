@@ -517,12 +517,9 @@ export namespace UIFactory {
     return new UIContainer({
       components: [
         subtitleOverlay,
-
+        new BufferingOverlay(),
         new CastStatusOverlay(),
-        // TODO: make an overlay for the quickseek buttons/double tab
         new TouchControlOverlay(),
-        // TODO: make a new buffer overlay
-        // new BufferingOverlay(),
         new RecommendationOverlay(),
         controlBar,
         new TitleBar({
@@ -531,7 +528,6 @@ export namespace UIFactory {
             new CastToggleButton(),
             new AirPlayToggleButton(),
             new VRToggleButton(),
-            // TODO: make a Share button
           ],
         }),
         settingsPanel,
