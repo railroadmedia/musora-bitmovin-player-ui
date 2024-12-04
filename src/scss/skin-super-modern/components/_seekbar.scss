@@ -1,7 +1,7 @@
 @import '../variables';
 @import '../mixins';
 
-$seekbar-height: .3em;
+$seekbar-height: .3125em;
 
 // sass-lint:disable no-vendor-prefixes
 %bar {
@@ -25,19 +25,19 @@ $seekbar-height: .3em;
   @include focusable;
 
   align-items: center;
-  display: flex;
+  font-size: 1em;
+  //display: flex;
   height: 1em;
-  justify-content: center;
-  margin: 0 .5em;
+  //justify-content: center;
+  //margin: 0 .5em;
   position: relative;
   width: 100%;
 
   $bar-inset: auto;
-
   .#{$prefix}-seekbar-playbackposition-marker {
     @extend %bar;
 
-    @include seekbar-position-marker($seekbar-height * 2.2);
+    @include seekbar-position-marker($seekbar-height * 3);
     background-color: $color-highlight;
     border-radius: 50%;
     box-shadow: 0 0 3px 0 transparentize($color: #000, $amount: .75);

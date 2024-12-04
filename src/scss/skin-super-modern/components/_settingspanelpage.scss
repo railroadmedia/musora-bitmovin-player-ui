@@ -11,8 +11,8 @@
   .#{$prefix}-container-wrapper > * {
     &.#{$prefix}-ui-label {
       display: inline-block;
-      font-size: .6em;
-      font-weight: 600;
+      font-size: .8em;
+      font-weight: 500;
       margin: 0;
       text-align: justify;
       width: 45%;
@@ -74,8 +74,8 @@
   }
 
   .#{$prefix}-ui-settings-panel-item {
-    height: 20px;
-    padding: 0 .4em;
+    //height: 20px;
+    padding: .5em .7em;
     white-space: nowrap;
 
     &:hover {
