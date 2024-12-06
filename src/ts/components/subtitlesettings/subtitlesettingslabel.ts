@@ -1,4 +1,4 @@
-import {LabelConfig} from '../label';
+import { Label, LabelConfig } from '../label';
 import {Container, ContainerConfig} from '../container';
 import {DOM} from '../../dom';
 import {SettingsPanelPageOpenButton} from '../settingspanelpageopenbutton';
@@ -16,9 +16,9 @@ export interface SubtitleSettingsLabelConfig extends LabelConfig {
  */
 export class SubtitleSettingsLabel extends Container<ContainerConfig> {
 
-  private opener: SettingsPanelPageOpenButton;
+  readonly opener: SettingsPanelPageOpenButton;
 
-  private text: LocalizableText;
+  readonly text: LocalizableText;
 
   private for: string;
 
@@ -30,23 +30,24 @@ export class SubtitleSettingsLabel extends Container<ContainerConfig> {
     this.for = config.for;
 
     this.config = this.mergeConfig(<ContainerConfig>config, {
-      cssClass: 'ui-label',
+      // cssClass: 'ui-label',
       components: [
+        new Label({ text: this.text, for: this.for } as LabelConfig),
         this.opener,
       ],
     }, this.config);
   }
 
-  protected toDomElement(): DOM {
-    let labelElement = new DOM('label', {
-      'id': this.config.id,
-      'class': this.getCssClasses(),
-      'for': this.for,
-    }, this).append(
-      new DOM('span', {}).html(i18n.performLocalization(this.text)),
-      this.opener.getDomElement(),
-    );
-
-    return labelElement;
-  }
+  // protected toDomElement(): DOM {
+  //   let labelElement = new DOM('label', {
+  //     'id': this.config.id,
+  //     'class': this.getCssClasses(),
+  //     'for': this.for,
+  //   }, this).append(
+  //     new DOM('span', {}).html(i18n.performLocalization(this.text)),
+  //     this.opener.getDomElement(),
+  //   );
+  //
+  //   return labelElement;
+  // }
 }

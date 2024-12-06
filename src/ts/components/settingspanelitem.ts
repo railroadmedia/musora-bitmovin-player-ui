@@ -11,6 +11,12 @@ import {PlaybackSpeedSelectBox} from './playbackspeedselectbox';
 import { PlayerAPI } from 'bitmovin-player';
 import { LocalizableText } from '../localization/i18n';
 
+export interface SettingsPanelItemConfig extends ContainerConfig {
+  label?: LocalizableText | Component<ComponentConfig>;
+  setting: Component<ComponentConfig>;
+  addSettingAsComponent?: boolean;
+}
+
 /**
  * An item for a {@link SettingsPanelPage},
  * Containing an optional {@link Label} and a component that configures a setting.
@@ -18,35 +24,38 @@ import { LocalizableText } from '../localization/i18n';
  *
  * @category Components
  */
-export class SettingsPanelItem extends Container<ContainerConfig> {
+export class SettingsPanelItem<Config extends SettingsPanelItemConfig> extends Container<Config> {
 
   private label: Component<ComponentConfig>;
   protected setting: Component<ComponentConfig>;
 
   private settingsPanelItemEvents = {
-    onActiveChanged: new EventDispatcher<SettingsPanelItem, NoArgs>(),
+    onActiveChanged: new EventDispatcher<SettingsPanelItem<Config>, NoArgs>(),
   };
 
-  constructor(label: LocalizableText | Component<ComponentConfig>, setting: Component<ComponentConfig>, config: ContainerConfig = {}, addSettingAsComponent: boolean = true) {
-    super(config);
+  constructor(config: SettingsPanelItemConfig) {
+    super(config as Config);
 
-    this.setting = setting;
+    this.setting = config.setting;
 
-    this.config = this.mergeConfig(config, {
+    // TODO: this feels ugly -> typescript weak type problem (no matching property from parent)
+    this.config = this.mergeConfig<Config>(config as Config, {
       cssClass: 'ui-settings-panel-item',
       role: 'menuitem',
-    }, this.config);
+      addSettingAsComponent: true,
+    } as Config, this.config as Config);
 
+    const label = config.label;
     if (label !== null) {
       if (label instanceof Component) {
         this.label = label;
       } else {
-        this.label = new Label({ text: label, for: this.setting.getConfig() ? this.setting.getConfig().id : this.getConfig().id } as LabelConfig);
+        this.label = new Label({ text: label } as LabelConfig);
       }
       this.addComponent(this.label);
     }
 
-    if (addSettingAsComponent) {
+    if (config.addSettingAsComponent) {
       this.addComponent(this.setting);
     }
   }
@@ -110,9 +119,10 @@ export class SettingsPanelItem extends Container<ContainerConfig> {
    * @see #isActive
    * @returns {Event<SettingsPanelItem, NoArgs>}
    */
-  get onActiveChanged(): Event<SettingsPanelItem, NoArgs> {
+  get onActiveChanged(): Event<SettingsPanelItem<Config>, NoArgs> {
     return this.settingsPanelItemEvents.onActiveChanged.getEvent();
   }
+
   get getLabel(): Component<ComponentConfig> {
     return this.label;
   }

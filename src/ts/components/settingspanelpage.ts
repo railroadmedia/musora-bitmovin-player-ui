@@ -1,5 +1,5 @@
 import {Container, ContainerConfig} from './container';
-import {SettingsPanelItem} from './settingspanelitem';
+import { SettingsPanelItem, SettingsPanelItemConfig } from './settingspanelitem';
 import {UIInstanceManager} from '../uimanager';
 import {Event, EventDispatcher, NoArgs} from '../eventdispatcher';
 import { PlayerAPI } from 'bitmovin-player';
@@ -63,8 +63,8 @@ export class SettingsPanelPage extends Container<ContainerConfig> {
     return false;
   }
 
-  getItems(): SettingsPanelItem[] {
-    return <SettingsPanelItem[]>this.config.components.filter(component => component instanceof SettingsPanelItem);
+  getItems(): SettingsPanelItem<SettingsPanelItemConfig>[] {
+    return <SettingsPanelItem<SettingsPanelItemConfig>[]>this.config.components.filter(component => component instanceof SettingsPanelItem);
   }
 
   onSettingsStateChangedEvent() {

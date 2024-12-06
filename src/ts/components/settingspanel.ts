@@ -4,7 +4,7 @@ import { UIInstanceManager } from '../uimanager';
 import { Timeout } from '../timeout';
 import { Event, EventDispatcher, NoArgs } from '../eventdispatcher';
 import { SettingsPanelPage } from './settingspanelpage';
-import { SettingsPanelItem } from './settingspanelitem';
+import { SettingsPanelItem, SettingsPanelItemConfig } from './settingspanelitem';
 import { PlayerAPI } from 'bitmovin-player';
 import { Component, ComponentConfig } from './component';
 
@@ -111,6 +111,15 @@ export class SettingsPanel extends Container<SettingsPanelConfig> {
       this.getDomElement().on('focusout', () => {
         this.hideTimeout.reset();
       });
+    }
+
+    if (config.pageTransitionAnimation) {
+      const handleResize = () => {
+        // Reset the dimension of the settingsPanel to let the browser calculate the new dimension after resizing
+        this.getDomElement().css({ width: '', height: '' });
+      };
+
+      player.on(player.exports.PlayerEvent.PlayerResized, handleResize);
     }
 
     this.onHide.subscribe(() => {
@@ -300,8 +309,8 @@ export class SettingsPanel extends Container<SettingsPanelConfig> {
     this.animateNavigation(targetPage, sourcePage, skipAnimation);
 
     this.updateActivePageClass();
-    targetPage.onActiveEvent();
     sourcePage.onInactiveEvent();
+    targetPage.onActiveEvent();
   }
 
   /**
@@ -321,6 +330,7 @@ export class SettingsPanel extends Container<SettingsPanelConfig> {
     const settingsPanelHTMLElement = this.getDomElement().get(0);
 
     // get current dimension
+    // TODO: handle resizing properly
     const settingsPanelWidth = settingsPanelHTMLElement.scrollWidth;
     const settingsPanelHeight = settingsPanelHTMLElement.scrollHeight;
 
@@ -383,8 +393,8 @@ export class SettingsPanel extends Container<SettingsPanelConfig> {
   }
 
   // collect all items from all pages (see hideHoveredSelectBoxes)
-  private getComputedItems(): SettingsPanelItem[] {
-    const allItems: SettingsPanelItem[] = [];
+  private getComputedItems(): SettingsPanelItem<SettingsPanelItemConfig>[] {
+    const allItems: SettingsPanelItem<SettingsPanelItemConfig>[] = [];
     for (let page of this.getPages()) {
       allItems.push(...page.getItems());
     }

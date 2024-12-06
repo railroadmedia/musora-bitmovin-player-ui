@@ -747,6 +747,8 @@ export class SeekBar extends Component<SeekBarConfig> {
       this.onSeekedEvent(targetPercentage);
     };
 
+    // TODO: the problem is that the SeekbarLabel is also inside the seekbarContainer and therefore reacts to the
+    // TODO: mouse inputs.
     let domElementToListen: DOM = this.config.renderSeekBarPlaybackPositionMarkerInOuterSeekBar ? seekBarContainer : seekBar;
 
     // A seek always start with a touchstart or mousedown directly on the seekbar.

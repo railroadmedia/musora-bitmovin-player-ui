@@ -339,7 +339,7 @@ export class Component<Config extends ComponentConfig> {
    * @param base configuration inherited from a superclass
    * @returns {Config}
    */
-  protected mergeConfig<Config>(config: Config, defaults: Config, base: Config): Config {
+  protected mergeConfig<Config>(config: Config, defaults: Partial<Config>, base: Config): Config {
     // Extend default config with supplied config
     let merged = Object.assign({}, base, defaults, config);
 

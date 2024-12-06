@@ -5,6 +5,7 @@ import { PlayerAPI } from 'bitmovin-player';
 import { ModernSettingsPanelItem } from './modernsettingspanelitem';
 import { SettingsPanelPage } from './settingspanelpage';
 
+// TODO: needed?
 /**
  * A panel containing a list of {@link ModernSettingsPanelItem items} that represent labelled settings.
  */
@@ -27,15 +28,12 @@ export class ModernSettingsPanelPage extends SettingsPanelPage {
   configure(player: PlayerAPI, uimanager: UIInstanceManager): void {
     super.configure(player, uimanager);
 
-    for (let component of this.getItems()) {
-      (<ModernSettingsPanelItem>component).getOnDisplaySubPage.subscribe((_, args: ModernSettingsPanelPage) => this.requestsDisplaySubMenu(this, args));
-      (<ModernSettingsPanelItem>component).getOnRequestNavigateBack.subscribe(() => this.modernSettingsPanelPageEvents.onRequestsNavigateBack.dispatch(this));
-      (<ModernSettingsPanelItem>component).onItemSelect.subscribe(() => {
-        for (let component of this.getItems()) {
-          component.getLabel.getDomElement().removeClass(this.prefixCss('selected'));
-        }
-      });
-    }
+    // for (let component of this.getItems()) {
+    //   if (component instanceof ModernSettingsPanelItem) {
+    //     component.getOnDisplaySubPage.subscribe((_, args: ModernSettingsPanelPage) => this.requestsDisplaySubMenu(this, args));
+    //     component.getOnRequestNavigateBack.subscribe(() => this.modernSettingsPanelPageEvents.onRequestsNavigateBack.dispatch(this));
+    //   }
+    // }
   }
 
   requestsDisplaySubMenu<Sender, Args>(_: Sender, args: ModernSettingsPanelPage) {

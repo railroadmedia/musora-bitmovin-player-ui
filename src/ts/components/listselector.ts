@@ -57,7 +57,7 @@ export interface ListSelectorConfig extends ComponentConfig {
 export abstract class ListSelector<Config extends ListSelectorConfig> extends Component<ListSelectorConfig> {
 
   protected items: ListItem[];
-  protected selectedItem: string;
+  protected selectedItem: string | null = null;
 
   private listSelectorEvents = {
     onItemAdded: new EventDispatcher<ListSelector<Config>, string>(),
@@ -191,7 +191,7 @@ export abstract class ListSelector<Config extends ListSelectorConfig> extends Co
    * @param key the key of the item to return
    * @returns {ListItem} the item with the requested key. Undefined if no item with the given key exists.
    */
-  getItemForKey(key: string): ListItem {
+  getItemForKey(key: string): ListItem | null {
     return this.items.find((item) => item.key === key);
   }
 

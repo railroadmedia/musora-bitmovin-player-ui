@@ -15,7 +15,6 @@
       font-weight: 500;
       margin: 0;
       text-align: justify;
-      width: 45%;
     }
 
     &.#{$prefix}-ui-label-setting-selected-option {
@@ -40,32 +39,6 @@
       font-weight: normal;
     }
 
-    &.#{$prefix}-heading {
-      &::before {
-        background-image: url('../../assets/skin-super-modern/images/angle-left.svg');
-        background-repeat: no-repeat;
-        background-size: 1.5em auto;
-        content: ' ';
-        display: inline-block;
-        height: 1.5em;
-        vertical-align: -.4em;
-        width: 1.5em;
-      }
-    }
-
-    &.#{$prefix}-selected {
-      &::before {
-        background-image: url('../../assets/skin-super-modern/images/check.svg');
-        background-repeat: no-repeat;
-        background-size: 1.5em auto;
-        content: ' ';
-        display: inline-block;
-        height: 1.5em;
-        vertical-align: -.4em;
-        width: 1.5em;
-      }
-    }
-
     // Controls (e.g. selectbox)
     &.#{$prefix}-ui-selectbox {
       margin-left: 10%;
@@ -74,7 +47,6 @@
   }
 
   .#{$prefix}-ui-settings-panel-item {
-    //height: 20px;
     padding: .5em .7em;
     white-space: nowrap;
 
@@ -91,6 +63,91 @@
       display: flex;
       height: 100%;
       width: 100%;
+    }
+  }
+
+  // TODO: de-duplicate this
+  .#{$prefix}-ui-settings-panel-item-select-option {
+    padding: .5em .7em;
+    white-space: nowrap;
+
+    &:hover {
+      background-color: transparentize($color-item-hover, .15);
+    }
+
+    &.#{$prefix}-hidden {
+      display: none;
+    }
+
+    .#{$prefix}-container-wrapper {
+      align-items: center;
+      display: flex;
+      height: 100%;
+      width: 100%;
+    }
+
+    &.#{$prefix}-selected {
+      .#{$prefix}-ui-label {
+        &::before {
+          background-image: url('../../assets/skin-super-modern/images/check.svg');
+          background-repeat: no-repeat;
+          background-size: 1.5em auto;
+          content: ' ';
+          display: inline-block;
+          height: 1.5em;
+          vertical-align: -.4em;
+          width: 1.5em;
+        }
+      }
+    }
+  }
+
+  // TODO: de-duplicate this
+  .#{$prefix}-ui-settings-panel-item-back {
+    @extend %ui-button;
+
+    border-bottom: 1px solid transparentize($color-item-hover, .15);;
+    padding: .5em .7em;
+    white-space: nowrap;
+
+    &:active {
+      transform: unset;
+    }
+
+    &:hover {
+      background-color: transparentize($color-item-hover, .15);
+    }
+
+    &.#{$prefix}-hidden {
+      display: none;
+    }
+
+    //.#{$prefix}-container-wrapper {
+      align-items: center;
+      display: flex;
+      height: 100%;
+      width: 100%;
+    //}
+
+    .#{$prefix}-label {
+      // TODO: de-duplicate this with the -ui-label from above
+      display: inline-block;
+      font-size: .8em;
+      font-weight: 500;
+      margin: 0;
+      text-align: justify;
+      width: 45%;
+
+      &::before {
+        background-image: url('../../assets/skin-super-modern/images/angle-left.svg');
+        background-repeat: no-repeat;
+        background-size: 1.5em auto;
+        content: ' ';
+        display: inline-block;
+        height: 1.5em;
+        vertical-align: -.4em;
+        width: 1.5em;
+      }
     }
   }
 }
