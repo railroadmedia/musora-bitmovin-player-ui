@@ -10,14 +10,17 @@ import { SettingsPanelPage } from './settingspanelpage';
  * A panel containing a list of {@link ModernSettingsPanelItem items} that represent labelled settings.
  */
 export class ModernSettingsPanelPage extends SettingsPanelPage {
+  readonly isDynamic: boolean;
 
   private modernSettingsPanelPageEvents = {
     onRequestsDisplaySubPage: new EventDispatcher<ModernSettingsPanelPage, ModernSettingsPanelPage>(),
     onRequestsNavigateBack: new EventDispatcher<ModernSettingsPanelPage, ModernSettingsPanelPage>(),
   };
 
-  constructor(config: ContainerConfig) {
+  constructor(config: ContainerConfig, isDynamic: boolean = false) {
     super(config);
+
+    this.isDynamic = isDynamic;
 
     this.config = this.mergeConfig<ContainerConfig>(config, {
       cssClass: 'ui-settings-panel-page',

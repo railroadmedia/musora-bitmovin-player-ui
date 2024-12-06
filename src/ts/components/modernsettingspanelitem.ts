@@ -108,7 +108,7 @@ export class ModernSettingsPanelItem extends SettingsPanelItem<ModernSettingsPan
 
   private buildSubPanelPage(): ModernSettingsPanelPage {
     const menuOptions = this.setting.getItems();
-    const page = new ModernSettingsPanelPage({});
+    const page = new ModernSettingsPanelPage({}, true);
 
     const text = this.config.label instanceof SubtitleSettingsLabel ? this.config.label.text : this.config.label;
 

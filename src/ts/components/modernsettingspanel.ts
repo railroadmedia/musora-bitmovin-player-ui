@@ -6,4 +6,15 @@ export class ModernSettingsPanel extends SettingsPanel {
     this.addComponent(page);
     this.updateComponents();
   }
+
+  popSettingsPanelPage() {
+    const currentActivePage = this.getActivePage();
+
+    super.popSettingsPanelPage();
+
+    if (currentActivePage instanceof ModernSettingsPanelPage && currentActivePage.isDynamic) {
+      this.removeComponent(currentActivePage);
+      this.updateComponents();
+    }
+  }
 }
