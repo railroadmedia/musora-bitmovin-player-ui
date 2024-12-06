@@ -97,9 +97,11 @@ export class SettingsPanel extends Container<SettingsPanelConfig> {
         this.hide();
         this.hideHoveredSelectBoxes();
       });
-      this.getDomElement().on('mouseenter', () => {
-        // On mouse enter clear the timeout
-        this.hideTimeout.clear();
+      this.getDomElement().on('mouseenter mousemove', () => {
+        // On mouse enter and mouse move clear the timeout
+        if (this.hideTimeout.isActive()) {
+          this.hideTimeout.clear();
+        }
       });
       this.getDomElement().on('mouseleave', () => {
         // On mouse leave activate the timeout
