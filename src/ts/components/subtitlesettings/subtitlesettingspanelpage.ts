@@ -1,7 +1,6 @@
 import { SettingsPanelPage, SettingsPanelPageConfig } from '../settingspanelpage';
 import {SettingsPanel} from '../settingspanel';
 import {SubtitleOverlay} from '../subtitleoverlay';
-import {ContainerConfig} from '../container';
 import {Component, ComponentConfig} from '../component';
 import {FontSizeSelectBox} from './fontsizeselectbox';
 import {FontFamilySelectBox} from './fontfamilyselectbox';
@@ -18,7 +17,7 @@ import {SettingsPanelPageBackButton} from '../settingspanelpagebackbutton';
 import {SettingsPanelItem} from '../settingspanelitem';
 import { PlayerAPI } from 'bitmovin-player';
 import { i18n } from '../../localization/i18n';
-import { ModernSettingsPanelItem } from '../modernsettingspanelitem';
+import { DynamicSettingsPanelItem } from '../dynamicsettingspanelitem';
 
 /**
  * @category Configs
@@ -51,63 +50,63 @@ export class SubtitleSettingsPanelPage extends SettingsPanelPage {
           setting: new SubtitleSettingsResetButton({}),
           cssClasses: ['title-item'],
         }),
-        new ModernSettingsPanelItem({
+        new DynamicSettingsPanelItem({
           label: i18n.getLocalizer('settings.subtitles.font.size'),
           setting: new FontSizeSelectBox({
             overlay: this.overlay,
           }),
           container: this.settingsPanel,
         }),
-        new ModernSettingsPanelItem({
+        new DynamicSettingsPanelItem({
           label: i18n.getLocalizer('settings.subtitles.font.family'),
           setting: new FontFamilySelectBox({
             overlay: this.overlay,
           }),
           container: this.settingsPanel,
         }),
-        new ModernSettingsPanelItem({
+        new DynamicSettingsPanelItem({
           label: i18n.getLocalizer('settings.subtitles.font.color'),
           setting: new FontColorSelectBox({
             overlay: this.overlay,
           }),
           container: this.settingsPanel,
         }),
-        new ModernSettingsPanelItem({
+        new DynamicSettingsPanelItem({
           label: i18n.getLocalizer('settings.subtitles.font.opacity'),
           setting: new FontOpacitySelectBox({
             overlay: this.overlay,
           }),
           container: this.settingsPanel,
         }),
-        new ModernSettingsPanelItem({
+        new DynamicSettingsPanelItem({
           label: i18n.getLocalizer('settings.subtitles.characterEdge'),
           setting: new CharacterEdgeSelectBox({
             overlay: this.overlay,
           }),
           container: this.settingsPanel,
         }),
-        new ModernSettingsPanelItem({
+        new DynamicSettingsPanelItem({
           label: i18n.getLocalizer('settings.subtitles.background.color'),
           setting: new BackgroundColorSelectBox({
             overlay: this.overlay,
           }),
           container: this.settingsPanel,
         }),
-        new ModernSettingsPanelItem({
+        new DynamicSettingsPanelItem({
           label: i18n.getLocalizer('settings.subtitles.background.opacity'),
           setting: new BackgroundOpacitySelectBox({
             overlay: this.overlay,
           }),
           container: this.settingsPanel,
         }),
-        new ModernSettingsPanelItem({
+        new DynamicSettingsPanelItem({
           label: i18n.getLocalizer('settings.subtitles.window.color'),
           setting: new WindowColorSelectBox({
             overlay: this.overlay,
           }),
           container: this.settingsPanel,
         }),
-        new ModernSettingsPanelItem({
+        new DynamicSettingsPanelItem({
           label: i18n.getLocalizer('settings.subtitles.window.opacity'),
           setting: new WindowOpacitySelectBox({
             overlay: this.overlay,

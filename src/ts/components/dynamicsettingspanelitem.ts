@@ -1,12 +1,11 @@
 import { Label, LabelConfig } from './label';
 import {UIInstanceManager} from '../uimanager';
-import {SelectBox} from './selectbox';
 import { PlayerAPI } from 'bitmovin-player';
 import { LocalizableText } from '../localization/i18n';
 import { ListSelector, ListSelectorConfig } from './listselector';
 import { SubtitleSelectBox } from './subtitleselectbox';
 import { SettingsPanelItem, SettingsPanelItemConfig } from './settingspanelitem';
-import { ModernSettingsPanelSelectOption } from './modernsettingspanelselectoption';
+import { SettingsPanelSelectOption } from './settingspanelselectoption';
 import { SettingsPanelPage } from './settingspanelpage';
 import { SubtitleSettingsLabel } from './subtitlesettings/subtitlesettingslabel';
 import { SettingsPanel } from './settingspanel';
@@ -14,30 +13,39 @@ import { SettingsPanelPageBackButton } from './settingspanelpagebackbutton';
 import { SubtitleSettingSelectBox } from './subtitlesettings/subtitlesettingselectbox';
 
 /**
- * An item for a {@link ModernSettingsPanelPage},
- * Containing an optional {@link Label} and a component that configures a setting.
- * If the components is a {@link SelectBox} it will handle the logic of displaying it or not
+ * Configuration interface for a {@link DynamicSettingsPanelItem}.
+ *
+ * @category Configs
  */
-export interface ModernSettingsPanelItemConfig extends SettingsPanelItemConfig {
+export interface DynamicSettingsPanelItemConfig extends SettingsPanelItemConfig {
+  /**
+   * The label component or the text for the label.
+   */
   label: LocalizableText | SubtitleSettingsLabel;
+  /**
+   * The list selector component which will be used to build the sub page.
+   */
   setting: ListSelector<ListSelectorConfig>;
+  /**
+   * The enclosing {@link SettingsPanel} where the sub page will be added.
+   */
   container: SettingsPanel;
 }
 
-export class ModernSettingsPanelItem extends SettingsPanelItem<ModernSettingsPanelItemConfig> {
-
-  /**
-   * If setting is null, that means that the item is not an option and does not
-   * have a submenu. So if setting is null we can assume that the item should be
-   * used as a back button
-   */
+/**
+ * A dynamic settings panel item which can build a sub page with the items of a {@link ListSelector}.
+ * The page will be dynamically added and removed from the {@link SettingsPanel}.
+*
+ * @category Components
+ */
+export class DynamicSettingsPanelItem extends SettingsPanelItem<DynamicSettingsPanelItemConfig> {
   private selectedOptionLabel: Label<LabelConfig>;
   protected setting: ListSelector<ListSelectorConfig>;
 
   private player: PlayerAPI;
   private uimanager: UIInstanceManager;
 
-  constructor(config: ModernSettingsPanelItemConfig) {
+  constructor(config: DynamicSettingsPanelItemConfig) {
     // TODO: is that the way? -> Should this happen in configure? -> I think so
     config.addSettingAsComponent = false;
 
@@ -120,7 +128,7 @@ export class ModernSettingsPanelItem extends SettingsPanelItem<ModernSettingsPan
 
     menuOptions
       .map((option) => {
-        return new ModernSettingsPanelSelectOption({
+        return new SettingsPanelSelectOption({
           label: option.label,
           setting: this.setting,
           settingsValue: option.key,

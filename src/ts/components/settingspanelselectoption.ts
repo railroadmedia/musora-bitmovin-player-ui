@@ -3,18 +3,33 @@ import { PlayerAPI } from 'bitmovin-player';
 import { UIInstanceManager } from '../uimanager';
 import { ListSelector, ListSelectorConfig } from './listselector';
 
-export interface ModernSettingsPanelSelectOptionConfig extends SettingsPanelItemConfig {
+/**
+ * Configuration interface for a {@link SettingsPanelSelectOption}.
+ *
+ * @category Configs
+ */
+export interface SettingsPanelSelectOptionConfig extends SettingsPanelItemConfig {
+  /**
+   * The setting that will be changed when this option is clicked.
+   */
   setting: ListSelector<ListSelectorConfig>;
+  /**
+   * The value of the setting that will be selected when this option is clicked.
+   */
   settingsValue: string | undefined;
-  autoCloseOnSelect?: boolean;
 }
 
-export class ModernSettingsPanelSelectOption extends SettingsPanelItem<ModernSettingsPanelSelectOptionConfig> {
-
+/**
+ * A custom select option for a {@link ListSelector} option.
+ * Is used for building dynamic sub pages from a {@link DynamicSettingsPanelItem}.
+ *
+ * @category Components
+ */
+export class SettingsPanelSelectOption extends SettingsPanelItem<SettingsPanelSelectOptionConfig> {
   private settingsValue: string | undefined;
   protected setting: ListSelector<ListSelectorConfig>;
 
-  constructor(config: ModernSettingsPanelSelectOptionConfig) {
+  constructor(config: SettingsPanelSelectOptionConfig) {
     super(config);
 
     this.settingsValue = config.settingsValue;
@@ -22,7 +37,7 @@ export class ModernSettingsPanelSelectOption extends SettingsPanelItem<ModernSet
     this.config = this.mergeConfig(config, {
       cssClasses: ['ui-settings-panel-item-select-option'],
       role: 'menuitem',
-    } as ModernSettingsPanelSelectOptionConfig, this.config);
+    } as SettingsPanelSelectOptionConfig, this.config);
   }
 
   configure(player: PlayerAPI, uimanager: UIInstanceManager) {
