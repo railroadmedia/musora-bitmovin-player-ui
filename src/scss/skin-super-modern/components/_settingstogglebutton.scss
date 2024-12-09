@@ -15,6 +15,6 @@
   background-image: url('../../assets/skin-super-modern/images/setting.svg');
 
   &.#{$prefix}-on {
-    background-image: url('../../assets/skin-super-modern/images/setting.svg');
+    transform: rotate(30deg);
   }
 }

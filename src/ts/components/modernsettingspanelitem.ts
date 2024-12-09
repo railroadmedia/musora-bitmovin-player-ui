@@ -115,7 +115,6 @@ export class ModernSettingsPanelItem extends SettingsPanelItem<ModernSettingsPan
     const backButton = new SettingsPanelPageBackButton({
       text: text,
       container: this.config.container,
-      cssClasses: ['ui-settings-panel-item-back'],
     });
     backButton.configure(this.player, this.uimanager);
     const backSettingsPanelItem = new SettingsPanelItem({
