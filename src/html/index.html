@@ -602,6 +602,11 @@
       .animate({ height: maxHeight }, 1000)
       .animate({ height: initialHeight }, 1000);
     },
+    'Show Buffering overlay': function() {
+      const player = uiManager.currentUi.playerWrapper.getPlayer();
+
+      player.fireEventInUI(bitmovin.player.PlayerEvent.StallStarted, {});
+    }
   };
   $.each(actions, function(title, handler) {
     $('#actions').append($('<button type="button" class="btn btn-primary btn-sm">' + title + '</button>').click(function() {printResult(handler(), title);})).append(' ');
