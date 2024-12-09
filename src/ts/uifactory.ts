@@ -1,6 +1,6 @@
 import { SubtitleOverlay } from './components/subtitleoverlay';
-import { SettingsPanelPage } from './components/settingspanelpage';
-import { SettingsPanelItem, SettingsPanelItemConfig } from './components/settingspanelitem';
+import { SettingsPanelPage, SettingsPanelPageConfig } from './components/settingspanelpage';
+import { SettingsPanelItem } from './components/settingspanelitem';
 import { VideoQualitySelectBox } from './components/videoqualityselectbox';
 import { PlaybackSpeedSelectBox } from './components/playbackspeedselectbox';
 import { AudioTrackSelectBox } from './components/audiotrackselectbox';
@@ -39,7 +39,7 @@ import { AdSkipButton } from './components/adskipbutton';
 import { CloseButton } from './components/closebutton';
 import { MetadataLabel, MetadataLabelContent } from './components/metadatalabel';
 import { PlayerUtils } from './playerutils';
-import { Label, LabelConfig } from './components/label';
+import { Label } from './components/label';
 import { CastUIContainer } from './components/castuicontainer';
 import { UIConditionContext, UIManager } from './uimanager';
 import { UIConfig } from './uiconfig';
@@ -51,10 +51,7 @@ import { SpatialNavigation } from './spatialnavigation/spatialnavigation';
 import { RootNavigationGroup } from './spatialnavigation/rootnavigationgroup';
 import { ListNavigationGroup, ListOrientation } from './spatialnavigation/ListNavigationGroup';
 import { EcoModeContainer } from './components/ecomodecontainer';
-import { SubtitleToggleButton } from './components/subtitletogglebutton';
 import { ModernSettingsPanelItem } from './components/modernsettingspanelitem';
-import { ModernSettingsPanelPage } from './components/modernsettingspanelpage';
-import { ModernSettingsPanel } from './components/modernsettingspanel';
 import { TouchControlOverlay } from './components/touchcontroloverlay';
 
 export namespace UIFactory {
@@ -453,14 +450,14 @@ export namespace UIFactory {
   export function superModernMobileUI() {
     let subtitleOverlay = new SubtitleOverlay();
 
-    let settingsPanel = new ModernSettingsPanel({
+    let settingsPanel = new SettingsPanel({
       components: [],
       hidden: true,
       pageTransitionAnimation: true,
       hideDelay: -1,
     });
 
-    let mainSettingsPanelPage = new ModernSettingsPanelPage({
+    let mainSettingsPanelPage = new SettingsPanelPage({
       components: [
         new ModernSettingsPanelItem({
           label: i18n.getLocalizer('settings.video.quality'),
@@ -576,7 +573,7 @@ export namespace UIFactory {
 
     let mainSettingsPanelPage: SettingsPanelPage;
 
-    let settingsPanel = new ModernSettingsPanel({
+    let settingsPanel = new SettingsPanel({
       components: [],
       hidden: true,
       pageTransitionAnimation: true,
@@ -614,7 +611,7 @@ export namespace UIFactory {
 
     components.unshift(ecoModeContainer);
 
-    mainSettingsPanelPage = new ModernSettingsPanelPage({
+    mainSettingsPanelPage = new SettingsPanelPage({
       components,
     });
 

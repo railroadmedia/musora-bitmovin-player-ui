@@ -3,7 +3,7 @@ import { SelectBox } from './selectbox';
 import { UIInstanceManager } from '../uimanager';
 import { Timeout } from '../timeout';
 import { Event, EventDispatcher, NoArgs } from '../eventdispatcher';
-import { SettingsPanelPage } from './settingspanelpage';
+import { SettingsPanelPage, SettingsPanelPageConfig } from './settingspanelpage';
 import { SettingsPanelItem, SettingsPanelItemConfig } from './settingspanelitem';
 import { PlayerAPI } from 'bitmovin-player';
 import { Component, ComponentConfig } from './component';
@@ -259,6 +259,11 @@ export class SettingsPanel extends Container<SettingsPanelConfig> {
       this.activePage = component;
     }
     super.addComponent(component);
+  }
+
+  addPage(page: SettingsPanelPage) {
+    this.addComponent(page);
+    this.updateComponents();
   }
 
   protected suspendHideTimeout() {

@@ -1,8 +1,7 @@
-import {SettingsPanelPage} from '../settingspanelpage';
+import { SettingsPanelPage, SettingsPanelPageConfig } from '../settingspanelpage';
 import {SettingsPanel} from '../settingspanel';
 import {SubtitleOverlay} from '../subtitleoverlay';
 import {ContainerConfig} from '../container';
-import {SubtitleSettingsManager} from './subtitlesettingsmanager';
 import {Component, ComponentConfig} from '../component';
 import {FontSizeSelectBox} from './fontsizeselectbox';
 import {FontFamilySelectBox} from './fontfamilyselectbox';
@@ -19,14 +18,12 @@ import {SettingsPanelPageBackButton} from '../settingspanelpagebackbutton';
 import {SettingsPanelItem} from '../settingspanelitem';
 import { PlayerAPI } from 'bitmovin-player';
 import { i18n } from '../../localization/i18n';
-import { ModernSettingsPanelPage } from '../modernsettingspanelpage';
 import { ModernSettingsPanelItem } from '../modernsettingspanelitem';
-import { ModernSettingsPanel } from '../modernsettingspanel';
 
 /**
  * @category Configs
  */
-export interface SubtitleSettingsPanelPageConfig extends ContainerConfig {
+export interface SubtitleSettingsPanelPageConfig extends SettingsPanelPageConfig {
   settingsPanel: SettingsPanel;
   overlay: SubtitleOverlay;
 }
@@ -34,7 +31,7 @@ export interface SubtitleSettingsPanelPageConfig extends ContainerConfig {
 /**
  * @category Components
  */
-export class SubtitleSettingsPanelPage extends ModernSettingsPanelPage {
+export class SubtitleSettingsPanelPage extends SettingsPanelPage {
 
   private readonly overlay: SubtitleOverlay;
   private readonly settingsPanel: SettingsPanel;
@@ -59,63 +56,63 @@ export class SubtitleSettingsPanelPage extends ModernSettingsPanelPage {
           setting: new FontSizeSelectBox({
             overlay: this.overlay,
           }),
-          container: this.settingsPanel as ModernSettingsPanel,
+          container: this.settingsPanel,
         }),
         new ModernSettingsPanelItem({
           label: i18n.getLocalizer('settings.subtitles.font.family'),
           setting: new FontFamilySelectBox({
             overlay: this.overlay,
           }),
-          container: this.settingsPanel as ModernSettingsPanel,
+          container: this.settingsPanel,
         }),
         new ModernSettingsPanelItem({
           label: i18n.getLocalizer('settings.subtitles.font.color'),
           setting: new FontColorSelectBox({
             overlay: this.overlay,
           }),
-          container: this.settingsPanel as ModernSettingsPanel,
+          container: this.settingsPanel,
         }),
         new ModernSettingsPanelItem({
           label: i18n.getLocalizer('settings.subtitles.font.opacity'),
           setting: new FontOpacitySelectBox({
             overlay: this.overlay,
           }),
-          container: this.settingsPanel as ModernSettingsPanel,
+          container: this.settingsPanel,
         }),
         new ModernSettingsPanelItem({
           label: i18n.getLocalizer('settings.subtitles.characterEdge'),
           setting: new CharacterEdgeSelectBox({
             overlay: this.overlay,
           }),
-          container: this.settingsPanel as ModernSettingsPanel,
+          container: this.settingsPanel,
         }),
         new ModernSettingsPanelItem({
           label: i18n.getLocalizer('settings.subtitles.background.color'),
           setting: new BackgroundColorSelectBox({
             overlay: this.overlay,
           }),
-          container: this.settingsPanel as ModernSettingsPanel,
+          container: this.settingsPanel,
         }),
         new ModernSettingsPanelItem({
           label: i18n.getLocalizer('settings.subtitles.background.opacity'),
           setting: new BackgroundOpacitySelectBox({
             overlay: this.overlay,
           }),
-          container: this.settingsPanel as ModernSettingsPanel,
+          container: this.settingsPanel,
         }),
         new ModernSettingsPanelItem({
           label: i18n.getLocalizer('settings.subtitles.window.color'),
           setting: new WindowColorSelectBox({
             overlay: this.overlay,
           }),
-          container: this.settingsPanel as ModernSettingsPanel,
+          container: this.settingsPanel,
         }),
         new ModernSettingsPanelItem({
           label: i18n.getLocalizer('settings.subtitles.window.opacity'),
           setting: new WindowOpacitySelectBox({
             overlay: this.overlay,
           }),
-          container: this.settingsPanel as ModernSettingsPanel,
+          container: this.settingsPanel,
         }),
       ],
     }, this.config);

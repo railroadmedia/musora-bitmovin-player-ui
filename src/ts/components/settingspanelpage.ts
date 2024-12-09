@@ -5,12 +5,16 @@ import {Event, EventDispatcher, NoArgs} from '../eventdispatcher';
 import { PlayerAPI } from 'bitmovin-player';
 import { BrowserUtils } from '../browserutils';
 
+export interface SettingsPanelPageConfig extends ContainerConfig {
+  removeOnPop?: Boolean;
+}
+
 /**
  * A panel containing a list of {@link SettingsPanelItem items} that represent labelled settings.
  *
  * @category Components
  */
-export class SettingsPanelPage extends Container<ContainerConfig> {
+export class SettingsPanelPage extends Container<SettingsPanelPageConfig> {
 
   private static readonly CLASS_LAST = 'last';
 
@@ -20,13 +24,14 @@ export class SettingsPanelPage extends Container<ContainerConfig> {
     onInactive: new EventDispatcher<SettingsPanelPage, NoArgs>(),
   };
 
-  constructor(config: ContainerConfig) {
+  constructor(config: SettingsPanelPageConfig) {
     super(config);
 
-    this.config = this.mergeConfig<ContainerConfig>(config, {
+    this.config = this.mergeConfig(config, {
       cssClass: 'ui-settings-panel-page',
       role: 'menu',
-    }, this.config);
+      removeOnPop: false,
+    } as SettingsPanelPageConfig, this.config);
   }
 
   configure(player: PlayerAPI, uimanager: UIInstanceManager): void {

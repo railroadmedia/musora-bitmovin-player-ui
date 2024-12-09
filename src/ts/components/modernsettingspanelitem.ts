@@ -3,20 +3,15 @@ import {UIInstanceManager} from '../uimanager';
 import {SelectBox} from './selectbox';
 import { PlayerAPI } from 'bitmovin-player';
 import { LocalizableText } from '../localization/i18n';
-import { ModernSettingsPanelPage } from './modernsettingspanelpage';
 import { ListSelector, ListSelectorConfig } from './listselector';
 import { SubtitleSelectBox } from './subtitleselectbox';
 import { SettingsPanelItem, SettingsPanelItemConfig } from './settingspanelitem';
-import {
-  Component,
-  ComponentConfig,
-  Container,
-  ContainerConfig,
-  SettingsPanelPageBackButton,
-  SubtitleSettingSelectBox, SubtitleSettingsLabel,
-} from '../main';
-import { ModernSettingsPanel } from './modernsettingspanel';
 import { ModernSettingsPanelSelectOption } from './modernsettingspanelselectoption';
+import { SettingsPanelPage } from './settingspanelpage';
+import { SubtitleSettingsLabel } from './subtitlesettings/subtitlesettingslabel';
+import { SettingsPanel } from './settingspanel';
+import { SettingsPanelPageBackButton } from './settingspanelpagebackbutton';
+import { SubtitleSettingSelectBox } from './subtitlesettings/subtitlesettingselectbox';
 
 /**
  * An item for a {@link ModernSettingsPanelPage},
@@ -26,7 +21,7 @@ import { ModernSettingsPanelSelectOption } from './modernsettingspanelselectopti
 export interface ModernSettingsPanelItemConfig extends SettingsPanelItemConfig {
   label: LocalizableText | SubtitleSettingsLabel;
   setting: ListSelector<ListSelectorConfig>;
-  container: ModernSettingsPanel;
+  container: SettingsPanel;
 }
 
 export class ModernSettingsPanelItem extends SettingsPanelItem<ModernSettingsPanelItemConfig> {
@@ -106,9 +101,9 @@ export class ModernSettingsPanelItem extends SettingsPanelItem<ModernSettingsPan
     this.getDomElement().on('click', (e) => { e.stopPropagation(); handleItemClick(); });
   }
 
-  private buildSubPanelPage(): ModernSettingsPanelPage {
+  private buildSubPanelPage(): SettingsPanelPage {
     const menuOptions = this.setting.getItems();
-    const page = new ModernSettingsPanelPage({}, true);
+    const page = new SettingsPanelPage({ removeOnPop: true });
 
     const text = this.config.label instanceof SubtitleSettingsLabel ? this.config.label.text : this.config.label;
 
@@ -155,7 +150,7 @@ export class ModernSettingsPanelItem extends SettingsPanelItem<ModernSettingsPan
 
   public displayItemsSubPage(): void {
     let page = this.buildSubPanelPage();
-    this.config.container.addDynamicPage(page);
+    this.config.container.addPage(page);
     this.config.container.setActivePage(page);
   }
 }
