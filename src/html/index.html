@@ -44,11 +44,18 @@
             </div>
 
             <div class="form-group form-check row">
-              <label for="config-ads" class="col-sm-4 form-check-label" for="config-ads">Ads</label>
+              <label for="config-ads" class="col-sm-4 form-check-label">Ads</label>
               <div class="col-sm-4 form-check">
                   <input type="checkbox" id="config-ads">
               </div>
               <span class="col-sm-4 form-text">Schedule client-side ads.</span>
+            </div>
+
+            <div class="form-group form-check row">
+                <label for="display-portrait" class="col-sm-4 form-check-label">Simulate portrait phone layout</label>
+                <div class="col-sm-4 form-check">
+                    <input type="checkbox" id="display-portrait">
+                </div>
             </div>
         </div>
 
@@ -745,6 +752,20 @@
     storeConfigInStorage();
   });
 
+  var displayPortraitCheckbox = $('#display-portrait');
+  displayPortraitCheckbox.change(function() {
+    const isChecked = $(this).is(':checked');
+
+    const playerWrapperContainer = $('.player-wrapper');
+    if (isChecked) {
+      playerWrapperContainer.addClass('portrait');
+    } else {
+      playerWrapperContainer.removeClass('portrait');
+    }
+
+    storeConfigInStorage();
+  });
+
   function scheduleAds() {
     adBreaks.forEach(function(adBreak) {
       player.ads.schedule(adBreak);
@@ -759,6 +780,7 @@
       adsEnabled: $('#config-ads').is(':checked'),
       source: $('#config-source').val(),
       uiOption: $('#config-ui').val(),
+      portraitEnabled: $('#display-portrait').is(':checked'),
     };
 
     try {
@@ -795,6 +817,10 @@
     }
     if ($('#config-ads') && config.adsEnabled !== undefined) {
       $('#config-ads').prop('checked', config.adsEnabled);
+    }
+    if ($('#display-portrait') && config.portraitEnabled !== undefined) {
+      $('#display-portrait').prop('checked', config.portraitEnabled);
+      $('#display-portrait').trigger('change');
     }
   })();
 </script>
