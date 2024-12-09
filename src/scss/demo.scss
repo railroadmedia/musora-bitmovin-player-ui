@@ -6,3 +6,11 @@ body {
 #player {
   position: relative;
 }
+
+.player-wrapper {
+  &.portrait {
+    aspect-ratio: 9 / 16;
+    margin: auto;
+    width: 300px;
+  }
+}
