@@ -696,50 +696,54 @@
   }, 'video.');
 
   // Collect all UI factory methods which are basically the different built-in skins and skin types
-  var configUISelect = $('#config-ui');
-
-  var defaultUis = [];
-  for (var member in bitmovin.playerui.UIFactory) {
-    if (typeof bitmovin.playerui.UIFactory[member] === 'function' && member.indexOf('buildModern') === 0) {
-        defaultUis.push(member);
+  const configUISelect = $('#config-ui');
+  const collectUIMethods = function(clazz, filter, label) {
+    const convertToOption = function(value) {
+      return $('<option></option>').attr('value', value).text(value);
     }
+
+    let demoGroup = $(`<optgroup label="${label}" />`);
+
+    Object.keys(clazz)
+      .filter((member) => {
+        return typeof clazz[member] === 'function';
+      })
+      .filter(filter)
+      .map(convertToOption)
+      .forEach((o) => {
+        demoGroup.append(o);
+      });
+
+    demoGroup.appendTo(configUISelect);
   }
 
-  let defaultUisGroup = $('<optgroup label="Default UIs" />');
-  // Fill the UI factory method select box
-  $.each(defaultUis, function(key, value) {
-    $('<option></option>').attr('value', value).text(value).appendTo(defaultUisGroup);
+  const uiFactoryData = [
+    {
+      className: bitmovin.playerui.UIFactory,
+      filter: (member) => {
+        return member.indexOf('buildModern') === 0;
+      },
+      label: 'Default UIs',
+    },
+    {
+      className: bitmovin.playerui.UIFactory,
+      filter: (member) => {
+        return member.indexOf('buildSuperModern') === 0;
+      },
+      label: 'More modern UIs',
+    },
+    {
+      className: bitmovin.playerui.DemoFactory,
+      filter: (member) => {
+        return member.indexOf('buildDemo') === 0;
+      },
+      label: 'Demos',
+    },
+  ];
+
+  uiFactoryData.forEach((data) => {
+    collectUIMethods(data.className, data.filter, data.label);
   });
-  defaultUisGroup.appendTo(configUISelect);
-
-  var superModernUis = [];
-  for (var member in bitmovin.playerui.UIFactory) {
-      if (typeof bitmovin.playerui.UIFactory[member] === 'function' && member.indexOf('buildSuperModern') === 0) {
-          superModernUis.push(member);
-      }
-  }
-
-  let moreModernUisGroup = $('<optgroup label="More modern UIs" />');
-  // Fill the UI factory method select box
-  $.each(superModernUis, function(key, value) {
-      $('<option></option>').attr('value', value).text(value).appendTo(moreModernUisGroup);
-  });
-  moreModernUisGroup.appendTo(configUISelect);
-
-  // Collect all UI Demos
-  var uiDemos = [];
-  for (var member in bitmovin.playerui.DemoFactory) {
-    if (typeof bitmovin.playerui.DemoFactory[member] === 'function' && member.indexOf('buildDemo') === 0) {
-      uiDemos.push(member);
-    }
-  }
-
-  // put all demos in own select-opt-group
-  let demoGroup = $('<optgroup label="Demos" />');
-  $.each(uiDemos, function(key, value) {
-    $('<option></option>').attr('value', value).text(value).appendTo(demoGroup);
-  });
-  demoGroup.appendTo(configUISelect);
 
   // Refresh UI when a factory is selected
   configUISelect.change(function() {
