@@ -11,9 +11,23 @@ import {PlaybackSpeedSelectBox} from './playbackspeedselectbox';
 import { PlayerAPI } from 'bitmovin-player';
 import { LocalizableText } from '../localization/i18n';
 
+/**
+ * Configuration interface for a {@link SettingsPanelItem}
+ *
+ * @category Configs
+ */
 export interface SettingsPanelItemConfig extends ContainerConfig {
+  /**
+   * The label component or the text for the label.
+   */
   label?: LocalizableText | Component<ComponentConfig>;
+  /**
+   * The component that configures a setting.
+   */
   setting?: Component<ComponentConfig>;
+  /**
+   * If the setting should be added as a component to this item.
+   */
   addSettingAsComponent?: boolean;
 }
 
@@ -33,17 +47,17 @@ export class SettingsPanelItem<Config extends SettingsPanelItemConfig> extends C
     onActiveChanged: new EventDispatcher<SettingsPanelItem<Config>, NoArgs>(),
   };
 
-  constructor(config: SettingsPanelItemConfig) {
-    super(config as Config);
+  constructor(config: SettingsPanelItemConfig)
+  constructor(config: Config) {
+    super(config);
 
     this.setting = config.setting;
 
-    // TODO: this feels ugly -> typescript weak type problem (no matching property from parent)
-    this.config = this.mergeConfig<Config>(config as Config, {
+    this.config = this.mergeConfig(config, {
       cssClass: 'ui-settings-panel-item',
       role: 'menuitem',
       addSettingAsComponent: true,
-    } as Config, this.config as Config);
+    } as Config, this.config);
 
     const label = config.label;
     if (label !== null) {
@@ -52,15 +66,19 @@ export class SettingsPanelItem<Config extends SettingsPanelItemConfig> extends C
       } else {
         this.label = new Label({ text: label } as LabelConfig);
       }
-      this.addComponent(this.label);
-    }
 
-    if (this.setting != null && this.config.addSettingAsComponent) {
-      this.addComponent(this.setting);
+      this.addComponent(this.label);
     }
   }
 
   configure(player: PlayerAPI, uimanager: UIInstanceManager): void {
+    super.configure(player, uimanager);
+
+    if (this.setting != null && this.config.addSettingAsComponent) {
+      this.addComponent(this.setting);
+      this.updateComponents();
+    }
+
     if (this.setting instanceof SelectBox || this.setting instanceof ListBox) {
       let handleConfigItemChanged = () => {
         if (!(this.setting instanceof SelectBox) && !(this.setting instanceof ListBox)) {
@@ -121,9 +139,5 @@ export class SettingsPanelItem<Config extends SettingsPanelItemConfig> extends C
    */
   get onActiveChanged(): Event<SettingsPanelItem<Config>, NoArgs> {
     return this.settingsPanelItemEvents.onActiveChanged.getEvent();
-  }
-
-  get getLabel(): Component<ComponentConfig> {
-    return this.label;
   }
 }

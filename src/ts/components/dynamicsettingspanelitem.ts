@@ -46,14 +46,10 @@ export class DynamicSettingsPanelItem extends SettingsPanelItem<DynamicSettingsP
   private uimanager: UIInstanceManager;
 
   constructor(config: DynamicSettingsPanelItemConfig) {
-    // TODO: is that the way? -> Should this happen in configure? -> I think so
-    config.addSettingAsComponent = false;
-
     super(config);
 
     this.setting = config.setting;
 
-    // TODO: this now does no longer work with the custom label with the opening button
     this.selectedOptionLabel = new Label({
       text: '-',
       for: this.getConfig().id,
