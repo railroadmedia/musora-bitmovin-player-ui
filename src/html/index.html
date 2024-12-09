@@ -43,11 +43,18 @@
             </div>
 
             <div class="form-group form-check row">
-              <label for="config-ads" class="col-sm-4 form-check-label" for="config-ads">Ads</label>
+              <label for="config-ads" class="col-sm-4 form-check-label">Ads</label>
               <div class="col-sm-4 form-check">
                   <input type="checkbox" id="config-ads">
               </div>
               <span class="col-sm-4 form-text">Schedule client-side ads.</span>
+            </div>
+
+            <div class="form-group form-check row">
+                <label for="display-portrait" class="col-sm-4 form-check-label">Simulate portrait phone layout</label>
+                <div class="col-sm-4 form-check">
+                    <input type="checkbox" id="display-portrait">
+                </div>
             </div>
         </div>
 
@@ -595,7 +602,7 @@
       .animate({ height: initialHeight }, 1000);
     },
     'Show Buffering overlay': function() {
-      var player = uiManager.currentUi.playerWrapper.getPlayer();
+      const player = uiManager.currentUi.playerWrapper.getPlayer();
 
       player.fireEventInUI(bitmovin.player.PlayerEvent.StallStarted, {});
     }
@@ -693,33 +700,54 @@
   }, 'video.');
 
   // Collect all UI factory methods which are basically the different built-in skins and skin types
-  var uiFactoryMethods = [];
-  for (var member in bitmovin.playerui.UIFactory) {
-    if (typeof bitmovin.playerui.UIFactory[member] == 'function' && member.indexOf('build') === 0) {
-      uiFactoryMethods.push(member);
+  const configUISelect = $('#config-ui');
+  const collectUIMethods = function(clazz, filter, label) {
+    const convertToOption = function(value) {
+      return $('<option></option>').attr('value', value).text(value);
     }
+
+    let demoGroup = $(`<optgroup label="${label}" />`);
+
+    Object.keys(clazz)
+      .filter((member) => {
+        return typeof clazz[member] === 'function';
+      })
+      .filter(filter)
+      .map(convertToOption)
+      .forEach((o) => {
+        demoGroup.append(o);
+      });
+
+    demoGroup.appendTo(configUISelect);
   }
 
-  var configUISelect = $('#config-ui');
+  const uiFactoryData = [
+    {
+      className: bitmovin.playerui.UIFactory,
+      filter: (member) => {
+        return member.indexOf('buildModern') === 0;
+      },
+      label: 'Default UIs',
+    },
+    {
+      className: bitmovin.playerui.UIFactory,
+      filter: (member) => {
+        return member.indexOf('buildSuperModern') === 0;
+      },
+      label: 'More modern UIs',
+    },
+    {
+      className: bitmovin.playerui.DemoFactory,
+      filter: (member) => {
+        return member.indexOf('buildDemo') === 0;
+      },
+      label: 'Demos',
+    },
+  ];
 
-  // Collect all UI Demos
-  var uiDemos = [];
-  for (var member in bitmovin.playerui.DemoFactory) {
-    if (typeof bitmovin.playerui.DemoFactory[member] === 'function' && member.indexOf('buildDemo') === 0) {
-      uiDemos.push(member);
-    }
-  }
-
-  // Fill the UI factory method select box
-  $.each(uiFactoryMethods, function(key, value) {
-    configUISelect.append($('<option></option>').attr('value', value).text(value));
+  uiFactoryData.forEach((data) => {
+    collectUIMethods(data.className, data.filter, data.label);
   });
-  // put all demos in own select-opt-group
-  let demoGroup = $('<optgroup label="Demos" />');
-  $.each(uiDemos, function(key, value) {
-    $('<option></option>').attr('value', value).text(value).appendTo(demoGroup);
-  });
-  demoGroup.appendTo(configUISelect);
 
   // Refresh UI when a factory is selected
   configUISelect.change(function() {
@@ -749,6 +777,20 @@
     storeConfigInStorage();
   });
 
+  var displayPortraitCheckbox = $('#display-portrait');
+  displayPortraitCheckbox.change(function() {
+    const isChecked = $(this).is(':checked');
+
+    const playerWrapperContainer = $('.player-wrapper');
+    if (isChecked) {
+      playerWrapperContainer.addClass('portrait');
+    } else {
+      playerWrapperContainer.removeClass('portrait');
+    }
+
+    storeConfigInStorage();
+  });
+
   function scheduleAds() {
     adBreaks.forEach(function(adBreak) {
       player.ads.schedule(adBreak);
@@ -763,6 +805,7 @@
       adsEnabled: $('#config-ads').is(':checked'),
       source: $('#config-source').val(),
       uiOption: $('#config-ui').val(),
+      portraitEnabled: $('#display-portrait').is(':checked'),
     };
 
     try {
@@ -799,6 +842,10 @@
     }
     if ($('#config-ads') && config.adsEnabled !== undefined) {
       $('#config-ads').prop('checked', config.adsEnabled);
+    }
+    if ($('#display-portrait') && config.portraitEnabled !== undefined) {
+      $('#display-portrait').prop('checked', config.portraitEnabled);
+      $('#display-portrait').trigger('change');
     }
   })();
 </script>
