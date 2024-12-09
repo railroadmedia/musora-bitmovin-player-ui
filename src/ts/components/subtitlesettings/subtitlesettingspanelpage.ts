@@ -47,10 +47,12 @@ export class SubtitleSettingsPanelPage extends ModernSettingsPanelPage {
 
     this.config = this.mergeConfig(config, {
       components: <Component<ComponentConfig>[]>[
-        new SettingsPanelPageBackButton({
-          text: i18n.getLocalizer('back'),
-          container: this.settingsPanel,
-          cssClasses: ['ui-settings-panel-item-back'],
+        new SettingsPanelItem({
+          label: new SettingsPanelPageBackButton({
+            container: this.settingsPanel,
+          }),
+          setting: new SubtitleSettingsResetButton({}),
+          cssClasses: ['title-item'],
         }),
         new ModernSettingsPanelItem({
           label: i18n.getLocalizer('settings.subtitles.font.size'),

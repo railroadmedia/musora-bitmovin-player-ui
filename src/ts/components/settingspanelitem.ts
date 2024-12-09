@@ -13,7 +13,7 @@ import { LocalizableText } from '../localization/i18n';
 
 export interface SettingsPanelItemConfig extends ContainerConfig {
   label?: LocalizableText | Component<ComponentConfig>;
-  setting: Component<ComponentConfig>;
+  setting?: Component<ComponentConfig>;
   addSettingAsComponent?: boolean;
 }
 
@@ -27,7 +27,7 @@ export interface SettingsPanelItemConfig extends ContainerConfig {
 export class SettingsPanelItem<Config extends SettingsPanelItemConfig> extends Container<Config> {
 
   private label: Component<ComponentConfig>;
-  protected setting: Component<ComponentConfig>;
+  protected setting: Component<ComponentConfig> | null;
 
   private settingsPanelItemEvents = {
     onActiveChanged: new EventDispatcher<SettingsPanelItem<Config>, NoArgs>(),
@@ -55,7 +55,7 @@ export class SettingsPanelItem<Config extends SettingsPanelItemConfig> extends C
       this.addComponent(this.label);
     }
 
-    if (config.addSettingAsComponent) {
+    if (this.setting != null && this.config.addSettingAsComponent) {
       this.addComponent(this.setting);
     }
   }

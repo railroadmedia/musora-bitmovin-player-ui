@@ -118,7 +118,11 @@ export class ModernSettingsPanelItem extends SettingsPanelItem<ModernSettingsPan
       cssClasses: ['ui-settings-panel-item-back'],
     });
     backButton.configure(this.player, this.uimanager);
-    page.addComponent(backButton);
+    const backSettingsPanelItem = new SettingsPanelItem({
+      label: backButton,
+      cssClasses: ['title-item'],
+    });
+    page.addComponent(backSettingsPanelItem);
 
     menuOptions
       .map((option) => {

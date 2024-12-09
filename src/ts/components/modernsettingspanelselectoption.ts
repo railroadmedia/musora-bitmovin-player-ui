@@ -20,7 +20,7 @@ export class ModernSettingsPanelSelectOption extends SettingsPanelItem<ModernSet
     this.settingsValue = config.settingsValue;
 
     this.config = this.mergeConfig(config, {
-      cssClass: 'ui-settings-panel-item-select-option',
+      cssClasses: ['ui-settings-panel-item-select-option'],
       role: 'menuitem',
     } as ModernSettingsPanelSelectOptionConfig, this.config);
   }
