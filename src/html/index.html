@@ -696,14 +696,35 @@
   }, 'video.');
 
   // Collect all UI factory methods which are basically the different built-in skins and skin types
-  var uiFactoryMethods = [];
+  var configUISelect = $('#config-ui');
+
+  var defaultUis = [];
   for (var member in bitmovin.playerui.UIFactory) {
-    if (typeof bitmovin.playerui.UIFactory[member] == 'function' && member.indexOf('build') === 0) {
-      uiFactoryMethods.push(member);
+    if (typeof bitmovin.playerui.UIFactory[member] === 'function' && member.indexOf('buildModern') === 0) {
+        defaultUis.push(member);
     }
   }
 
-  var configUISelect = $('#config-ui');
+  let defaultUisGroup = $('<optgroup label="Default UIs" />');
+  // Fill the UI factory method select box
+  $.each(defaultUis, function(key, value) {
+    $('<option></option>').attr('value', value).text(value).appendTo(defaultUisGroup);
+  });
+  defaultUisGroup.appendTo(configUISelect);
+
+  var superModernUis = [];
+  for (var member in bitmovin.playerui.UIFactory) {
+      if (typeof bitmovin.playerui.UIFactory[member] === 'function' && member.indexOf('buildSuperModern') === 0) {
+          superModernUis.push(member);
+      }
+  }
+
+  let moreModernUisGroup = $('<optgroup label="More modern UIs" />');
+  // Fill the UI factory method select box
+  $.each(superModernUis, function(key, value) {
+      $('<option></option>').attr('value', value).text(value).appendTo(moreModernUisGroup);
+  });
+  moreModernUisGroup.appendTo(configUISelect);
 
   // Collect all UI Demos
   var uiDemos = [];
@@ -713,10 +734,6 @@
     }
   }
 
-  // Fill the UI factory method select box
-  $.each(uiFactoryMethods, function(key, value) {
-    configUISelect.append($('<option></option>').attr('value', value).text(value));
-  });
   // put all demos in own select-opt-group
   let demoGroup = $('<optgroup label="Demos" />');
   $.each(uiDemos, function(key, value) {
