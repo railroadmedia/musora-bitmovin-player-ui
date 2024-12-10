@@ -48,6 +48,6 @@ export class SubtitleSettingSelectBox extends SelectBox {
   }
 
   configure(player: PlayerAPI, uimanager: UIInstanceManager): void {
-      this.settingsManager = uimanager.getSubtitleSettingsManager();
+    this.settingsManager = uimanager.getSubtitleSettingsManager();
   }
 }

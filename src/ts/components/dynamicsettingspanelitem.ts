@@ -1,5 +1,5 @@
 import { Label, LabelConfig } from './label';
-import {UIInstanceManager} from '../uimanager';
+import { UIInstanceManager } from '../uimanager';
 import { PlayerAPI } from 'bitmovin-player';
 import { LocalizableText } from '../localization/i18n';
 import { ListSelector, ListSelectorConfig } from './listselector';
@@ -102,7 +102,10 @@ export class DynamicSettingsPanelItem extends SettingsPanelItem<DynamicSettingsP
     const handleItemClick = () => {
       this.displayItemsSubPage();
     };
-    this.getDomElement().on('click', (e) => { e.stopPropagation(); handleItemClick(); });
+    this.getDomElement().on('click', (e) => {
+      e.stopPropagation();
+      handleItemClick();
+    });
   }
 
   private buildSubPanelPage(): SettingsPanelPage {
