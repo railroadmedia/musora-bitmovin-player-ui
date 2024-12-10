@@ -283,7 +283,12 @@
     const playgroundConfig = getConfigFromStorage();
 
     // Add UI
-    uiManager = bitmovin.playerui.UIFactory[playgroundConfig.uiOption || 'buildDefaultUI'](player, uiConfig);
+    if (playgroundConfig.uiOption != null && bitmovin.playerui.UIFactory[playgroundConfig.uiOption] != null) {
+      uiManager = bitmovin.playerui.UIFactory[playgroundConfig.uiOption](player, uiConfig);
+    } else {
+      localStorage.clear();
+      uiManager = bitmovin.playerui.UIFactory.buildDefaultUI(player, uiConfig);
+    }
 
     player.load(sources[playgroundConfig.source || 'fullyFeatured']).then(function() {
       console.log('source successfully loaded');
