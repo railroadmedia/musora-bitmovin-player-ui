@@ -33,6 +33,7 @@ export class SubtitleSettingsLabel extends Container<ContainerConfig> {
         new Label({ text: this.text, for: this.for } as LabelConfig),
         this.opener,
       ],
+      cssClass: 'ui-subtitle-settings-label',
     }, this.config);
   }
 }

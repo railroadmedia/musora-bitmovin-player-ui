@@ -1,5 +1,5 @@
 import { SubtitleOverlay } from './components/subtitleoverlay';
-import { SettingsPanelPage, SettingsPanelPageConfig } from './components/settingspanelpage';
+import { SettingsPanelPage } from './components/settingspanelpage';
 import { SettingsPanelItem } from './components/settingspanelitem';
 import { VideoQualitySelectBox } from './components/videoqualityselectbox';
 import { PlaybackSpeedSelectBox } from './components/playbackspeedselectbox';
@@ -487,6 +487,7 @@ export namespace UIFactory {
     let subtitleSettingsPanelPage = new SubtitleSettingsPanelPage({
       settingsPanel: settingsPanel,
       overlay: subtitleOverlay,
+      useDynamicSettingsPanelItem: true,
     });
 
     let subtitleSettingsOpenButton = new SettingsPanelPageOpenButton({
@@ -620,6 +621,7 @@ export namespace UIFactory {
     let subtitleSettingsPanelPage = new SubtitleSettingsPanelPage({
       settingsPanel: settingsPanel,
       overlay: subtitleOverlay,
+      useDynamicSettingsPanelItem: true,
     });
 
     let subtitleSettingsOpenButton = new SettingsPanelPageOpenButton({
