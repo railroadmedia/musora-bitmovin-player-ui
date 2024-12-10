@@ -337,7 +337,6 @@ export class SettingsPanel extends Container<SettingsPanelConfig> {
     const settingsPanelHTMLElement = this.getDomElement().get(0);
 
     // get current dimension
-    // TODO: handle resizing properly
     const settingsPanelWidth = settingsPanelHTMLElement.scrollWidth;
     const settingsPanelHeight = settingsPanelHTMLElement.scrollHeight;
 
