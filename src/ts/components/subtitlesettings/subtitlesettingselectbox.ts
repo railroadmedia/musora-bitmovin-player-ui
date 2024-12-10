@@ -20,7 +20,7 @@ export interface SubtitleSettingSelectBoxConfig extends ListSelectorConfig {
 export class SubtitleSettingSelectBox extends SelectBox {
 
   protected settingsManager?: SubtitleSettingsManager;
-  public overlay: SubtitleOverlay;
+  readonly overlay: SubtitleOverlay;
   private currentCssClass: string;
 
   constructor(config: SubtitleSettingSelectBoxConfig) {

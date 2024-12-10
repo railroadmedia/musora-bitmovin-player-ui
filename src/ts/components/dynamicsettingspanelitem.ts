@@ -138,15 +138,11 @@ export class DynamicSettingsPanelItem extends SettingsPanelItem<DynamicSettingsP
 
     page.configure(this.player, this.uimanager);
 
-    if (this.setting instanceof SubtitleSettingSelectBox) {
+    const setting = this.setting;
+    if (setting instanceof SubtitleSettingSelectBox) {
       // Keep the preview subtitle overlay visible when the sub-page is for a subtitle setting
-      page.onActive.subscribe(() => {
-        (<SubtitleSettingSelectBox>this.setting).overlay.enablePreviewSubtitleLabel();
-      });
-
-      page.onInactive.subscribe(() => {
-        (<SubtitleSettingSelectBox>this.setting).overlay.removePreviewSubtitleLabel();
-      });
+      page.onActive.subscribe(() => setting.overlay.enablePreviewSubtitleLabel());
+      page.onInactive.subscribe(() => setting.overlay.removePreviewSubtitleLabel());
     }
 
     return page;
