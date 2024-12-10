@@ -17,6 +17,7 @@
   background-color: $background-color;
   border-radius: 4px;
   bottom: 3.5em;
+  box-shadow: 0 0 3px 0 transparentize($color: #000, $amount: .75);
   height: fit-content;
   max-height: 60%;
   min-width: fit-content;
