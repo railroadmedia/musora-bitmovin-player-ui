@@ -13,6 +13,7 @@
 
   $background-color: transparentize($color-background-menu, .15);
 
+  backdrop-filter: blur(10px);
   background-color: $background-color;
   border-radius: 4px;
   bottom: 3.5em;
