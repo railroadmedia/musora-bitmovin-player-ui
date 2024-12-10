@@ -5,7 +5,15 @@ import {Event, EventDispatcher, NoArgs} from '../eventdispatcher';
 import { PlayerAPI } from 'bitmovin-player';
 import { BrowserUtils } from '../browserutils';
 
+/**
+ * Configuration interface for a {@link SettingsPanelPage}
+ *
+ * @category Configs
+ */
 export interface SettingsPanelPageConfig extends ContainerConfig {
+  /**
+   * If the page should be removed from the DOM when it is popped from the navigation stack.
+   */
   removeOnPop?: Boolean;
 }
 
