@@ -56,7 +56,7 @@
   @import 'skin-tv';
 
   // sass-lint:disable nesting-depth
-  .#{$prefix}-ui-uicontainer {
+  &.#{$prefix}-ui-uicontainer {
     color: $color-primary;
     font-family: $font-family;
     font-size: $font-size;
