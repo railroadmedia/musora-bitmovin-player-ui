@@ -1,7 +1,7 @@
 @import '../variables';
 @import '../mixins';
 
-$seekbar-height: .3em;
+$seekbar-height: .3125em;
 
 // sass-lint:disable no-vendor-prefixes
 %bar {
@@ -25,19 +25,16 @@ $seekbar-height: .3em;
   @include focusable;
 
   align-items: center;
-  display: flex;
+  font-size: 1em;
   height: 1em;
-  justify-content: center;
-  margin: 0 .5em;
   position: relative;
   width: 100%;
 
   $bar-inset: auto;
-
   .#{$prefix}-seekbar-playbackposition-marker {
     @extend %bar;
 
-    @include seekbar-position-marker($seekbar-height * 2.2);
+    @include seekbar-position-marker($seekbar-height * 3);
     background-color: $color-highlight;
     border-radius: 50%;
     box-shadow: 0 0 3px 0 transparentize($color: #000, $amount: .75);
@@ -49,14 +46,18 @@ $seekbar-height: .3em;
     @include hidden;
     @include focusable;
 
-    border-radius: 1em;
     cursor: pointer;
     font-size: 1em;
     height: $seekbar-height;
     margin: calc((1em - $seekbar-height) / 2) 0;
-    overflow: hidden;
     position: relative;
     width: 100%;
+
+    .#{$prefix}-seekbar-bars {
+      @extend %bar;
+      border-radius: 1em;
+      overflow: hidden;
+    }
 
     .#{$prefix}-seekbar-backdrop {
       @extend %bar;
@@ -67,7 +68,7 @@ $seekbar-height: .3em;
 
     .#{$prefix}-seekbar-bufferlevel {
       @extend %bar;
-      background-color: transparentize($color-secondary, .3);
+      background-color: $color-primary;
       margin: $bar-inset 0;
       transition: .3s linear, .3s linear;
       transition-property: transform;
