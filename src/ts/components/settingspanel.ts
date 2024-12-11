@@ -217,12 +217,18 @@ export class SettingsPanel extends Container<SettingsPanelConfig> {
       targetPage = this.getRootPage();
     }
 
+    const currentActivePage = this.activePage;
     this.navigateToPage(
       targetPage,
       this.activePage,
       NavigationDirection.Backwards,
       !(this.config as SettingsPanelConfig).pageTransitionAnimation,
     );
+
+    if (currentActivePage.getConfig().removeOnPop) {
+      this.removeComponent(currentActivePage);
+      this.updateComponents();
+    }
   }
 
   /**
