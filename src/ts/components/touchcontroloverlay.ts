@@ -83,11 +83,11 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
     this.seekBackwardLabel = new Label({text: '', for: this.getConfig().id, cssClass: 'seek-backward-label', hidden: true});
 
     this.config = this.mergeConfig(config, {
-      cssClass: 'ui-touchcontrol-overlay',
+      cssClass: 'ui-touch-control-overlay',
       acceptsTouchWithUiHidden: true,
       seekTime: 10,
       seekDoubleTapMargin: 15,
-      components: [this.playbackToggleButton, this.seekForwardLabel, this.seekBackwardLabel],
+      components: [this.seekBackwardLabel, this.playbackToggleButton, this.seekForwardLabel],
     }, this.config);
   }
 
