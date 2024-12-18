@@ -114,7 +114,10 @@ export class SeekBar extends Component<SeekBarConfig> {
   private seekBarMarkersContainer: DOM;
   private timelineMarkersHandler: TimelineMarkersHandler;
 
+  private uiBoundingRect: DOMRect;
+
   private player: PlayerAPI;
+  private uiManager: UIInstanceManager;
 
   protected seekBarType: SeekBarType;
 
@@ -220,6 +223,7 @@ export class SeekBar extends Component<SeekBarConfig> {
     super.configure(player, uimanager);
 
     this.player = player;
+    this.uiManager = uimanager;
 
     // Apply scaling transform to the backdrop bar to have all bars rendered similarly
     // (the call must be up here to be executed for the volume slider as well)
@@ -453,6 +457,7 @@ export class SeekBar extends Component<SeekBarConfig> {
     // is positioned absolutely and must therefore be updated when the size of the seekbar changes.
     player.on(player.exports.PlayerEvent.PlayerResized, () => {
       this.refreshPlaybackPosition();
+      this.uiBoundingRect = this.uiManager.getUI().getDomElement().get(0).getBoundingClientRect();
     });
     // Additionally, when this code is called, the seekbar is not part of the UI yet and therefore does not have a size,
     // resulting in a wrong initial position of the marker. Refreshing it once the UI is configured solved this issue.
@@ -1020,6 +1025,20 @@ export class SeekBar extends Component<SeekBarConfig> {
     this.seekBarEvents.onSeek.dispatch(this);
   }
 
+  private updateLabelPosition = (seekPositionPercentage: number) => {
+    const labelDomElement = this.label.getDomElement();
+    labelDomElement.css({
+      'left': seekPositionPercentage + '%',
+      'transform': null,
+    });
+
+    // TODO: Re-test `requestAnimationFrame` to prevent forced synchronous layout calculation
+    if (!this.uiBoundingRect) {
+      this.uiBoundingRect = this.uiManager.getUI().getDomElement().get(0).getBoundingClientRect();
+    }
+    this.label.ensureWithinBounds(this.uiBoundingRect);
+  };
+
   protected onSeekPreviewEvent(percentage: number, scrubbing: boolean) {
     let snappedMarker = this.timelineMarkersHandler && this.timelineMarkersHandler.getMarkerAtPosition(percentage);
 
@@ -1043,9 +1062,7 @@ export class SeekBar extends Component<SeekBarConfig> {
     }
 
     if (this.label) {
-      this.label.getDomElement().css({
-        'left': seekPositionPercentage + '%',
-      });
+      this.updateLabelPosition(seekPositionPercentage);
     }
 
     this.seekBarEvents.onSeekPreview.dispatch(this, {

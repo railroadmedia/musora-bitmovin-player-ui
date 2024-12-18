@@ -136,6 +136,34 @@ export class SeekBarLabel extends Container<SeekBarLabelConfig> {
     }
   };
 
+  public ensureWithinBounds = (bounds: DOMRect) => {
+    // TODO move into CSS
+    const overflowMargin = 8;
+
+    const labelBounding = this.container.getDomElement().get(0).getBoundingClientRect();
+
+    let preventOverflowOffset = 0;
+    if (labelBounding.right + overflowMargin > bounds.right) {
+      preventOverflowOffset = labelBounding.right - bounds.right + overflowMargin;
+    } else if (labelBounding.left - overflowMargin < bounds.left) {
+      preventOverflowOffset = labelBounding.left - bounds.left - overflowMargin;
+    }
+
+    if (preventOverflowOffset !== 0) {
+      this.getDomElement().css({
+        transform: `translateX(${-preventOverflowOffset}px)`,
+      });
+
+      this.caret.getDomElement().css({
+        transform: `translateX(${preventOverflowOffset}px)`,
+      });
+    } else {
+      this.caret.getDomElement().css({
+        transform: `translateX(${0}px)`,
+      });
+    }
+  }
+
   /**
    * Sets arbitrary text on the label.
    * @param text the text to show on the label
