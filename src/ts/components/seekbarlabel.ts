@@ -36,6 +36,8 @@ export class SeekBarLabel extends Container<SeekBarLabelConfig> {
   private appliedMarkerCssClasses: string[] = [];
   private player: PlayerAPI;
   private uiManager: UIInstanceManager;
+  private readonly container: Container<ContainerConfig>;
+  private readonly caret: Label<LabelConfig>;
 
   constructor(config: SeekBarLabelConfig = {}) {
     super(config);
@@ -45,17 +47,22 @@ export class SeekBarLabel extends Container<SeekBarLabelConfig> {
     this.thumbnail = new Component({ cssClasses: ['seekbar-thumbnail'], role: 'img' });
     this.thumbnailImageLoader = new ImageLoader();
 
+    this.container = new Container({
+      components: [
+        this.thumbnail,
+        new Container({
+          components: [this.titleLabel, this.timeLabel],
+          cssClass: 'seekbar-label-metadata',
+        }),
+      ],
+      cssClass: 'seekbar-label-inner',
+    });
+
+    this.caret = new Label({ cssClasses: ['seekbar-label-caret'] });
+
     this.config = this.mergeConfig(config, {
       cssClass: 'ui-seekbar-label',
-      components: [new Container({
-        components: [
-          this.thumbnail,
-          new Container({
-            components: [this.titleLabel, this.timeLabel],
-            cssClass: 'seekbar-label-metadata',
-          })],
-        cssClass: 'seekbar-label-inner',
-      })],
+      components: [this.container, this.caret],
       hidden: true,
     }, this.config);
   }
