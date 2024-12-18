@@ -90,6 +90,7 @@ export { SettingsPanelItem } from './components/settingspanelitem';
 export { ReplayButton } from './components/replaybutton';
 export { QuickSeekButton, QuickSeekButtonConfig } from './components/quickseekbutton';
 export { ListSelector, ListSelectorConfig, ListItem, ListItemFilter, ListItemLabelTranslator } from './components/listselector';
+export { AdStatusOverlay } from './components/adstatusoverlay';
 
 // Object.assign polyfill for ES5/IE9
 // https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
