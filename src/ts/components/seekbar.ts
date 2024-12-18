@@ -569,6 +569,13 @@ export class SeekBar extends Component<SeekBarConfig> {
         return;
       }
 
+      // Reset the currentTimeSeekBar and set the position to 0 if the player has no duration
+      if (this.player.getDuration() === 0) {
+        this.setPlaybackPosition(0);
+        currentTimeSeekBar = 0;
+        return;
+      }
+
       currentTimeSeekBar += currentTimeUpdateDeltaSecs;
 
       try {
