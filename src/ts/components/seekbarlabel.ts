@@ -152,17 +152,11 @@ export class SeekBarLabel extends Container<SeekBarLabelConfig> {
     }
 
     if (preventOverflowOffset !== 0) {
-      this.getDomElement().css({
-        left: seekPositionPx - preventOverflowOffset + 'px',
-      });
+      this.getDomElement().css('left', seekPositionPx - preventOverflowOffset + 'px');
 
-      this.caret.getDomElement().css({
-        transform: `translateX(${preventOverflowOffset}px)`,
-      });
+      this.caret.getDomElement().css('transform', `translateX(${preventOverflowOffset}px)`);
     } else {
-      this.caret.getDomElement().css({
-        transform: `translateX(${0}px)`,
-      });
+      this.caret.getDomElement().css('transform', null);
     }
   }
 
