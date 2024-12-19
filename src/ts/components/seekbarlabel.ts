@@ -136,7 +136,11 @@ export class SeekBarLabel extends Container<SeekBarLabelConfig> {
     }
   };
 
-  public ensureWithinBounds = (bounds: DOMRect) => {
+  public setPositionInBounds(seekPositionPx: number, bounds: DOMRect) {
+    this.getDomElement().css({
+      'left': seekPositionPx + 'px',
+    });
+
     // TODO move into CSS
     const overflowMargin = 8;
 
@@ -151,7 +155,7 @@ export class SeekBarLabel extends Container<SeekBarLabelConfig> {
 
     if (preventOverflowOffset !== 0) {
       this.getDomElement().css({
-        transform: `translateX(${-preventOverflowOffset}px)`,
+        left: seekPositionPx - preventOverflowOffset + 'px',
       });
 
       this.caret.getDomElement().css({

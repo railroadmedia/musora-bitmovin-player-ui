@@ -721,10 +721,13 @@ export class SeekBar extends Component<SeekBarConfig> {
         e.stopPropagation();
       }
 
-      let targetPercentage = 100 * this.getOffset(e);
+      const offset = this.getOffset(e);
+      const targetPercentage = 100 * offset;
+      const seekPositionPx = offset * this.seekBar.width();
+
       this.setSeekPosition(targetPercentage);
       this.setPlaybackPosition(targetPercentage);
-      this.onSeekPreviewEvent(targetPercentage, true);
+      this.onSeekPreviewEvent(targetPercentage, seekPositionPx, true);
     };
 
     let mouseTouchUpHandler = (e: MouseEvent | TouchEvent) => {
@@ -782,10 +785,12 @@ export class SeekBar extends Component<SeekBarConfig> {
         mouseTouchMoveHandler(e);
       }
 
-      let position = 100 * this.getOffset(e);
-      this.setSeekPosition(position);
+      const offset = this.getOffset(e);
+      const seekPositionPercentage = 100 * offset;
+      const seekPositionPx = offset * this.seekBar.width();
 
-      this.onSeekPreviewEvent(position, false);
+      this.setSeekPosition(seekPositionPercentage);
+      this.onSeekPreviewEvent(seekPositionPercentage, seekPositionPx, false);
 
       if (this.hasLabel() && this.getLabel().isHidden()) {
         this.getLabel().show();
@@ -1025,21 +1030,15 @@ export class SeekBar extends Component<SeekBarConfig> {
     this.seekBarEvents.onSeek.dispatch(this);
   }
 
-  private updateLabelPosition = (seekPositionPercentage: number) => {
-    const labelDomElement = this.label.getDomElement();
-    labelDomElement.css({
-      'left': seekPositionPercentage + '%',
-      'transform': null,
-    });
-
-    // TODO: Re-test `requestAnimationFrame` to prevent forced synchronous layout calculation
+  private updateLabelPosition = (pixelPosition: number) => {
     if (!this.uiBoundingRect) {
       this.uiBoundingRect = this.uiManager.getUI().getDomElement().get(0).getBoundingClientRect();
     }
-    this.label.ensureWithinBounds(this.uiBoundingRect);
+
+    this.label.setPositionInBounds(pixelPosition, this.uiBoundingRect);
   };
 
-  protected onSeekPreviewEvent(percentage: number, scrubbing: boolean) {
+  protected onSeekPreviewEvent(percentage: number, targetOffsetPx: number, scrubbing: boolean) {
     let snappedMarker = this.timelineMarkersHandler && this.timelineMarkersHandler.getMarkerAtPosition(percentage);
 
     let seekPositionPercentage = percentage;
@@ -1062,7 +1061,7 @@ export class SeekBar extends Component<SeekBarConfig> {
     }
 
     if (this.label) {
-      this.updateLabelPosition(seekPositionPercentage);
+      this.updateLabelPosition(targetOffsetPx);
     }
 
     this.seekBarEvents.onSeekPreview.dispatch(this, {
