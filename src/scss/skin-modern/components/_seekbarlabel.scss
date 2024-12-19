@@ -21,6 +21,9 @@
 
   > .#{$prefix}-container-wrapper {
     @extend %center-on-left-edge;
+
+    padding-left: 1em;
+    padding-right: 1em;
   }
 
   // bottom arrow from http://www.cssarrowplease.com/

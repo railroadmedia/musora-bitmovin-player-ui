@@ -141,16 +141,14 @@ export class SeekBarLabel extends Container<SeekBarLabelConfig> {
       'left': seekPositionPx + 'px',
     });
 
-    // TODO move into CSS
-    const overflowMargin = 8;
-
-    const labelBounding = this.container.getDomElement().get(0).getBoundingClientRect();
+    // Check parent container as it has a padding that needs to be considered
+    const labelBounding = this.container.getDomElement().get(0).parentElement.getBoundingClientRect();
 
     let preventOverflowOffset = 0;
-    if (labelBounding.right + overflowMargin > bounds.right) {
-      preventOverflowOffset = labelBounding.right - bounds.right + overflowMargin;
-    } else if (labelBounding.left - overflowMargin < bounds.left) {
-      preventOverflowOffset = labelBounding.left - bounds.left - overflowMargin;
+    if (labelBounding.right > bounds.right) {
+      preventOverflowOffset = labelBounding.right - bounds.right;
+    } else if (labelBounding.left < bounds.left) {
+      preventOverflowOffset = labelBounding.left - bounds.left;
     }
 
     if (preventOverflowOffset !== 0) {
