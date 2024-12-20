@@ -137,9 +137,7 @@ export class SeekBarLabel extends Container<SeekBarLabelConfig> {
   };
 
   public setPositionInBounds(seekPositionPx: number, bounds: DOMRect) {
-    this.getDomElement().css({
-      'left': seekPositionPx + 'px',
-    });
+    this.getDomElement().css('left', seekPositionPx + 'px');
 
     // Check parent container as it has a padding that needs to be considered
     const labelBounding = this.container.getDomElement().get(0).parentElement.getBoundingClientRect();
