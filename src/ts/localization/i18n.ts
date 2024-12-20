@@ -184,6 +184,7 @@ export class I18n {
 
     return matches
       .map((m: string) => ({ match: m, key: m.slice(1, -1) }))
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       .reduce((str, { key, match }) => config.hasOwnProperty(key) ? str.replace(match, config[key]) : str, text);
   }
 
