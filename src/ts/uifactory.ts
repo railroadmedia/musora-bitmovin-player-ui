@@ -53,6 +53,7 @@ import { ListNavigationGroup, ListOrientation } from './spatialnavigation/ListNa
 import { EcoModeContainer } from './components/ecomodecontainer';
 import { DynamicSettingsPanelItem } from './components/dynamicsettingspanelitem';
 import { TouchControlOverlay } from './components/touchcontroloverlay';
+import { AdStatusOverlay } from './components/adstatusoverlay';
 
 export namespace UIFactory {
   export function buildDefaultSuperModernUI(player: PlayerAPI, config: UIConfig = {}): UIManager {
@@ -440,11 +441,93 @@ export namespace UIFactory {
   }
 
   export function superModernMobileAdsUI() {
-    return new UIContainer({});
+    let controlBar = new ControlBar({
+      components: [
+        new Container({
+          components: [
+            new PlaybackTimeLabel({ timeLabelMode: PlaybackTimeLabelMode.CurrentTime }),
+            new SeekBar({ label: new SeekBarLabel() }),
+            new PlaybackTimeLabel({
+              timeLabelMode: PlaybackTimeLabelMode.TotalTime,
+              cssClasses: ['text-right'],
+            }),
+          ],
+          cssClasses: ['controlbar-top'],
+        }),
+        new Container({
+          components: [
+            new PlaybackToggleButton(),
+            new VolumeToggleButton(),
+            new Spacer(),
+            new FullscreenToggleButton(),
+          ],
+          cssClasses: ['controlbar-bottom'],
+        }),
+      ],
+    });
+
+    return new UIContainer({
+      components: [
+        new BufferingOverlay(),
+        new AdClickOverlay(),
+        new PlaybackToggleOverlay(),
+        controlBar,
+        new AdStatusOverlay(),
+        new ErrorMessageOverlay(),
+      ],
+      hideDelay: 2000,
+      hidePlayerStateExceptions: [
+        PlayerUtils.PlayerState.Prepared,
+        PlayerUtils.PlayerState.Paused,
+        PlayerUtils.PlayerState.Finished,
+      ],
+      cssClasses: ['ui-skin-super-modern', 'ui-skin-smallscreen', 'ui-skin-ads'],
+    });
   }
 
   export function superModernAdsUI() {
-    return new UIContainer({});
+    let controlBar = new ControlBar({
+      components: [
+        new Container({
+          components: [
+            new PlaybackTimeLabel({ timeLabelMode: PlaybackTimeLabelMode.CurrentTime }),
+            new SeekBar({ label: new SeekBarLabel() }),
+            new PlaybackTimeLabel({
+              timeLabelMode: PlaybackTimeLabelMode.TotalTime,
+              cssClasses: ['text-right'],
+            }),
+          ],
+          cssClasses: ['controlbar-top'],
+        }),
+        new Container({
+          components: [
+            new PlaybackToggleButton(),
+            new VolumeToggleButton(),
+            new Spacer(),
+            new FullscreenToggleButton(),
+          ],
+          cssClasses: ['controlbar-bottom'],
+        }),
+      ],
+    });
+
+    return new UIContainer({
+      components: [
+        new BufferingOverlay(),
+        new AdClickOverlay(),
+        new PlaybackToggleOverlay(),
+        new AdStatusOverlay(),
+        controlBar,
+        new ErrorMessageOverlay(),
+      ],
+      hideDelay: 2000,
+      hidePlayerStateExceptions: [
+        PlayerUtils.PlayerState.Prepared,
+        PlayerUtils.PlayerState.Paused,
+        PlayerUtils.PlayerState.Finished,
+      ],
+      cssClasses: ['ui-skin-super-modern', 'ui-skin-ads'],
+    });
   }
 
   export function superModernMobileUI() {
