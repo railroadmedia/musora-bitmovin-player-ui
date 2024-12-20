@@ -16,6 +16,7 @@
   min-width: 1.5em;
   padding: .25em;
   transition: transform .15s ease;
+  -webkit-tap-highlight-color: transparent;
 
   .#{$prefix}-label {
     color: $color-primary;
