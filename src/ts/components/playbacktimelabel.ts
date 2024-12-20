@@ -192,8 +192,7 @@ export class PlaybackTimeLabel extends Label<PlaybackTimeLabelConfig> {
         this.setText(`${currentTime} / ${totalTime}`);
         break;
       case PlaybackTimeLabelMode.RemainingTime:
-        let remainingTime = StringUtils.secondsToTime(durationSeconds - playbackSeconds, this.timeFormat);
-        this.setText(`${remainingTime}`);
+        this.setText(`${StringUtils.secondsToTime(durationSeconds - playbackSeconds, this.timeFormat)}`);
         break;
     }
   }

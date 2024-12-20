@@ -1,4 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Constructor<T = unknown> = { new (...params: any[]): T };
 type GenericMock = { [key: string]: jest.Mock };
 
