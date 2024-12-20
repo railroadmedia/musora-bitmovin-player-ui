@@ -36,6 +36,8 @@ export class SeekBarLabel extends Container<SeekBarLabelConfig> {
   private appliedMarkerCssClasses: string[] = [];
   private player: PlayerAPI;
   private uiManager: UIInstanceManager;
+  private readonly container: Container<ContainerConfig>;
+  private readonly caret: Label<LabelConfig>;
 
   constructor(config: SeekBarLabelConfig = {}) {
     super(config);
@@ -45,17 +47,22 @@ export class SeekBarLabel extends Container<SeekBarLabelConfig> {
     this.thumbnail = new Component({ cssClasses: ['seekbar-thumbnail'], role: 'img' });
     this.thumbnailImageLoader = new ImageLoader();
 
+    this.container = new Container({
+      components: [
+        this.thumbnail,
+        new Container({
+          components: [this.titleLabel, this.timeLabel],
+          cssClass: 'seekbar-label-metadata',
+        }),
+      ],
+      cssClass: 'seekbar-label-inner',
+    });
+
+    this.caret = new Label({ cssClasses: ['seekbar-label-caret'] });
+
     this.config = this.mergeConfig(config, {
       cssClass: 'ui-seekbar-label',
-      components: [new Container({
-        components: [
-          this.thumbnail,
-          new Container({
-            components: [this.titleLabel, this.timeLabel],
-            cssClass: 'seekbar-label-metadata',
-          })],
-        cssClass: 'seekbar-label-inner',
-      })],
+      components: [this.container, this.caret],
       hidden: true,
     }, this.config);
   }
@@ -128,6 +135,28 @@ export class SeekBarLabel extends Container<SeekBarLabelConfig> {
       this.appliedMarkerCssClasses = cssClasses;
     }
   };
+
+  public setPositionInBounds(seekPositionPx: number, bounds: DOMRect) {
+    this.getDomElement().css('left', seekPositionPx + 'px');
+
+    // Check parent container as it has a padding that needs to be considered
+    const labelBounding = this.container.getDomElement().get(0).parentElement.getBoundingClientRect();
+
+    let preventOverflowOffset = 0;
+    if (labelBounding.right > bounds.right) {
+      preventOverflowOffset = labelBounding.right - bounds.right;
+    } else if (labelBounding.left < bounds.left) {
+      preventOverflowOffset = labelBounding.left - bounds.left;
+    }
+
+    if (preventOverflowOffset !== 0) {
+      this.getDomElement().css('left', seekPositionPx - preventOverflowOffset + 'px');
+
+      this.caret.getDomElement().css('transform', `translateX(${preventOverflowOffset}px)`);
+    } else {
+      this.caret.getDomElement().css('transform', null);
+    }
+  }
 
   /**
    * Sets arbitrary text on the label.

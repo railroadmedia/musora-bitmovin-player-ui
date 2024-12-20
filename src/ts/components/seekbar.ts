@@ -114,7 +114,10 @@ export class SeekBar extends Component<SeekBarConfig> {
   private seekBarMarkersContainer: DOM;
   private timelineMarkersHandler: TimelineMarkersHandler;
 
+  private uiBoundingRect: DOMRect;
+
   private player: PlayerAPI;
+  private uiManager: UIInstanceManager;
 
   protected seekBarType: SeekBarType;
 
@@ -220,6 +223,7 @@ export class SeekBar extends Component<SeekBarConfig> {
     super.configure(player, uimanager);
 
     this.player = player;
+    this.uiManager = uimanager;
 
     // Apply scaling transform to the backdrop bar to have all bars rendered similarly
     // (the call must be up here to be executed for the volume slider as well)
@@ -453,6 +457,7 @@ export class SeekBar extends Component<SeekBarConfig> {
     // is positioned absolutely and must therefore be updated when the size of the seekbar changes.
     player.on(player.exports.PlayerEvent.PlayerResized, () => {
       this.refreshPlaybackPosition();
+      this.uiBoundingRect = this.uiManager.getUI().getDomElement().get(0).getBoundingClientRect();
     });
     // Additionally, when this code is called, the seekbar is not part of the UI yet and therefore does not have a size,
     // resulting in a wrong initial position of the marker. Refreshing it once the UI is configured solved this issue.
@@ -716,10 +721,13 @@ export class SeekBar extends Component<SeekBarConfig> {
         e.stopPropagation();
       }
 
-      let targetPercentage = 100 * this.getOffset(e);
+      const offset = this.getOffset(e);
+      const targetPercentage = 100 * offset;
+      const seekPositionPx = offset * this.seekBar.width();
+
       this.setSeekPosition(targetPercentage);
       this.setPlaybackPosition(targetPercentage);
-      this.onSeekPreviewEvent(targetPercentage, true);
+      this.onSeekPreviewEvent(targetPercentage, seekPositionPx, true);
     };
 
     let mouseTouchUpHandler = (e: MouseEvent | TouchEvent) => {
@@ -777,10 +785,12 @@ export class SeekBar extends Component<SeekBarConfig> {
         mouseTouchMoveHandler(e);
       }
 
-      let position = 100 * this.getOffset(e);
-      this.setSeekPosition(position);
+      const offset = this.getOffset(e);
+      const seekPositionPercentage = 100 * offset;
+      const seekPositionPx = offset * this.seekBar.width();
 
-      this.onSeekPreviewEvent(position, false);
+      this.setSeekPosition(seekPositionPercentage);
+      this.onSeekPreviewEvent(seekPositionPercentage, seekPositionPx, false);
 
       if (this.hasLabel() && this.getLabel().isHidden()) {
         this.getLabel().show();
@@ -1020,7 +1030,15 @@ export class SeekBar extends Component<SeekBarConfig> {
     this.seekBarEvents.onSeek.dispatch(this);
   }
 
-  protected onSeekPreviewEvent(percentage: number, scrubbing: boolean) {
+  private updateLabelPosition = (pixelPosition: number) => {
+    if (!this.uiBoundingRect) {
+      this.uiBoundingRect = this.uiManager.getUI().getDomElement().get(0).getBoundingClientRect();
+    }
+
+    this.label.setPositionInBounds(pixelPosition, this.uiBoundingRect);
+  };
+
+  protected onSeekPreviewEvent(percentage: number, targetOffsetPx: number, scrubbing: boolean) {
     let snappedMarker = this.timelineMarkersHandler && this.timelineMarkersHandler.getMarkerAtPosition(percentage);
 
     let seekPositionPercentage = percentage;
@@ -1043,9 +1061,7 @@ export class SeekBar extends Component<SeekBarConfig> {
     }
 
     if (this.label) {
-      this.label.getDomElement().css({
-        'left': seekPositionPercentage + '%',
-      });
+      this.updateLabelPosition(targetOffsetPx);
     }
 
     this.seekBarEvents.onSeekPreview.dispatch(this, {

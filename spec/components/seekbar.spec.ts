@@ -114,7 +114,7 @@ describe('SeekBar', () => {
 
         jest.spyOn(playerMock, 'getSeekableRange').mockImplementation(() => ({start: 26, end: 30}));
 
-        seekbar['onSeekPreviewEvent'](40, true)
+        seekbar['onSeekPreviewEvent'](40, 100, true);
 
         playerMock.eventEmitter.fireSegmentRequestFinished();
 
@@ -127,19 +127,19 @@ describe('SeekBar', () => {
       it('will update the scrubber location after a successful segment request download and the user is not scrubbing', () => {
         jest.spyOn(playerMock, 'getSeekableRange').mockImplementation(() => ({start: 26, end: 30}));
 
-        seekbar['onSeekPreviewEvent'](18, false)
+        seekbar['onSeekPreviewEvent'](18, 100, false);
 
         playerMock.eventEmitter.fireSegmentRequestFinished();
 
         expect(setPlaybackPositionSpy).toHaveBeenLastCalledWith(18);
-        expect(setBufferPositionSpy).toHaveBeenLastCalledWith(18)
+        expect(setBufferPositionSpy).toHaveBeenLastCalledWith(18);
       });
     });
   });
 
   describe('group playback', () => {
     beforeEach(() => {
-      jest.spyOn(playerMock, 'getDuration').mockReturnValue(0)
+      jest.spyOn(playerMock, 'getDuration').mockReturnValue(0);
       seekbar.configure(playerMock, uiInstanceManagerMock);
     });
 

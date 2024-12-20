@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+- Seek preview thumbnails exceeding the UI dimensions when default size is increased
+
 ## [3.75.0] - 2024-11-19
 
 ### Fixed
