@@ -224,8 +224,8 @@ describe('SettingsPanel', () => {
         const selectBox = new SelectBox();
         const closeDropdownSpy = jest.spyOn(selectBox, 'closeDropdown');
 
-        settingsPanel.getActivePage().addComponent(new SettingsPanelItem({ label: new Label(), setting: selectBox }));
-        settingsPanel.getActivePage().addComponent(new SettingsPanelItem({ label: new Label(), setting: new VolumeSlider() }));
+        settingsPanel.getActivePage().addComponent(new SettingsPanelItem({ label: new Label(), settingComponent: selectBox }));
+        settingsPanel.getActivePage().addComponent(new SettingsPanelItem({ label: new Label(), settingComponent: new VolumeSlider() }));
 
         settingsPanel['hideHoveredSelectBoxes']();
 
