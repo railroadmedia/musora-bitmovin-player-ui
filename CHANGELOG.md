@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 ### Changed
-- Update to Node v22
+- Chore: Update to Node v22
 
 ## [3.76.0] - 2024-12-20
 
