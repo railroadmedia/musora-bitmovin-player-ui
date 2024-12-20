@@ -1,12 +1,7 @@
 @import '../variables';
 @import '../mixins';
 
-// sass-lint:disable no-vendor-prefixes
 %opacity-transition {
-  -moz-transition: opacity .25s ease;
-  -ms-transition: opacity .25s ease;
-  -o-transition: opacity .25s ease;
-  -webkit-transition: opacity .25s ease;
   transition:  opacity .25s ease-out;
 }
 
@@ -23,15 +18,15 @@
 
 %seek-label {
   @extend %opacity-transition;
-  font-size: .4em;
-  font-weight: 600;
+  @include hidden-animated;
+  font-weight: 500;
   margin: 0;
   opacity: 1;
   position: absolute;
   text-shadow: $color-shadow-seek-label;
 }
 
-.#{$prefix}-ui-touchcontrol-overlay {
+.#{$prefix}-ui-touch-control-overlay {
   @extend %ui-container;
   @include layout-cover;
 
@@ -47,20 +42,14 @@
 
     .#{$prefix}-seek-forward-label {
       @extend %seek-label;
-      right: 15%;
 
-      &.#{$prefix}-hidden {
-        opacity: 0;
-      }
+      right: 10%;
     }
 
     .#{$prefix}-seek-backward-label {
       @extend %seek-label;
-      left: 15%;
 
-      &.#{$prefix}-hidden {
-        opacity: 0;
-      }
+      left: 10%;
     }
   }
 
