@@ -399,7 +399,7 @@ export class SettingsPanel extends Container<SettingsPanelConfig> {
    */
   private hideHoveredSelectBoxes(): void {
     this.getComputedItems()
-      .map(item => item['setting'])
+      .map(item => item['settingComponent'])
       .filter(component => component instanceof SelectBox)
       .forEach((selectBox: SelectBox) => selectBox.closeDropdown());
   }

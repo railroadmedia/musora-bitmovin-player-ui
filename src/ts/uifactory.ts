@@ -81,10 +81,10 @@ export namespace UIFactory {
     let mainSettingsPanelPage: SettingsPanelPage;
 
     const components: Container<ContainerConfig>[] = [
-      new SettingsPanelItem({ label: i18n.getLocalizer('settings.video.quality'), setting: new VideoQualitySelectBox() }),
-      new SettingsPanelItem({ label: i18n.getLocalizer('speed'), setting: new PlaybackSpeedSelectBox() }),
-      new SettingsPanelItem({ label: i18n.getLocalizer('settings.audio.track'), setting: new AudioTrackSelectBox() }),
-      new SettingsPanelItem({ label: i18n.getLocalizer('settings.audio.quality'), setting: new AudioQualitySelectBox() }),
+      new SettingsPanelItem({ label: i18n.getLocalizer('settings.video.quality'), settingComponent: new VideoQualitySelectBox() }),
+      new SettingsPanelItem({ label: i18n.getLocalizer('speed'), settingComponent: new PlaybackSpeedSelectBox() }),
+      new SettingsPanelItem({ label: i18n.getLocalizer('settings.audio.track'), settingComponent: new AudioTrackSelectBox() }),
+      new SettingsPanelItem({ label: i18n.getLocalizer('settings.audio.quality'), settingComponent: new AudioQualitySelectBox() }),
     ];
 
     if (config.ecoMode) {
@@ -127,7 +127,7 @@ export namespace UIFactory {
           text: i18n.getLocalizer('settings.subtitles'),
           opener: subtitleSettingsOpenButton,
         }),
-        setting: subtitleSelectBox,
+        settingComponent: subtitleSelectBox,
         role: 'menubar',
       }),
     );
@@ -231,10 +231,10 @@ export namespace UIFactory {
 
     let mainSettingsPanelPage = new SettingsPanelPage({
       components: [
-        new SettingsPanelItem({ label: i18n.getLocalizer('settings.video.quality'), setting: new VideoQualitySelectBox() }),
-        new SettingsPanelItem({ label: i18n.getLocalizer('speed'), setting: new PlaybackSpeedSelectBox() }),
-        new SettingsPanelItem({ label: i18n.getLocalizer('settings.audio.track'), setting: new AudioTrackSelectBox() }),
-        new SettingsPanelItem({ label: i18n.getLocalizer('settings.audio.quality'), setting: new AudioQualitySelectBox() }),
+        new SettingsPanelItem({ label: i18n.getLocalizer('settings.video.quality'), settingComponent: new VideoQualitySelectBox() }),
+        new SettingsPanelItem({ label: i18n.getLocalizer('speed'), settingComponent: new PlaybackSpeedSelectBox() }),
+        new SettingsPanelItem({ label: i18n.getLocalizer('settings.audio.track'), settingComponent: new AudioTrackSelectBox() }),
+        new SettingsPanelItem({ label: i18n.getLocalizer('settings.audio.quality'), settingComponent: new AudioQualitySelectBox() }),
       ],
     });
 
@@ -265,7 +265,7 @@ export namespace UIFactory {
           text: i18n.getLocalizer('settings.subtitles'),
           opener: subtitleSettingsOpenButton,
         }),
-        setting: subtitleSelectBox,
+        settingComponent: subtitleSelectBox,
         role: 'menubar',
       }),
     );
@@ -461,22 +461,22 @@ export namespace UIFactory {
       components: [
         new DynamicSettingsPanelItem({
           label: i18n.getLocalizer('settings.video.quality'),
-          setting: new VideoQualitySelectBox(),
+          settingComponent: new VideoQualitySelectBox(),
           container: settingsPanel,
         }),
         new DynamicSettingsPanelItem({
           label: i18n.getLocalizer('speed'),
-          setting: new PlaybackSpeedSelectBox(),
+          settingComponent: new PlaybackSpeedSelectBox(),
           container: settingsPanel,
         }),
         new DynamicSettingsPanelItem({
           label: i18n.getLocalizer('settings.audio.track'),
-          setting: new AudioTrackSelectBox() ,
+          settingComponent: new AudioTrackSelectBox() ,
           container: settingsPanel,
         }),
         new DynamicSettingsPanelItem({
           label: i18n.getLocalizer('settings.audio.quality'),
-          setting: new AudioQualitySelectBox(),
+          settingComponent: new AudioQualitySelectBox(),
           container: settingsPanel,
         }),
       ],
@@ -503,7 +503,7 @@ export namespace UIFactory {
         text: i18n.getLocalizer('settings.subtitles'),
         opener: subtitleSettingsOpenButton,
       }),
-      setting: subtitleSelectBox,
+      settingComponent: subtitleSelectBox,
       role: 'menubar',
       container: settingsPanel,
     });
@@ -518,7 +518,7 @@ export namespace UIFactory {
               timeLabelMode: PlaybackTimeLabelMode.CurrentTime,
               hideInLivePlayback: true,
             }),
-            new SeekBar({ label: new SeekBarLabel(), renderSeekBarPlaybackPositionMarkerInOuterSeekBar: true }),
+            new SeekBar({ label: new SeekBarLabel() }),
             new PlaybackTimeLabel({
               timeLabelMode: PlaybackTimeLabelMode.TotalTime,
               cssClasses: ['text-right'],
@@ -583,22 +583,22 @@ export namespace UIFactory {
     const components: Container<ContainerConfig>[] = [
       new DynamicSettingsPanelItem({
         label: i18n.getLocalizer('settings.video.quality'),
-        setting: new VideoQualitySelectBox(),
+        settingComponent: new VideoQualitySelectBox(),
         container: settingsPanel,
       }),
       new DynamicSettingsPanelItem({
         label: i18n.getLocalizer('speed'),
-        setting: new PlaybackSpeedSelectBox(),
+        settingComponent: new PlaybackSpeedSelectBox(),
         container: settingsPanel,
       }),
       new DynamicSettingsPanelItem({
         label: i18n.getLocalizer('settings.audio.track'),
-        setting: new AudioTrackSelectBox(),
+        settingComponent: new AudioTrackSelectBox(),
         container: settingsPanel,
       }),
       new DynamicSettingsPanelItem({
         label: i18n.getLocalizer('settings.audio.quality'),
-        setting: new AudioQualitySelectBox(),
+        settingComponent: new AudioQualitySelectBox(),
         container: settingsPanel,
       }),
     ];
@@ -639,7 +639,7 @@ export namespace UIFactory {
         text: i18n.getLocalizer('settings.subtitles'),
         opener: subtitleSettingsOpenButton,
       }),
-      setting: subtitleSelectBox,
+      settingComponent: subtitleSelectBox,
       role: 'menubar',
       container: settingsPanel,
     });
@@ -654,7 +654,7 @@ export namespace UIFactory {
               timeLabelMode: PlaybackTimeLabelMode.CurrentTime,
               hideInLivePlayback: true,
             }),
-            new SeekBar({ label: new SeekBarLabel(), renderSeekBarPlaybackPositionMarkerInOuterSeekBar: true }),
+            new SeekBar({ label: new SeekBarLabel() }),
             new PlaybackTimeLabel({
               timeLabelMode: PlaybackTimeLabelMode.TotalTime,
               cssClasses: ['text-right'],
@@ -666,7 +666,7 @@ export namespace UIFactory {
           components: [
             new PlaybackToggleButton(),
             new VolumeToggleButton(),
-            new VolumeSlider({ renderSeekBarPlaybackPositionMarkerInOuterSeekBar: true }),
+            new VolumeSlider(),
             new Spacer(),
             new PictureInPictureToggleButton(),
             new AirPlayToggleButton(),
@@ -809,7 +809,7 @@ export namespace UIFactory {
     const subtitleListPanel = new SettingsPanel({
       components: [
         new SettingsPanelPage({
-          components: [new SettingsPanelItem({ setting: subtitleListBox })],
+          components: [new SettingsPanelItem({ settingComponent: subtitleListBox })],
         }),
       ],
       hidden: true,
@@ -819,7 +819,7 @@ export namespace UIFactory {
     const audioTrackListPanel = new SettingsPanel({
       components: [
         new SettingsPanelPage({
-          components: [new SettingsPanelItem({ setting: audioTrackListBox })],
+          components: [new SettingsPanelItem({ settingComponent: audioTrackListBox })],
         }),
       ],
       hidden: true,

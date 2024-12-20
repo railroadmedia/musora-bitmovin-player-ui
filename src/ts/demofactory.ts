@@ -70,9 +70,9 @@ export namespace DemoFactory {
       components: [
         new SettingsPanelPage({
           components: [
-            new SettingsPanelItem({ label: 'Video Quality', setting: new VideoQualitySelectBox() }),
-            new SettingsPanelItem({ label: 'Speed', setting: new PlaybackSpeedSelectBox() }),
-            new SettingsPanelItem({ label: 'Audio Quality', setting: new AudioQualitySelectBox() }),
+            new SettingsPanelItem({ label: 'Video Quality', settingComponent: new VideoQualitySelectBox() }),
+            new SettingsPanelItem({ label: 'Speed', settingComponent: new PlaybackSpeedSelectBox() }),
+            new SettingsPanelItem({ label: 'Audio Quality', settingComponent: new AudioQualitySelectBox() }),
           ],
         }),
       ],
@@ -84,7 +84,7 @@ export namespace DemoFactory {
       components: [
         new SettingsPanelPage({
           components: [
-            new SettingsPanelItem({ label: null, setting: subtitleListBox }),
+            new SettingsPanelItem({ label: null, settingComponent: subtitleListBox }),
           ],
         }),
       ],
@@ -96,7 +96,7 @@ export namespace DemoFactory {
       components: [
         new SettingsPanelPage({
           components: [
-            new SettingsPanelItem({ label: null, setting: audioTrackListBox }),
+            new SettingsPanelItem({ label: null, settingComponent: audioTrackListBox }),
           ],
         }),
       ],

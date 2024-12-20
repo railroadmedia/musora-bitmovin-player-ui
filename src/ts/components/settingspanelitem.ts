@@ -24,7 +24,7 @@ export interface SettingsPanelItemConfig extends ContainerConfig {
   /**
    * The component that configures a setting.
    */
-  setting?: Component<ComponentConfig>;
+  settingComponent?: Component<ComponentConfig>;
   /**
    * If the setting should be added as a component to this item.
    */
@@ -41,7 +41,7 @@ export interface SettingsPanelItemConfig extends ContainerConfig {
 export class SettingsPanelItem<Config extends SettingsPanelItemConfig> extends Container<Config> {
 
   private label: Component<ComponentConfig>;
-  protected setting: Component<ComponentConfig> | null;
+  protected settingComponent: Component<ComponentConfig> | null;
 
   private settingsPanelItemEvents = {
     onActiveChanged: new EventDispatcher<SettingsPanelItem<Config>, NoArgs>(),
@@ -51,7 +51,7 @@ export class SettingsPanelItem<Config extends SettingsPanelItemConfig> extends C
   constructor(config: Config) {
     super(config);
 
-    this.setting = config.setting;
+    this.settingComponent = config.settingComponent;
 
     this.config = this.mergeConfig(config, {
       cssClass: 'ui-settings-panel-item',
@@ -74,14 +74,14 @@ export class SettingsPanelItem<Config extends SettingsPanelItemConfig> extends C
   configure(player: PlayerAPI, uimanager: UIInstanceManager): void {
     super.configure(player, uimanager);
 
-    if (this.setting != null && this.config.addSettingAsComponent) {
-      this.addComponent(this.setting);
+    if (this.settingComponent != null && this.config.addSettingAsComponent) {
+      this.addComponent(this.settingComponent);
       this.updateComponents();
     }
 
-    if (this.setting instanceof SelectBox || this.setting instanceof ListBox) {
+    if (this.settingComponent instanceof SelectBox || this.settingComponent instanceof ListBox) {
       let handleConfigItemChanged = () => {
-        if (!(this.setting instanceof SelectBox) && !(this.setting instanceof ListBox)) {
+        if (!(this.settingComponent instanceof SelectBox) && !(this.settingComponent instanceof ListBox)) {
           return;
         }
         // The minimum number of items that must be available for the setting to be displayed
@@ -89,15 +89,15 @@ export class SettingsPanelItem<Config extends SettingsPanelItemConfig> extends C
         let minItemsToDisplay = 2;
         // Audio/video quality select boxes contain an additional 'auto' mode, which in combination with a single
         // available quality also does not make sense
-        if ((this.setting instanceof VideoQualitySelectBox && this.setting.hasAutoItem())
-          || this.setting instanceof AudioQualitySelectBox) {
+        if ((this.settingComponent instanceof VideoQualitySelectBox && this.settingComponent.hasAutoItem())
+          || this.settingComponent instanceof AudioQualitySelectBox) {
           minItemsToDisplay = 3;
         }
 
-        if (this.setting.itemCount() < minItemsToDisplay) {
+        if (this.settingComponent.itemCount() < minItemsToDisplay) {
           // Hide the setting if no meaningful choice is available
           this.hide();
-        } else if (this.setting instanceof PlaybackSpeedSelectBox
+        } else if (this.settingComponent instanceof PlaybackSpeedSelectBox
           && !uimanager.getConfig().playbackSpeedSelectionEnabled) {
           // Hide the PlaybackSpeedSelectBox if disabled in config
           this.hide();
@@ -112,8 +112,8 @@ export class SettingsPanelItem<Config extends SettingsPanelItemConfig> extends C
         this.getDomElement().attr('aria-haspopup', 'true');
       };
 
-      this.setting.onItemAdded.subscribe(handleConfigItemChanged);
-      this.setting.onItemRemoved.subscribe(handleConfigItemChanged);
+      this.settingComponent.onItemAdded.subscribe(handleConfigItemChanged);
+      this.settingComponent.onItemRemoved.subscribe(handleConfigItemChanged);
 
       // Initialize hidden state
       handleConfigItemChanged();
