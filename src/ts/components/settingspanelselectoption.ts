@@ -12,7 +12,7 @@ export interface SettingsPanelSelectOptionConfig extends SettingsPanelItemConfig
   /**
    * The setting that will be changed when this option is clicked.
    */
-  setting: ListSelector<ListSelectorConfig>;
+  settingComponent: ListSelector<ListSelectorConfig>;
   /**
    * The value of the setting that will be selected when this option is clicked.
    */
@@ -27,7 +27,7 @@ export interface SettingsPanelSelectOptionConfig extends SettingsPanelItemConfig
  */
 export class SettingsPanelSelectOption extends SettingsPanelItem<SettingsPanelSelectOptionConfig> {
   private settingsValue: string | undefined;
-  protected setting: ListSelector<ListSelectorConfig>;
+  protected settingComponent: ListSelector<ListSelectorConfig>;
 
   constructor(config: SettingsPanelSelectOptionConfig) {
     super(config);
@@ -44,7 +44,7 @@ export class SettingsPanelSelectOption extends SettingsPanelItem<SettingsPanelSe
     super.configure(player, uimanager);
 
     const handleSelectedOptionChanged = () => {
-      let selectedItem = this.setting.getSelectedItem();
+      let selectedItem = this.settingComponent.getSelectedItem();
 
       if (this.settingsValue === selectedItem) {
         this.getDomElement().addClass(this.prefixCss('selected'));
@@ -52,10 +52,10 @@ export class SettingsPanelSelectOption extends SettingsPanelItem<SettingsPanelSe
         this.getDomElement().removeClass(this.prefixCss('selected'));
       }
     };
-    this.setting.onItemSelected.subscribe(handleSelectedOptionChanged);
+    this.settingComponent.onItemSelected.subscribe(handleSelectedOptionChanged);
 
     const handleItemClick = () => {
-      this.setting.selectItem(this.settingsValue);
+      this.settingComponent.selectItem(this.settingsValue);
     };
     this.getDomElement().on('click', () => handleItemClick());
 

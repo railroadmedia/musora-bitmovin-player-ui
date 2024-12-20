@@ -25,7 +25,7 @@ export interface DynamicSettingsPanelItemConfig extends SettingsPanelItemConfig 
   /**
    * The list selector component which will be used to build the sub page.
    */
-  setting: ListSelector<ListSelectorConfig>;
+  settingComponent: ListSelector<ListSelectorConfig>;
   /**
    * The enclosing {@link SettingsPanel} where the sub page will be added.
    */
@@ -40,7 +40,7 @@ export interface DynamicSettingsPanelItemConfig extends SettingsPanelItemConfig 
  */
 export class DynamicSettingsPanelItem extends SettingsPanelItem<DynamicSettingsPanelItemConfig> {
   private selectedOptionLabel: Label<LabelConfig>;
-  protected setting: ListSelector<ListSelectorConfig>;
+  protected settingComponent: ListSelector<ListSelectorConfig>;
 
   private player: PlayerAPI;
   private uimanager: UIInstanceManager;
@@ -48,7 +48,7 @@ export class DynamicSettingsPanelItem extends SettingsPanelItem<DynamicSettingsP
   constructor(config: DynamicSettingsPanelItemConfig) {
     super(config);
 
-    this.setting = config.setting;
+    this.settingComponent = config.settingComponent;
 
     this.selectedOptionLabel = new Label({
       text: '-',
@@ -76,12 +76,12 @@ export class DynamicSettingsPanelItem extends SettingsPanelItem<DynamicSettingsP
       this.config.label.opener.configure(player, uimanager);
     }
 
-    if (this.setting != null) {
-      this.setting.configure(this.player, this.uimanager);
+    if (this.settingComponent != null) {
+      this.settingComponent.configure(this.player, this.uimanager);
     }
 
     const handleSelectedItemChanged = () => {
-      let selectedItem = this.setting.getItemForKey(this.setting.getSelectedItem());
+      let selectedItem = this.settingComponent.getItemForKey(this.settingComponent.getSelectedItem());
       if (selectedItem == null) {
         this.selectedOptionLabel.hide();
         return;
@@ -89,13 +89,13 @@ export class DynamicSettingsPanelItem extends SettingsPanelItem<DynamicSettingsP
 
       this.selectedOptionLabel.show();
       let selectedOptionLabelText = selectedItem.label;
-      if (this.setting instanceof SubtitleSelectBox) {
-        let availableSettings = this.setting.getItems().length;
+      if (this.settingComponent instanceof SubtitleSelectBox) {
+        let availableSettings = this.settingComponent.getItems().length;
         selectedOptionLabelText = selectedOptionLabelText + ' (' + (availableSettings - 1) + ')';
       }
       this.selectedOptionLabel.setText(selectedOptionLabelText);
     };
-    this.setting.onItemSelected.subscribe(handleSelectedItemChanged);
+    this.settingComponent.onItemSelected.subscribe(handleSelectedItemChanged);
 
     handleSelectedItemChanged();
 
@@ -109,7 +109,7 @@ export class DynamicSettingsPanelItem extends SettingsPanelItem<DynamicSettingsP
   }
 
   private buildSubPanelPage(): SettingsPanelPage {
-    const menuOptions = this.setting.getItems();
+    const menuOptions = this.settingComponent.getItems();
     const page = new SettingsPanelPage({ removeOnPop: true });
 
     const text = this.config.label instanceof SubtitleSettingsLabel ? this.config.label.text : this.config.label;
@@ -129,7 +129,7 @@ export class DynamicSettingsPanelItem extends SettingsPanelItem<DynamicSettingsP
       .map((option) => {
         return new SettingsPanelSelectOption({
           label: option.label,
-          setting: this.setting,
+          settingComponent: this.settingComponent,
           settingsValue: option.key,
           addSettingAsComponent: false,
         });
@@ -141,7 +141,7 @@ export class DynamicSettingsPanelItem extends SettingsPanelItem<DynamicSettingsP
 
     page.configure(this.player, this.uimanager);
 
-    const setting = this.setting;
+    const setting = this.settingComponent;
     if (setting instanceof SubtitleSettingSelectBox) {
       // Keep the preview subtitle overlay visible when the sub-page is for a subtitle setting
       page.onActive.subscribe(() => setting.overlay.enablePreviewSubtitleLabel());

@@ -113,7 +113,7 @@ export class SubtitleSettingsPanelPage extends SettingsPanelPage {
       label: new SettingsPanelPageBackButton({
         container: this.settingsPanel,
       }),
-      setting: new SubtitleSettingsResetButton({}),
+      settingComponent: new SubtitleSettingsResetButton({}),
       cssClasses: ['title-item'],
     });
 
@@ -148,13 +148,13 @@ export class SubtitleSettingsPanelPage extends SettingsPanelPage {
     if (useDynamicSettingsPanelItem) {
       return new DynamicSettingsPanelItem({
         label: label,
-        setting: setting,
+        settingComponent: setting,
         container: this.settingsPanel,
       });
     } else {
       return new SettingsPanelItem({
         label: label,
-        setting: setting,
+        settingComponent: setting,
       });
     }
   }
