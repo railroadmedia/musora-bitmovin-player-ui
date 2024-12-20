@@ -1,8 +1,6 @@
-import {SettingsPanelPage} from '../settingspanelpage';
+import { SettingsPanelPage, SettingsPanelPageConfig } from '../settingspanelpage';
 import {SettingsPanel} from '../settingspanel';
 import {SubtitleOverlay} from '../subtitleoverlay';
-import {ContainerConfig} from '../container';
-import {SubtitleSettingsManager} from './subtitlesettingsmanager';
 import {Component, ComponentConfig} from '../component';
 import {FontSizeSelectBox} from './fontsizeselectbox';
 import {FontFamilySelectBox} from './fontfamilyselectbox';
@@ -16,16 +14,19 @@ import {WindowOpacitySelectBox} from './windowopacityselectbox';
 import {SubtitleSettingsResetButton} from './subtitlesettingsresetbutton';
 import {UIInstanceManager} from '../../uimanager';
 import {SettingsPanelPageBackButton} from '../settingspanelpagebackbutton';
-import {SettingsPanelItem} from '../settingspanelitem';
+import { SettingsPanelItem, SettingsPanelItemConfig } from '../settingspanelitem';
 import { PlayerAPI } from 'bitmovin-player';
-import { i18n } from '../../localization/i18n';
+import { i18n, LocalizableText } from '../../localization/i18n';
+import { DynamicSettingsPanelItem } from '../dynamicsettingspanelitem';
+import { ListSelector, ListSelectorConfig } from '../listselector';
 
 /**
  * @category Configs
  */
-export interface SubtitleSettingsPanelPageConfig extends ContainerConfig {
+export interface SubtitleSettingsPanelPageConfig extends SettingsPanelPageConfig {
   settingsPanel: SettingsPanel;
   overlay: SubtitleOverlay;
+  useDynamicSettingsPanelItem?: boolean;
 }
 
 /**
@@ -42,43 +43,88 @@ export class SubtitleSettingsPanelPage extends SettingsPanelPage {
     this.overlay = config.overlay;
     this.settingsPanel = config.settingsPanel;
 
+    const components = [
+      this.buildSettingsPanelItem(
+        i18n.getLocalizer('settings.subtitles.font.size'),
+        new FontSizeSelectBox({
+          overlay: this.overlay,
+        }),
+        config.useDynamicSettingsPanelItem,
+      ),
+      this.buildSettingsPanelItem(
+        i18n.getLocalizer('settings.subtitles.font.family'),
+        new FontFamilySelectBox({
+          overlay: this.overlay,
+        }),
+        config.useDynamicSettingsPanelItem,
+      ),
+      this.buildSettingsPanelItem(
+        i18n.getLocalizer('settings.subtitles.font.color'),
+        new FontColorSelectBox({
+          overlay: this.overlay,
+        }),
+        config.useDynamicSettingsPanelItem,
+      ),
+      this.buildSettingsPanelItem(
+        i18n.getLocalizer('settings.subtitles.font.opacity'),
+        new FontOpacitySelectBox({
+          overlay: this.overlay,
+        }),
+        config.useDynamicSettingsPanelItem,
+      ),
+      this.buildSettingsPanelItem(
+        i18n.getLocalizer('settings.subtitles.characterEdge'),
+        new CharacterEdgeSelectBox({
+          overlay: this.overlay,
+        }),
+        config.useDynamicSettingsPanelItem,
+      ),
+      this.buildSettingsPanelItem(
+        i18n.getLocalizer('settings.subtitles.background.color'),
+        new BackgroundColorSelectBox({
+          overlay: this.overlay,
+        }),
+        config.useDynamicSettingsPanelItem,
+      ),
+      this.buildSettingsPanelItem(
+        i18n.getLocalizer('settings.subtitles.background.opacity'),
+        new BackgroundOpacitySelectBox({
+          overlay: this.overlay,
+        }),
+        config.useDynamicSettingsPanelItem,
+      ),
+      this.buildSettingsPanelItem(
+        i18n.getLocalizer('settings.subtitles.window.color'),
+        new WindowColorSelectBox({
+          overlay: this.overlay,
+        }),
+        config.useDynamicSettingsPanelItem,
+      ),
+      this.buildSettingsPanelItem(
+        i18n.getLocalizer('settings.subtitles.window.opacity'),
+        new WindowOpacitySelectBox({
+          overlay: this.overlay,
+        }),
+        config.useDynamicSettingsPanelItem,
+      ),
+    ];
+
+    const backItem = new SettingsPanelItem({
+      label: new SettingsPanelPageBackButton({
+        container: this.settingsPanel,
+      }),
+      settingComponent: new SubtitleSettingsResetButton({}),
+      cssClasses: ['title-item'],
+    });
+
+    if (config.useDynamicSettingsPanelItem) {
+      components.unshift(backItem);
+    } else {
+      components.push(backItem);
+    }
 
     this.config = this.mergeConfig(config, {
-      components: <Component<ComponentConfig>[]>[
-        new SettingsPanelItem(i18n.getLocalizer('settings.subtitles.font.size'), new FontSizeSelectBox({
-          overlay: this.overlay,
-        })),
-        new SettingsPanelItem(i18n.getLocalizer('settings.subtitles.font.family'), new FontFamilySelectBox({
-          overlay: this.overlay,
-        })),
-        new SettingsPanelItem(i18n.getLocalizer('settings.subtitles.font.color'), new FontColorSelectBox({
-          overlay: this.overlay,
-        })),
-        new SettingsPanelItem(i18n.getLocalizer('settings.subtitles.font.opacity'), new FontOpacitySelectBox({
-          overlay: this.overlay,
-        })),
-        new SettingsPanelItem(i18n.getLocalizer('settings.subtitles.characterEdge'), new CharacterEdgeSelectBox({
-          overlay: this.overlay,
-        })),
-        new SettingsPanelItem(i18n.getLocalizer('settings.subtitles.background.color'), new BackgroundColorSelectBox({
-          overlay: this.overlay,
-        })),
-        new SettingsPanelItem(i18n.getLocalizer('settings.subtitles.background.opacity'), new BackgroundOpacitySelectBox({
-          overlay: this.overlay,
-        })),
-        new SettingsPanelItem(i18n.getLocalizer('settings.subtitles.window.color'), new WindowColorSelectBox({
-          overlay: this.overlay,
-        })),
-        new SettingsPanelItem(i18n.getLocalizer('settings.subtitles.window.opacity'), new WindowOpacitySelectBox({
-          overlay: this.overlay,
-        })),
-        new SettingsPanelItem(new SettingsPanelPageBackButton({
-          container: this.settingsPanel,
-          text: i18n.getLocalizer('back'),
-        }), new SubtitleSettingsResetButton({}), {
-          role: 'menubar',
-        }),
-      ],
+      components: components,
     }, this.config);
   }
 
@@ -92,5 +138,24 @@ export class SubtitleSettingsPanelPage extends SettingsPanelPage {
     this.onInactive.subscribe(() => {
       this.overlay.removePreviewSubtitleLabel();
     });
+  }
+
+  private buildSettingsPanelItem(
+    label: LocalizableText,
+    setting: ListSelector<ListSelectorConfig>,
+    useDynamicSettingsPanelItem: boolean = false,
+  ): SettingsPanelItem<SettingsPanelItemConfig> {
+    if (useDynamicSettingsPanelItem) {
+      return new DynamicSettingsPanelItem({
+        label: label,
+        settingComponent: setting,
+        container: this.settingsPanel,
+      });
+    } else {
+      return new SettingsPanelItem({
+        label: label,
+        settingComponent: setting,
+      });
+    }
   }
 }

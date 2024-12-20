@@ -39,7 +39,7 @@ import { AdSkipButton } from './components/adskipbutton';
 import { CloseButton } from './components/closebutton';
 import { MetadataLabel, MetadataLabelContent } from './components/metadatalabel';
 import { PlayerUtils } from './playerutils';
-import { Label, LabelConfig } from './components/label';
+import { Label } from './components/label';
 import { CastUIContainer } from './components/castuicontainer';
 import { UIConditionContext, UIManager } from './uimanager';
 import { UIConfig } from './uiconfig';
@@ -51,10 +51,7 @@ import { SpatialNavigation } from './spatialnavigation/spatialnavigation';
 import { RootNavigationGroup } from './spatialnavigation/rootnavigationgroup';
 import { ListNavigationGroup, ListOrientation } from './spatialnavigation/ListNavigationGroup';
 import { EcoModeContainer } from './components/ecomodecontainer';
-import { SubtitleToggleButton } from './components/subtitletogglebutton';
-import { ModernSettingsPanelItem } from './components/modernsettingspanelitem';
-import { ModernSettingsPanelPage } from './components/modernsettingspanelpage';
-import { ModernSettingsPanel } from './components/modernsettingspanel';
+import { DynamicSettingsPanelItem } from './components/dynamicsettingspanelitem';
 import { TouchControlOverlay } from './components/touchcontroloverlay';
 
 export namespace UIFactory {
@@ -84,10 +81,10 @@ export namespace UIFactory {
     let mainSettingsPanelPage: SettingsPanelPage;
 
     const components: Container<ContainerConfig>[] = [
-      new SettingsPanelItem(i18n.getLocalizer('settings.video.quality'), new VideoQualitySelectBox()),
-      new SettingsPanelItem(i18n.getLocalizer('speed'), new PlaybackSpeedSelectBox()),
-      new SettingsPanelItem(i18n.getLocalizer('settings.audio.track'), new AudioTrackSelectBox()),
-      new SettingsPanelItem(i18n.getLocalizer('settings.audio.quality'), new AudioQualitySelectBox()),
+      new SettingsPanelItem({ label: i18n.getLocalizer('settings.video.quality'), settingComponent: new VideoQualitySelectBox() }),
+      new SettingsPanelItem({ label: i18n.getLocalizer('speed'), settingComponent: new PlaybackSpeedSelectBox() }),
+      new SettingsPanelItem({ label: i18n.getLocalizer('settings.audio.track'), settingComponent: new AudioTrackSelectBox() }),
+      new SettingsPanelItem({ label: i18n.getLocalizer('settings.audio.quality'), settingComponent: new AudioQualitySelectBox() }),
     ];
 
     if (config.ecoMode) {
@@ -125,16 +122,14 @@ export namespace UIFactory {
     });
 
     mainSettingsPanelPage.addComponent(
-      new SettingsPanelItem(
-        new SubtitleSettingsLabel({
+      new SettingsPanelItem({
+        label: new SubtitleSettingsLabel({
           text: i18n.getLocalizer('settings.subtitles'),
           opener: subtitleSettingsOpenButton,
         }),
-        subtitleSelectBox,
-        {
-          role: 'menubar',
-        },
-      ),
+        settingComponent: subtitleSelectBox,
+        role: 'menubar',
+      }),
     );
 
     settingsPanel.addComponent(subtitleSettingsPanelPage);
@@ -236,10 +231,10 @@ export namespace UIFactory {
 
     let mainSettingsPanelPage = new SettingsPanelPage({
       components: [
-        new SettingsPanelItem(i18n.getLocalizer('settings.video.quality'), new VideoQualitySelectBox()),
-        new SettingsPanelItem(i18n.getLocalizer('speed'), new PlaybackSpeedSelectBox()),
-        new SettingsPanelItem(i18n.getLocalizer('settings.audio.track'), new AudioTrackSelectBox()),
-        new SettingsPanelItem(i18n.getLocalizer('settings.audio.quality'), new AudioQualitySelectBox()),
+        new SettingsPanelItem({ label: i18n.getLocalizer('settings.video.quality'), settingComponent: new VideoQualitySelectBox() }),
+        new SettingsPanelItem({ label: i18n.getLocalizer('speed'), settingComponent: new PlaybackSpeedSelectBox() }),
+        new SettingsPanelItem({ label: i18n.getLocalizer('settings.audio.track'), settingComponent: new AudioTrackSelectBox() }),
+        new SettingsPanelItem({ label: i18n.getLocalizer('settings.audio.quality'), settingComponent: new AudioQualitySelectBox() }),
       ],
     });
 
@@ -265,16 +260,14 @@ export namespace UIFactory {
     const subtitleSelectBox = new SubtitleSelectBox();
 
     mainSettingsPanelPage.addComponent(
-      new SettingsPanelItem(
-        new SubtitleSettingsLabel({
+      new SettingsPanelItem({
+        label: new SubtitleSettingsLabel({
           text: i18n.getLocalizer('settings.subtitles'),
           opener: subtitleSettingsOpenButton,
         }),
-        subtitleSelectBox,
-        {
-          role: 'menubar',
-        },
-      ),
+        settingComponent: subtitleSelectBox,
+        role: 'menubar',
+      }),
     );
 
     settingsPanel.addComponent(subtitleSettingsPanelPage);
@@ -457,32 +450,65 @@ export namespace UIFactory {
   export function superModernMobileUI() {
     let subtitleOverlay = new SubtitleOverlay();
 
-    let mainSettingsPanelPage = new ModernSettingsPanelPage({
-      components: [
-        new ModernSettingsPanelItem(i18n.getLocalizer('settings.video.quality'), new VideoQualitySelectBox()),
-        new ModernSettingsPanelItem(i18n.getLocalizer('speed'), new PlaybackSpeedSelectBox()),
-        new ModernSettingsPanelItem(i18n.getLocalizer('settings.audio.track'), new AudioTrackSelectBox()),
-        new ModernSettingsPanelItem(i18n.getLocalizer('settings.audio.quality'), new AudioQualitySelectBox()),
-      ],
-    });
-
-    let settingsPanel = new ModernSettingsPanel({
-      components: [mainSettingsPanelPage],
+    let settingsPanel = new SettingsPanel({
+      components: [],
       hidden: true,
       pageTransitionAnimation: true,
       hideDelay: -1,
     });
 
+    let mainSettingsPanelPage = new SettingsPanelPage({
+      components: [
+        new DynamicSettingsPanelItem({
+          label: i18n.getLocalizer('settings.video.quality'),
+          settingComponent: new VideoQualitySelectBox(),
+          container: settingsPanel,
+        }),
+        new DynamicSettingsPanelItem({
+          label: i18n.getLocalizer('speed'),
+          settingComponent: new PlaybackSpeedSelectBox(),
+          container: settingsPanel,
+        }),
+        new DynamicSettingsPanelItem({
+          label: i18n.getLocalizer('settings.audio.track'),
+          settingComponent: new AudioTrackSelectBox() ,
+          container: settingsPanel,
+        }),
+        new DynamicSettingsPanelItem({
+          label: i18n.getLocalizer('settings.audio.quality'),
+          settingComponent: new AudioQualitySelectBox(),
+          container: settingsPanel,
+        }),
+      ],
+    });
+
+    settingsPanel.addComponent(mainSettingsPanelPage);
+
+    let subtitleSettingsPanelPage = new SubtitleSettingsPanelPage({
+      settingsPanel: settingsPanel,
+      overlay: subtitleOverlay,
+      useDynamicSettingsPanelItem: true,
+    });
+
+    let subtitleSettingsOpenButton = new SettingsPanelPageOpenButton({
+      targetPage: subtitleSettingsPanelPage,
+      container: settingsPanel,
+      ariaLabel: i18n.getLocalizer('settings.subtitles'),
+      text: i18n.getLocalizer('open'),
+    });
+
     const subtitleSelectBox = new SubtitleSelectBox();
-    let subtitleSelectItem = new ModernSettingsPanelItem(
-      new Label({ text: i18n.getLocalizer('settings.subtitles') } as LabelConfig),
-      subtitleSelectBox,
-      null,
-      {
-        role: 'menubar',
-      },
-    );
+    let subtitleSelectItem = new DynamicSettingsPanelItem({
+      label: new SubtitleSettingsLabel({
+        text: i18n.getLocalizer('settings.subtitles'),
+        opener: subtitleSettingsOpenButton,
+      }),
+      settingComponent: subtitleSelectBox,
+      role: 'menubar',
+      container: settingsPanel,
+    });
     mainSettingsPanelPage.addComponent(subtitleSelectItem);
+    settingsPanel.addComponent(subtitleSettingsPanelPage);
 
     let controlBar = new ControlBar({
       components: [
@@ -506,7 +532,7 @@ export namespace UIFactory {
             new VolumeToggleButton(),
             new Spacer(),
             new SettingsToggleButton({ settingsPanel: settingsPanel }),
-            new SubtitleToggleButton(subtitleSelectItem, subtitleSelectBox),
+            // new SubtitleToggleButton(subtitleSelectItem, subtitleSelectBox),
             new FullscreenToggleButton(),
           ],
           cssClasses: ['controlbar-bottom'],
@@ -543,52 +569,82 @@ export namespace UIFactory {
     });
   }
 
-  export function superModernUI() {
+  export function superModernUI(config: UIConfig) {
     let subtitleOverlay = new SubtitleOverlay();
 
     let mainSettingsPanelPage: SettingsPanelPage;
 
-    const components: Container<ContainerConfig>[] = [
-      new ModernSettingsPanelItem(i18n.getLocalizer('settings.video.quality'), new VideoQualitySelectBox()),
-      new ModernSettingsPanelItem(i18n.getLocalizer('speed'), new PlaybackSpeedSelectBox()),
-      new ModernSettingsPanelItem(i18n.getLocalizer('settings.audio.track'), new AudioTrackSelectBox()),
-      new ModernSettingsPanelItem(i18n.getLocalizer('settings.audio.quality'), new AudioQualitySelectBox()),
-    ];
-
-    mainSettingsPanelPage = new ModernSettingsPanelPage({
-      components,
-    });
-
-    let settingsPanel = new ModernSettingsPanel({
-      components: [mainSettingsPanelPage],
+    let settingsPanel = new SettingsPanel({
+      components: [],
       hidden: true,
       pageTransitionAnimation: true,
     });
 
-    // let subtitleSettingsPanelPage = new SubtitleSettingsPanelPage({
-    //   settingsPanel: settingsPanel,
-    //   overlay: subtitleOverlay,
-    // });
-    //
-    // let subtitleSettingsOpenButton = new SettingsPanelPageOpenButton({
-    //   targetPage: subtitleSettingsPanelPage,
-    //   container: settingsPanel,
-    //   ariaLabel: i18n.getLocalizer('settings.subtitles'),
-    //   text: i18n.getLocalizer('open'),
-    // });
+    const components: Container<ContainerConfig>[] = [
+      new DynamicSettingsPanelItem({
+        label: i18n.getLocalizer('settings.video.quality'),
+        settingComponent: new VideoQualitySelectBox(),
+        container: settingsPanel,
+      }),
+      new DynamicSettingsPanelItem({
+        label: i18n.getLocalizer('speed'),
+        settingComponent: new PlaybackSpeedSelectBox(),
+        container: settingsPanel,
+      }),
+      new DynamicSettingsPanelItem({
+        label: i18n.getLocalizer('settings.audio.track'),
+        settingComponent: new AudioTrackSelectBox(),
+        container: settingsPanel,
+      }),
+      new DynamicSettingsPanelItem({
+        label: i18n.getLocalizer('settings.audio.quality'),
+        settingComponent: new AudioQualitySelectBox(),
+        container: settingsPanel,
+      }),
+    ];
+
+    if (config.ecoMode) {
+      const ecoModeContainer = new EcoModeContainer();
+
+      ecoModeContainer.setOnToggleCallback(() => {
+        // forces the browser to re-calculate the height of the settings panel when adding/removing elements
+        settingsPanel.getDomElement().css({ width: '', height: '' });
+      });
+
+      components.unshift(ecoModeContainer);
+    }
+
+    mainSettingsPanelPage = new SettingsPanelPage({
+      components,
+    });
+
+    settingsPanel.addComponent(mainSettingsPanelPage);
+
+    let subtitleSettingsPanelPage = new SubtitleSettingsPanelPage({
+      settingsPanel: settingsPanel,
+      overlay: subtitleOverlay,
+      useDynamicSettingsPanelItem: true,
+    });
+
+    let subtitleSettingsOpenButton = new SettingsPanelPageOpenButton({
+      targetPage: subtitleSettingsPanelPage,
+      container: settingsPanel,
+      ariaLabel: i18n.getLocalizer('settings.subtitles'),
+      text: i18n.getLocalizer('open'),
+    });
 
     const subtitleSelectBox = new SubtitleSelectBox();
-    let subtitleSelectItem = new ModernSettingsPanelItem(
-      new Label({ text: i18n.getLocalizer('settings.subtitles') } as LabelConfig),
-      subtitleSelectBox,
-      null,
-      {
-        role: 'menubar',
-      },
-    );
+    let subtitleSelectItem = new DynamicSettingsPanelItem({
+      label: new SubtitleSettingsLabel({
+        text: i18n.getLocalizer('settings.subtitles'),
+        opener: subtitleSettingsOpenButton,
+      }),
+      settingComponent: subtitleSelectBox,
+      role: 'menubar',
+      container: settingsPanel,
+    });
     mainSettingsPanelPage.addComponent(subtitleSelectItem);
-
-    // settingsPanel.addComponent(subtitleSettingsPanelPage);
+    settingsPanel.addComponent(subtitleSettingsPanelPage);
 
     let controlBar = new ControlBar({
       components: [
@@ -680,7 +736,7 @@ export namespace UIFactory {
           },
         },
         {
-          ui: superModernUI(),
+          ui: superModernUI(config),
           condition: (context: UIConditionContext) => {
             return !context.isAd && !context.adRequiresUi;
           },
@@ -753,7 +809,7 @@ export namespace UIFactory {
     const subtitleListPanel = new SettingsPanel({
       components: [
         new SettingsPanelPage({
-          components: [new SettingsPanelItem(null, subtitleListBox)],
+          components: [new SettingsPanelItem({ settingComponent: subtitleListBox })],
         }),
       ],
       hidden: true,
@@ -763,7 +819,7 @@ export namespace UIFactory {
     const audioTrackListPanel = new SettingsPanel({
       components: [
         new SettingsPanelPage({
-          components: [new SettingsPanelItem(null, audioTrackListBox)],
+          components: [new SettingsPanelItem({ settingComponent: audioTrackListBox })],
         }),
       ],
       hidden: true,

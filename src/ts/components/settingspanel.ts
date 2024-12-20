@@ -3,8 +3,8 @@ import { SelectBox } from './selectbox';
 import { UIInstanceManager } from '../uimanager';
 import { Timeout } from '../timeout';
 import { Event, EventDispatcher, NoArgs } from '../eventdispatcher';
-import { SettingsPanelPage } from './settingspanelpage';
-import { SettingsPanelItem } from './settingspanelitem';
+import { SettingsPanelPage, SettingsPanelPageConfig } from './settingspanelpage';
+import { SettingsPanelItem, SettingsPanelItemConfig } from './settingspanelitem';
 import { PlayerAPI } from 'bitmovin-player';
 import { Component, ComponentConfig } from './component';
 
@@ -97,9 +97,11 @@ export class SettingsPanel extends Container<SettingsPanelConfig> {
         this.hide();
         this.hideHoveredSelectBoxes();
       });
-      this.getDomElement().on('mouseenter', () => {
-        // On mouse enter clear the timeout
-        this.hideTimeout.clear();
+      this.getDomElement().on('mouseenter mousemove', () => {
+        // On mouse enter and mouse move clear the timeout
+        if (this.hideTimeout.isActive()) {
+          this.hideTimeout.clear();
+        }
       });
       this.getDomElement().on('mouseleave', () => {
         // On mouse leave activate the timeout
@@ -111,6 +113,15 @@ export class SettingsPanel extends Container<SettingsPanelConfig> {
       this.getDomElement().on('focusout', () => {
         this.hideTimeout.reset();
       });
+    }
+
+    if (config.pageTransitionAnimation) {
+      const handleResize = () => {
+        // Reset the dimension of the settingsPanel to let the browser calculate the new dimension after resizing
+        this.getDomElement().css({ width: '', height: '' });
+      };
+
+      player.on(player.exports.PlayerEvent.PlayerResized, handleResize);
     }
 
     this.onHide.subscribe(() => {
@@ -206,12 +217,18 @@ export class SettingsPanel extends Container<SettingsPanelConfig> {
       targetPage = this.getRootPage();
     }
 
+    const currentActivePage = this.activePage;
     this.navigateToPage(
       targetPage,
       this.activePage,
       NavigationDirection.Backwards,
       !(this.config as SettingsPanelConfig).pageTransitionAnimation,
     );
+
+    if (currentActivePage.getConfig().removeOnPop) {
+      this.removeComponent(currentActivePage);
+      this.updateComponents();
+    }
   }
 
   /**
@@ -248,6 +265,11 @@ export class SettingsPanel extends Container<SettingsPanelConfig> {
       this.activePage = component;
     }
     super.addComponent(component);
+  }
+
+  addPage(page: SettingsPanelPage) {
+    this.addComponent(page);
+    this.updateComponents();
   }
 
   protected suspendHideTimeout() {
@@ -300,8 +322,8 @@ export class SettingsPanel extends Container<SettingsPanelConfig> {
     this.animateNavigation(targetPage, sourcePage, skipAnimation);
 
     this.updateActivePageClass();
-    targetPage.onActiveEvent();
     sourcePage.onInactiveEvent();
+    targetPage.onActiveEvent();
   }
 
   /**
@@ -377,14 +399,14 @@ export class SettingsPanel extends Container<SettingsPanelConfig> {
    */
   private hideHoveredSelectBoxes(): void {
     this.getComputedItems()
-      .map(item => item['setting'])
+      .map(item => item['settingComponent'])
       .filter(component => component instanceof SelectBox)
       .forEach((selectBox: SelectBox) => selectBox.closeDropdown());
   }
 
   // collect all items from all pages (see hideHoveredSelectBoxes)
-  private getComputedItems(): SettingsPanelItem[] {
-    const allItems: SettingsPanelItem[] = [];
+  private getComputedItems(): SettingsPanelItem<SettingsPanelItemConfig>[] {
+    const allItems: SettingsPanelItem<SettingsPanelItemConfig>[] = [];
     for (let page of this.getPages()) {
       allItems.push(...page.getItems());
     }

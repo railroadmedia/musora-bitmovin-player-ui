@@ -6,7 +6,7 @@ import { StorageUtils } from '../storageutils';
 import { SubtitleSelectBox } from './subtitleselectbox';
 import { prefixCss } from './dummycomponent';
 import { SubtitleSwitchHandler } from '../subtitleutils';
-import { ModernSettingsPanelItem } from './modernsettingspanelitem';
+import { DynamicSettingsPanelItem } from './dynamicsettingspanelitem';
 
 export interface StoredSubtitleLanguage {
     language: string;
@@ -17,11 +17,11 @@ export class SubtitleToggleButton extends ToggleButton<ToggleButtonConfig> {
   /**
    * Requires the settingsPanelItem which holds the SubtitleSelectBox in its setting
    */
-    private settingsPanelItem: ModernSettingsPanelItem;
+    private settingsPanelItem: DynamicSettingsPanelItem;
     private subtitleSelectBox: SubtitleSelectBox;
     private player: PlayerAPI;
 
-    constructor(settingsPanelItem: ModernSettingsPanelItem, subtitleSelectBox: SubtitleSelectBox, config: ToggleButtonConfig = {}) {
+    constructor(settingsPanelItem: DynamicSettingsPanelItem, subtitleSelectBox: SubtitleSelectBox, config: ToggleButtonConfig = {}) {
         super(config);
 
         this.settingsPanelItem = settingsPanelItem;

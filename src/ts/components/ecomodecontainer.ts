@@ -3,14 +3,14 @@ import { i18n } from '../localization/i18n';
 import { Container, ContainerConfig } from './container';
 import { EcoModeToggleButton } from './ecomodetogglebutton';
 import { Label, LabelConfig } from './label';
-import { SettingsPanelItem } from './settingspanelitem';
+import { SettingsPanelItem, SettingsPanelItemConfig } from './settingspanelitem';
 
 /**
  * @category Containers
  */
 export class EcoModeContainer extends Container<ContainerConfig> {
-  private ecoModeSavedEmissionsItem: SettingsPanelItem;
-  private ecoModeToggleButtonItem: SettingsPanelItem;
+  private ecoModeSavedEmissionsItem: SettingsPanelItem<SettingsPanelItemConfig>;
+  private ecoModeToggleButtonItem: SettingsPanelItem<SettingsPanelItemConfig>;
   private emissionsSavedLabel: Label<LabelConfig>;
   private savedEmissons = 0;
   private currentEnergyEmission: number;
@@ -29,8 +29,10 @@ export class EcoModeContainer extends Container<ContainerConfig> {
       cssClass: 'ui-label-savedEnergy',
     });
 
-    this.ecoModeToggleButtonItem = new SettingsPanelItem(labelEcoMode, ecoModeToggleButton);
-    this.ecoModeSavedEmissionsItem = new SettingsPanelItem('Saved Emissions', this.emissionsSavedLabel, {
+    this.ecoModeToggleButtonItem = new SettingsPanelItem({ label: labelEcoMode, settingComponent: ecoModeToggleButton });
+    this.ecoModeSavedEmissionsItem = new SettingsPanelItem({
+      label: 'Saved Emissions',
+      settingComponent: this.emissionsSavedLabel,
       hidden: true,
     });
 

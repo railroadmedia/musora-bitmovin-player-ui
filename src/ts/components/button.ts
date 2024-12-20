@@ -71,7 +71,8 @@ export class Button<Config extends ButtonConfig> extends Component<Config> {
     }).html(i18n.performLocalization(this.config.text)));
 
     // Listen for the click event on the button element and trigger the corresponding event on the button component
-    buttonElement.on('click', () => {
+    buttonElement.on('click', (e) => {
+      e.stopPropagation();
       this.onClickEvent();
     });
 

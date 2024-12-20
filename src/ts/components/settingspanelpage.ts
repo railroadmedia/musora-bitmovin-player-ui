@@ -1,16 +1,28 @@
 import {Container, ContainerConfig} from './container';
-import {SettingsPanelItem} from './settingspanelitem';
+import { SettingsPanelItem, SettingsPanelItemConfig } from './settingspanelitem';
 import {UIInstanceManager} from '../uimanager';
 import {Event, EventDispatcher, NoArgs} from '../eventdispatcher';
 import { PlayerAPI } from 'bitmovin-player';
 import { BrowserUtils } from '../browserutils';
 
 /**
+ * Configuration interface for a {@link SettingsPanelPage}
+ *
+ * @category Configs
+ */
+export interface SettingsPanelPageConfig extends ContainerConfig {
+  /**
+   * If the page should be removed from the DOM when it is popped from the navigation stack.
+   */
+  removeOnPop?: Boolean;
+}
+
+/**
  * A panel containing a list of {@link SettingsPanelItem items} that represent labelled settings.
  *
  * @category Components
  */
-export class SettingsPanelPage extends Container<ContainerConfig> {
+export class SettingsPanelPage extends Container<SettingsPanelPageConfig> {
 
   private static readonly CLASS_LAST = 'last';
 
@@ -20,13 +32,14 @@ export class SettingsPanelPage extends Container<ContainerConfig> {
     onInactive: new EventDispatcher<SettingsPanelPage, NoArgs>(),
   };
 
-  constructor(config: ContainerConfig) {
+  constructor(config: SettingsPanelPageConfig) {
     super(config);
 
-    this.config = this.mergeConfig<ContainerConfig>(config, {
+    this.config = this.mergeConfig(config, {
       cssClass: 'ui-settings-panel-page',
       role: 'menu',
-    }, this.config);
+      removeOnPop: false,
+    } as SettingsPanelPageConfig, this.config);
   }
 
   configure(player: PlayerAPI, uimanager: UIInstanceManager): void {
@@ -63,8 +76,8 @@ export class SettingsPanelPage extends Container<ContainerConfig> {
     return false;
   }
 
-  getItems(): SettingsPanelItem[] {
-    return <SettingsPanelItem[]>this.config.components.filter(component => component instanceof SettingsPanelItem);
+  getItems(): SettingsPanelItem<SettingsPanelItemConfig>[] {
+    return <SettingsPanelItem<SettingsPanelItemConfig>[]>this.config.components.filter(component => component instanceof SettingsPanelItem);
   }
 
   onSettingsStateChangedEvent() {

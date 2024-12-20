@@ -165,7 +165,7 @@ describe('ListSelector', () => {
 
     it('returns false if selected item does not exist', () => {
       const result = listSelector.selectItem('notExistingKey');
-      expect(listSelector.getSelectedItem()).toBeUndefined();
+      expect(listSelector.getSelectedItem()).toBeNull();
       expect(result).toBeFalsy();
     });
 

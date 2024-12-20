@@ -3,23 +3,31 @@
 %ui-settingspanelpagebackbutton {
   @extend %ui-button;
 
-  font-size: .8em;
-  position: relative;
-  width: 8em;
+  border-collapse: collapse;
+  padding: unset;
+  flex: 1;
+  text-align: left;
+
+  &:active {
+    transform: unset;
+  }
 
   .#{$prefix}-label {
     display: inline-block;
+    font-size: .8em;
+    font-weight: 500;
+    margin: 0;
+    text-align: justify;
 
     &::before {
-      border-bottom: .2em solid $color-primary;
-      border-left: .2em solid $color-primary;
-      content: '';
-      height: .6em;
-      margin-left: -.8em;
-      position: absolute;
-      top: .6em;
-      transform: rotate(45deg);
-      width: .6em;
+      background-image: url('../../assets/skin-super-modern/images/angle-left.svg');
+      background-repeat: no-repeat;
+      background-size: 1.5em auto;
+      content: ' ';
+      display: inline-block;
+      height: 1.5em;
+      vertical-align: -.4em;
+      width: 1.5em;
     }
   }
 }

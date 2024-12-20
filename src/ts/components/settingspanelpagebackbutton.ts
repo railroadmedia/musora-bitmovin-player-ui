@@ -1,6 +1,7 @@
 import {UIInstanceManager} from '../uimanager';
 import {SettingsPanelPageNavigatorButton, SettingsPanelPageNavigatorConfig} from './settingspanelpagenavigatorbutton';
 import { PlayerAPI } from 'bitmovin-player';
+import { i18n } from '../localization/i18n';
 
 /**
  * @category Buttons
@@ -12,7 +13,7 @@ export class SettingsPanelPageBackButton extends SettingsPanelPageNavigatorButto
 
     this.config = this.mergeConfig(config, {
       cssClass: 'ui-settingspanelpagebackbutton',
-      text: 'back',
+      text: i18n.getLocalizer('back'),
     } as SettingsPanelPageNavigatorConfig, this.config);
   }
 

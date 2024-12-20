@@ -12,49 +12,76 @@ import { PlayerAPI } from 'bitmovin-player';
 import { LocalizableText } from '../localization/i18n';
 
 /**
+ * Configuration interface for a {@link SettingsPanelItem}
+ *
+ * @category Configs
+ */
+export interface SettingsPanelItemConfig extends ContainerConfig {
+  /**
+   * The label component or the text for the label.
+   */
+  label?: LocalizableText | Component<ComponentConfig>;
+  /**
+   * The component that configures a setting.
+   */
+  settingComponent?: Component<ComponentConfig>;
+  /**
+   * If the setting should be added as a component to this item.
+   */
+  addSettingAsComponent?: boolean;
+}
+
+/**
  * An item for a {@link SettingsPanelPage},
  * Containing an optional {@link Label} and a component that configures a setting.
  * If the components is a {@link SelectBox} it will handle the logic of displaying it or not
  *
  * @category Components
  */
-export class SettingsPanelItem extends Container<ContainerConfig> {
+export class SettingsPanelItem<Config extends SettingsPanelItemConfig> extends Container<Config> {
 
   private label: Component<ComponentConfig>;
-  protected setting: Component<ComponentConfig>;
+  protected settingComponent: Component<ComponentConfig> | null;
 
   private settingsPanelItemEvents = {
-    onActiveChanged: new EventDispatcher<SettingsPanelItem, NoArgs>(),
+    onActiveChanged: new EventDispatcher<SettingsPanelItem<Config>, NoArgs>(),
   };
 
-  constructor(label: LocalizableText | Component<ComponentConfig>, setting: Component<ComponentConfig>, config: ContainerConfig = {}, addSettingAsComponent: boolean = true) {
+  constructor(config: SettingsPanelItemConfig)
+  constructor(config: Config) {
     super(config);
 
-    this.setting = setting;
+    this.settingComponent = config.settingComponent;
 
     this.config = this.mergeConfig(config, {
       cssClass: 'ui-settings-panel-item',
       role: 'menuitem',
-    }, this.config);
+      addSettingAsComponent: true,
+    } as Config, this.config);
 
+    const label = config.label;
     if (label !== null) {
       if (label instanceof Component) {
         this.label = label;
       } else {
-        this.label = new Label({ text: label, for: this.setting.getConfig() ? this.setting.getConfig().id : this.getConfig().id } as LabelConfig);
+        this.label = new Label({ text: label } as LabelConfig);
       }
-      this.addComponent(this.label);
-    }
 
-    if (addSettingAsComponent) {
-      this.addComponent(this.setting);
+      this.addComponent(this.label);
     }
   }
 
   configure(player: PlayerAPI, uimanager: UIInstanceManager): void {
-    if (this.setting instanceof SelectBox || this.setting instanceof ListBox) {
+    super.configure(player, uimanager);
+
+    if (this.settingComponent != null && this.config.addSettingAsComponent) {
+      this.addComponent(this.settingComponent);
+      this.updateComponents();
+    }
+
+    if (this.settingComponent instanceof SelectBox || this.settingComponent instanceof ListBox) {
       let handleConfigItemChanged = () => {
-        if (!(this.setting instanceof SelectBox) && !(this.setting instanceof ListBox)) {
+        if (!(this.settingComponent instanceof SelectBox) && !(this.settingComponent instanceof ListBox)) {
           return;
         }
         // The minimum number of items that must be available for the setting to be displayed
@@ -62,15 +89,15 @@ export class SettingsPanelItem extends Container<ContainerConfig> {
         let minItemsToDisplay = 2;
         // Audio/video quality select boxes contain an additional 'auto' mode, which in combination with a single
         // available quality also does not make sense
-        if ((this.setting instanceof VideoQualitySelectBox && this.setting.hasAutoItem())
-          || this.setting instanceof AudioQualitySelectBox) {
+        if ((this.settingComponent instanceof VideoQualitySelectBox && this.settingComponent.hasAutoItem())
+          || this.settingComponent instanceof AudioQualitySelectBox) {
           minItemsToDisplay = 3;
         }
 
-        if (this.setting.itemCount() < minItemsToDisplay) {
+        if (this.settingComponent.itemCount() < minItemsToDisplay) {
           // Hide the setting if no meaningful choice is available
           this.hide();
-        } else if (this.setting instanceof PlaybackSpeedSelectBox
+        } else if (this.settingComponent instanceof PlaybackSpeedSelectBox
           && !uimanager.getConfig().playbackSpeedSelectionEnabled) {
           // Hide the PlaybackSpeedSelectBox if disabled in config
           this.hide();
@@ -85,8 +112,8 @@ export class SettingsPanelItem extends Container<ContainerConfig> {
         this.getDomElement().attr('aria-haspopup', 'true');
       };
 
-      this.setting.onItemAdded.subscribe(handleConfigItemChanged);
-      this.setting.onItemRemoved.subscribe(handleConfigItemChanged);
+      this.settingComponent.onItemAdded.subscribe(handleConfigItemChanged);
+      this.settingComponent.onItemRemoved.subscribe(handleConfigItemChanged);
 
       // Initialize hidden state
       handleConfigItemChanged();
@@ -110,10 +137,7 @@ export class SettingsPanelItem extends Container<ContainerConfig> {
    * @see #isActive
    * @returns {Event<SettingsPanelItem, NoArgs>}
    */
-  get onActiveChanged(): Event<SettingsPanelItem, NoArgs> {
+  get onActiveChanged(): Event<SettingsPanelItem<Config>, NoArgs> {
     return this.settingsPanelItemEvents.onActiveChanged.getEvent();
-  }
-  get getLabel(): Component<ComponentConfig> {
-    return this.label;
   }
 }

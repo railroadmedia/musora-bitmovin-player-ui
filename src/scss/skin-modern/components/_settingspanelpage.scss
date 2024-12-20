@@ -16,6 +16,15 @@
       width: 45%;
     }
 
+    &.#{$prefix}-ui-subtitle-settings-label {
+      display: inline-block;
+      width: 45%;
+
+      .#{$prefix}-ui-label {
+        margin-right: 10px;
+      }
+    }
+
     // Controls (e.g. selectbox)
     &.#{$prefix}-ui-selectbox {
       margin-left: 10%;
