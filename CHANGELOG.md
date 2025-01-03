@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.77.0] - 2025-01-03
+
+### Changed
+- Chore: Update to Node v22
+
 ## [3.76.0] - 2024-12-20
 
 ### Fixed
@@ -1023,6 +1028,7 @@ Version 2.0 of the UI framework is built for player 7.1. If absolutely necessary
 ## 1.0.0 (2017-02-03)
 - First release
 
+[3.77.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.76.0...v3.77.0
 [3.76.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.75.0...v3.76.0
 [3.75.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.74.0...v3.75.0
 [3.74.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.73.0...v3.74.0
