@@ -292,8 +292,7 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
             'letter-spacing': `${fontLetterSpacing}px`,
           });
 
-          // TODO set top and line-height on region
-          // label.regionStyle = `font-size: ${fontSize}px;`;
+          label.regionStyle = `line-height: ${fontSize}px;`;
         }
       }
     };
@@ -333,7 +332,7 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
         'letter-spacing': `${fontLetterSpacing}px`,
       });
 
-      label.regionStyle = `line-height: ${fontSize}px; top: ${event.position.row * SubtitleOverlay.CEA608_ROW_OFFSET}%;`;
+      label.regionStyle = `line-height: ${fontSize}px;`;
     });
 
     const reset = () => {
