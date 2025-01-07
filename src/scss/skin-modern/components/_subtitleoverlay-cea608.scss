@@ -6,18 +6,20 @@
     right: 3em;
     top: 2em;
 
-    .#{$prefix}-subtitle-region-container.#{$prefix}-subtitle-position-default {
-      bottom: 0;
+    .#{$prefix}-subtitle-region-container {
       left: 0;
       right: 0;
-      top: 0;
+      height: calc(100% / 15);
+      text-align: left;
+      line-height: 1em;
     }
 
     .#{$prefix}-ui-subtitle-label {
       font-family: 'Courier New', Courier, 'Nimbus Mono L', 'Cutive Mono', monospace;
-      line-height: 1em;
-      position: absolute;
+      //line-height: 1em;
+      //position: absolute;
       text-transform: uppercase;
+      display: inline-block;
 
       // sass-lint:disable force-pseudo-nesting nesting-depth
       &:nth-child(1n-1)::after {

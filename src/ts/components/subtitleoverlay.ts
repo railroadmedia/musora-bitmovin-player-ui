@@ -291,6 +291,9 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
             'font-size': `${fontSize}px`,
             'letter-spacing': `${fontLetterSpacing}px`,
           });
+
+          // TODO set top and line-height on region
+          // label.regionStyle = `font-size: ${fontSize}px;`;
         }
       }
     };
@@ -325,11 +328,12 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
       }
 
       label.getDomElement().css({
-        'left': `${event.position.column * SubtitleOverlay.CEA608_COLUMN_OFFSET}%`,
-        'top': `${event.position.row * SubtitleOverlay.CEA608_ROW_OFFSET}%`,
+        'margin-left': `${event.position.column * SubtitleOverlay.CEA608_COLUMN_OFFSET}%`,
         'font-size': `${fontSize}px`,
         'letter-spacing': `${fontLetterSpacing}px`,
       });
+
+      label.regionStyle = `line-height: ${fontSize}px; top: ${event.position.row * SubtitleOverlay.CEA608_ROW_OFFSET}%;`;
     });
 
     const reset = () => {
@@ -403,6 +407,10 @@ export class SubtitleLabel extends Label<SubtitleLabelConfig> {
 
   get regionStyle(): string {
     return this.config.regionStyle;
+  }
+
+  set regionStyle(style: string) {
+    this.config.regionStyle = style;
   }
 }
 
