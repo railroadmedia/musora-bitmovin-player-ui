@@ -198,10 +198,14 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
 
   generateLabel(event: SubtitleCueEvent): SubtitleLabel {
     // Sanitize cue data (must be done before the cue ID is generated in subtitleManager.cueEnter / update)
+    let region = event.region;
+
     if (event.position) {
       // Sometimes the positions are undefined, we assume them to be zero
       event.position.row = event.position.row || 0;
       event.position.column = event.position.column || 0;
+
+      region = region || `cea608-row-${event.position.row}`;
     }
 
     const label = new SubtitleLabel({
@@ -209,7 +213,7 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
       // else use the plain text
       text: event.html || ActiveSubtitleManager.generateImageTagText(event.image) || event.text,
       vtt: event.vtt,
-      region: event.region,
+      region: region,
       regionStyle: event.regionStyle,
     });
 
