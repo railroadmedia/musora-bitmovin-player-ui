@@ -38,8 +38,6 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
   private static readonly CEA608_NUM_ROWS = 15;
   // The number of columns in a cea608 grid
   private static readonly CEA608_NUM_COLUMNS = 32;
-  // The offset in percent for one row (which is also the height of a row)
-  private static readonly CEA608_ROW_OFFSET = 100 / SubtitleOverlay.CEA608_NUM_ROWS;
   // The offset in percent for one column (which is also the width of a column)
   private static readonly CEA608_COLUMN_OFFSET = 100 / SubtitleOverlay.CEA608_NUM_COLUMNS;
 
