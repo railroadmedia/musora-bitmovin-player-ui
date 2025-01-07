@@ -9,7 +9,7 @@
     top: 2em;
 
     .#{$prefix}-subtitle-region-container {
-      height: calc(100% / 15);
+      height: math.div(100%, 15);
       left: 0;
       line-height: 1em;
       right: 0;
