@@ -1,4 +1,4 @@
-@use "sass:math";
+@use 'sass:math';
 
 .#{$prefix}-ui-subtitle-overlay {
   &.#{$prefix}-cea608 {
@@ -9,11 +9,11 @@
     top: 2em;
 
     .#{$prefix}-subtitle-region-container {
-      left: 0;
-      right: 0;
       height: calc(100% / 15);
-      text-align: left;
+      left: 0;
       line-height: 1em;
+      right: 0;
+      text-align: left;
 
       // Define positions for all 15 rows
       @for $i from 0 through 14 {
@@ -24,9 +24,9 @@
     }
 
     .#{$prefix}-ui-subtitle-label {
+      display: inline-block;
       font-family: 'Courier New', Courier, 'Nimbus Mono L', 'Cutive Mono', monospace;
       text-transform: uppercase;
-      display: inline-block;
 
       // sass-lint:disable force-pseudo-nesting nesting-depth
       &:nth-child(1n-1)::after {
