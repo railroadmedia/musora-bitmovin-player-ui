@@ -27,6 +27,7 @@
       display: inline-block;
       font-family: 'Courier New', Courier, 'Nimbus Mono L', 'Cutive Mono', monospace;
       text-transform: uppercase;
+      vertical-align: bottom;
 
       // sass-lint:disable force-pseudo-nesting nesting-depth
       &:nth-child(1n-1)::after {
