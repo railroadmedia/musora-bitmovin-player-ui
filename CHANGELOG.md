@@ -7,7 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 ### Fixed
-- Unexpected styling for the initially displayed cue when enabling CEA-608 captions 
+- Unexpected styling for the initially displayed cue when enabling CEA-608 captions
+- Vertical alignment of CEA-608 captions on small player sizes
 
 ## [3.79.0] - 2025-01-08
 
