@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+- CEA-608 caption window covering almost the entire video area
+
+### Changed
+- Create separate region components for each CEA-608 row
+
 ## [3.78.0] - 2025-01-08
 
 ### Changed
