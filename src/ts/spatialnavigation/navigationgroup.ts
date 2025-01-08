@@ -122,6 +122,8 @@ export class NavigationGroup {
       }
       return;
     }
+
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     this.handleInput(direction, this.defaultNavigationHandler, this.onNavigation);
   }
 
@@ -131,6 +133,7 @@ export class NavigationGroup {
    * @param action The action of the event
    */
   public handleAction(action: Action): void {
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     this.handleInput(action, this.defaultActionHandler, this.onAction);
   }
 
