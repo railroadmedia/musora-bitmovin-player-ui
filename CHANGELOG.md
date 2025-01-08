@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Chore: Pre-commit hook for linting TypeScript file changes
 
+## [3.80.0] - 2025-01-08
+
+### Fixed
+- Unexpected styling for the initially displayed cue when enabling CEA-608 captions
+- Vertical alignment of CEA-608 captions on small player sizes
+
 ## [3.79.0] - 2025-01-08
 
 ### Fixed
@@ -1046,6 +1052,7 @@ Version 2.0 of the UI framework is built for player 7.1. If absolutely necessary
 ## 1.0.0 (2017-02-03)
 - First release
 
+[3.80.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.79.0...v3.80.0
 [3.79.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.78.0...v3.79.0
 [3.78.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.77.0...v3.78.0
 [3.77.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.76.0...v3.77.0
