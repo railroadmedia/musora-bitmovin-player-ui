@@ -887,6 +887,7 @@ export class PlayerWrapper {
     for (let method of methods) {
       wrapper[method] = function() {
         // console.log('called ' + member); // track method calls on the player
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         return (<any>player)[method].apply(player, arguments);
       };
     }

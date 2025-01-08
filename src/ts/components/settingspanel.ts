@@ -367,6 +367,7 @@ export class SettingsPanel extends Container<SettingsPanelConfig> {
   private forceBrowserReflow(): void {
     // Force the browser to reflow the layout
     // https://gist.github.com/paulirish/5d52fb081b3570c81e3a
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     this.getDomElement().get(0).offsetLeft;
   }
 

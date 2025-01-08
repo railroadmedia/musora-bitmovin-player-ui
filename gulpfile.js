@@ -7,7 +7,7 @@ var cssBase64 = require('gulp-css-base64');
 var postcss = require('gulp-postcss');
 var uglify = require('gulp-uglify');
 var rename = require('gulp-rename');
-var tslint = require('gulp-tslint');
+var gulpESLintNew = require('gulp-eslint-new');
 var sassLint = require('gulp-sass-lint');
 var ts = require('gulp-typescript');
 var replace = require('gulp-replace');
@@ -29,7 +29,6 @@ var buffer = require('vinyl-buffer');
 var del = require('del');
 var browserSync = require('browser-sync');
 var merge = require('merge2');
-var nativeTslint = require('tslint');
 var npmPackage = require('./package.json');
 var path = require('path');
 var combine = require('stream-combiner2');
@@ -93,18 +92,10 @@ gulp.task('copy-json', function() {
 
 // TypeScript linting
 gulp.task('lint-ts', function() {
-  // The program is required for type checking rules to work: https://palantir.github.io/tslint/usage/type-checking/
-  var program = nativeTslint.Linter.createProgram("./tsconfig.json");
-
   return gulp.src(paths.source.ts)
-  .pipe(tslint({
-    formatter: 'verbose',
-    program: program,
-  }))
-  .pipe(tslint.report({
-    // Print just the number of errors (instead of printing all errors again)
-    summarizeFailureOutput: true
-  }))
+    .pipe(gulpESLintNew())
+    .pipe(gulpESLintNew.format())           // Output lint results to the console.
+    .pipe(gulpESLintNew.failAfterError());
 });
 
 // Sass/SCSS linting

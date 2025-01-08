@@ -80,7 +80,7 @@ export namespace ErrorUtils {
 
     if (errorMessage) {
       // Use the error message text if there is one
-      return `${errorMessage}\n(${error.name})`; // default error message style
+      return `${errorMessage as string}\n(${error.name})`; // default error message style
     } else {
       // Fallback to error code/name if no message is defined
       return `${error.code} ${error.name}`;
