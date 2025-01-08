@@ -1,3 +1,5 @@
+@use 'sass:math';
+
 .#{$prefix}-ui-subtitle-overlay {
   &.#{$prefix}-cea608 {
 
@@ -6,17 +8,24 @@
     right: 3em;
     top: 2em;
 
-    .#{$prefix}-subtitle-region-container.#{$prefix}-subtitle-position-default {
-      bottom: 0;
+    .#{$prefix}-subtitle-region-container {
+      height: math.div(100%, 15);
       left: 0;
+      line-height: 1em;
       right: 0;
-      top: 0;
+      text-align: left;
+
+      // Define positions for all 15 rows
+      @for $i from 0 through 14 {
+        &.#{$prefix}-subtitle-position-cea608-row-#{$i} {
+          top: math.div($i, 15) * 100%;
+        }
+      }
     }
 
     .#{$prefix}-ui-subtitle-label {
+      display: inline-block;
       font-family: 'Courier New', Courier, 'Nimbus Mono L', 'Cutive Mono', monospace;
-      line-height: 1em;
-      position: absolute;
       text-transform: uppercase;
 
       // sass-lint:disable force-pseudo-nesting nesting-depth
