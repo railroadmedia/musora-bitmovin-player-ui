@@ -23,13 +23,13 @@
 
   &.#{$prefix}-on {
     .#{$prefix}-image {
-      background-image: url('../../assets/skin-modern/images/pause.svg');
+      background-image: url('../../assets/images/pause.svg');
     }
   }
 
   &.#{$prefix}-off {
     .#{$prefix}-image {
-      background-image: url('../../assets/skin-modern/images/play.svg');
+      background-image: url('../../assets/images/play.svg');
     }
   }
 
