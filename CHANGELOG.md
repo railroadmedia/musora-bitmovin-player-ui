@@ -4,6 +4,45 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.80.0] - 2025-01-08
+
+### Fixed
+- Unexpected styling for the initially displayed cue when enabling CEA-608 captions
+- Vertical alignment of CEA-608 captions on small player sizes
+
+## [3.79.0] - 2025-01-08
+
+### Fixed
+- CEA-608 caption window covering almost the entire video area
+
+### Changed
+- Create separate region components for each CEA-608 row
+
+## [3.78.0] - 2025-01-08
+
+### Changed
+- Chore: Switch from `tslint` to `eslint` for linting
+
+## [3.77.0] - 2025-01-03
+
+### Changed
+- Chore: Update to Node v22
+
+## [3.76.0] - 2024-12-20
+
+### Fixed
+- Seek preview thumbnails exceeding the UI dimensions when default size is increased
+
+## [3.75.0] - 2024-11-19
+
+### Fixed
+- Potential performance impact caused by forced layout reflows
+
+## [3.74.0] - 2024-10-24
+
+### Changed
+- Dpad keymap for Android devices
+
 ## [3.73.0] - 2024-09-06
 
 ### Added
@@ -1008,6 +1047,13 @@ Version 2.0 of the UI framework is built for player 7.1. If absolutely necessary
 ## 1.0.0 (2017-02-03)
 - First release
 
+[3.80.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.79.0...v3.80.0
+[3.79.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.78.0...v3.79.0
+[3.78.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.77.0...v3.78.0
+[3.77.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.76.0...v3.77.0
+[3.76.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.75.0...v3.76.0
+[3.75.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.74.0...v3.75.0
+[3.74.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.73.0...v3.74.0
 [3.73.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.72.0...v3.73.0
 [3.72.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.71.0...v3.72.0
 [3.71.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.70.0...v3.71.0

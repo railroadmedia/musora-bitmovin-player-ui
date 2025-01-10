@@ -111,11 +111,11 @@ export class Container<Config extends ContainerConfig> extends Component<Config>
      */
     let component;
 
-    while (component = this.componentsToRemove.shift()) {
+    while ((component = this.componentsToRemove.shift()) !== undefined) {
       component.getDomElement().remove();
     }
 
-    while (component = this.componentsToAdd.shift()) {
+    while ((component = this.componentsToAdd.shift()) !== undefined) {
       this.innerContainerElement.append(component.getDomElement());
     }
   }

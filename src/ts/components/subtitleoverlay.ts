@@ -38,8 +38,6 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
   private static readonly CEA608_NUM_ROWS = 15;
   // The number of columns in a cea608 grid
   private static readonly CEA608_NUM_COLUMNS = 32;
-  // The offset in percent for one row (which is also the height of a row)
-  private static readonly CEA608_ROW_OFFSET = 100 / SubtitleOverlay.CEA608_NUM_ROWS;
   // The offset in percent for one column (which is also the width of a column)
   private static readonly CEA608_COLUMN_OFFSET = 100 / SubtitleOverlay.CEA608_NUM_COLUMNS;
 
@@ -198,10 +196,14 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
 
   generateLabel(event: SubtitleCueEvent): SubtitleLabel {
     // Sanitize cue data (must be done before the cue ID is generated in subtitleManager.cueEnter / update)
+    let region = event.region;
+
     if (event.position) {
       // Sometimes the positions are undefined, we assume them to be zero
       event.position.row = event.position.row || 0;
       event.position.column = event.position.column || 0;
+
+      region = region || `cea608-row-${event.position.row}`;
     }
 
     const label = new SubtitleLabel({
@@ -209,7 +211,7 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
       // else use the plain text
       text: event.html || ActiveSubtitleManager.generateImageTagText(event.image) || event.text,
       vtt: event.vtt,
-      region: event.region,
+      region: region,
       regionStyle: event.regionStyle,
     });
 
@@ -287,6 +289,8 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
             'font-size': `${fontSize}px`,
             'letter-spacing': `${fontLetterSpacing}px`,
           });
+
+          label.regionStyle = `line-height: ${fontSize}px;`;
         }
       }
     };
@@ -321,11 +325,12 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
       }
 
       label.getDomElement().css({
-        'left': `${event.position.column * SubtitleOverlay.CEA608_COLUMN_OFFSET}%`,
-        'top': `${event.position.row * SubtitleOverlay.CEA608_ROW_OFFSET}%`,
+        'margin-left': `${event.position.column * SubtitleOverlay.CEA608_COLUMN_OFFSET}%`,
         'font-size': `${fontSize}px`,
         'letter-spacing': `${fontLetterSpacing}px`,
       });
+
+      label.regionStyle = `line-height: ${fontSize}px;`;
     });
 
     const reset = () => {
@@ -342,7 +347,7 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
     });
 
     player.on(player.exports.PlayerEvent.SourceUnloaded, reset);
-    player.on(player.exports.PlayerEvent.SubtitleEnabled, reset);
+    player.on(player.exports.PlayerEvent.SubtitleEnable, reset);
     player.on(player.exports.PlayerEvent.SubtitleDisabled, reset);
   }
 
@@ -399,6 +404,10 @@ export class SubtitleLabel extends Label<SubtitleLabelConfig> {
 
   get regionStyle(): string {
     return this.config.regionStyle;
+  }
+
+  set regionStyle(style: string) {
+    this.config.regionStyle = style;
   }
 }
 

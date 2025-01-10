@@ -21,6 +21,23 @@
 
   > .#{$prefix}-container-wrapper {
     @extend %center-on-left-edge;
+
+    padding-left: 1em;
+    padding-right: 1em;
+  }
+
+  // bottom arrow from http://www.cssarrowplease.com/
+  .#{$prefix}-seekbar-label-caret {
+    border: solid transparent;
+    border-color: transparent;
+    border-top-color: $color-primary;
+    border-width: .5em;
+    height: 0;
+    margin-left: -.5em;
+    pointer-events: none;
+    position: absolute;
+    top: 100%;
+    width: 0;
   }
 
   .#{$prefix}-seekbar-label-inner {

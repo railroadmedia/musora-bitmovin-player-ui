@@ -2,6 +2,7 @@ import { MockHelper, TestingPlayerAPI } from '../helper/MockHelper';
 import { UIInstanceManager } from '../../src/ts/uimanager';
 import { SeekBarLabel } from '../../src/ts/components/seekbarlabel';
 import { SeekPreviewEventArgs } from '../../src/ts/components/seekbar';
+import { DOM } from '../../src/ts/dom';
 
 let playerMock: TestingPlayerAPI;
 let uiInstanceManagerMock: UIInstanceManager;
@@ -92,6 +93,99 @@ describe('SeekBarLabel', () => {
 
         expect(playerMock.getThumbnail).toHaveBeenCalledWith(11);
       });
+    });
+  });
+
+  describe("calculates correct values for thumbnail positioning", () => {
+    const uiContainerBoundingRect = {
+      x: 200,
+      y: 150,
+      width: 1600,
+      height: 900,
+      top: 150,
+      right: 1800,
+      bottom: 1050,
+      left: 200,
+    } as DOMRect;
+
+    let containerGetDomElementMock: () => jest.Mocked<DOM>;
+    let caretGetDomElementMock: () => jest.Mocked<DOM>;
+
+    beforeEach(() => {
+      containerGetDomElementMock = jest
+        .fn()
+        .mockReturnValue(MockHelper.generateDOMMock());
+
+      containerGetDomElementMock().get = jest.fn().mockReturnValue({
+        parentElement: jest.fn().mockReturnValue({
+          getBoundingClientRect: jest.fn(),
+        }),
+      });
+
+      caretGetDomElementMock = jest.fn().mockReturnValue(MockHelper.generateDOMMock());
+
+      seekbarLabel["container"].getDomElement = containerGetDomElementMock;
+      seekbarLabel["caret"].getDomElement = caretGetDomElementMock;
+    });
+
+    it("when thumbnail within UI container bounds", () => {
+      const labelRect = {
+        x: 400,
+        y: 700,
+        width: 200,
+        height: 120,
+        top: 700,
+        right: 600,
+        bottom: 820,
+        left: 400,
+      } as DOMRect;
+
+      containerGetDomElementMock().get(0).parentElement!.getBoundingClientRect =
+        jest.fn().mockReturnValue(labelRect);
+
+      seekbarLabel.setPositionInBounds(100, uiContainerBoundingRect);
+
+      expect(caretGetDomElementMock().css).toHaveBeenCalledWith('transform', null);
+    });
+
+    it("when thumbnail would overflow UI container leftside", () => {
+      const labelRect = {
+        x: 180,
+        y: 700,
+        width: 200,
+        height: 120,
+        top: 700,
+        right: 380,
+        bottom: 820,
+        left: 180,
+      } as DOMRect;
+
+      containerGetDomElementMock().get(0).parentElement!.getBoundingClientRect =
+        jest.fn().mockReturnValue(labelRect);
+
+      seekbarLabel.setPositionInBounds(100, uiContainerBoundingRect);
+
+      expect(seekbarLabel.getDomElement().css).toHaveBeenCalledWith('left', '120px');
+    });
+
+    it("when thumbnail would overflow UI container rightside", () => {
+      const labelRect = {
+        x: 1650,
+        y: 700,
+        width: 200,
+        height: 120,
+        top: 700,
+        right: 1850,
+        bottom: 820,
+        left: 1650,
+      } as DOMRect;
+
+      containerGetDomElementMock().get(0).parentElement!.getBoundingClientRect =
+        jest.fn().mockReturnValue(labelRect);
+
+      seekbarLabel.setPositionInBounds(100, uiContainerBoundingRect);
+
+      expect(seekbarLabel.getDomElement().css).toHaveBeenCalledWith('left', '50px');
     });
   });
 });

@@ -70,8 +70,10 @@ export class SeekBarController {
 
   protected seekBarControls(type: SeekBarType) {
     if (type === SeekBarType.Live) {
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       return this.arrowKeyControls(this.player.getTimeShift(), { min: this.player.getMaxTimeShift(), max: 0 }, this.player.timeShift);
     } else if (type === SeekBarType.Vod) {
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       return this.arrowKeyControls(this.player.getCurrentTime(), { min: 0, max: this.player.getDuration() }, this.player.seek);
     } else if (type === SeekBarType.Volume && this.volumeController != null) {
       const volumeTransition = this.volumeController.startTransition();

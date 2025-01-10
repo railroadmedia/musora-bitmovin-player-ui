@@ -77,11 +77,12 @@ export abstract class ListSelector<Config extends ListSelectorConfig> extends Co
   }
 
   private getItemIndex(key: string): number {
-    for (let index in this.items) {
-      if (key === this.items[index].key) {
-        return parseInt(index);
+    for (let i = 0; i < this.items.length; i++) {
+      if (this.items[i].key === key) {
+        return i;
       }
     }
+
     return -1;
   }
 
