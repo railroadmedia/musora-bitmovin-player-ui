@@ -39,7 +39,7 @@
                 <div class="col-sm-4">
                     <select class="form-control" id="config-ui"></select>
                 </div>
-                <span class="col-sm-4 form-text">The UI skin or skin type to display.</span>
+                <span class="col-sm-4 form-text">The UI type to display.</span>
             </div>
 
             <div class="form-group form-check row">
@@ -286,7 +286,7 @@
       uiManager = bitmovin.playerui.UIFactory[playgroundConfig.uiOption](player, uiConfig);
     } else {
       localStorage.clear();
-      uiManager = bitmovin.playerui.UIFactory.buildDefaultUI(player, uiConfig);
+      uiManager = bitmovin.playerui.UIFactory.buildUI(player, uiConfig);
     }
 
     player.load(sources[playgroundConfig.source || 'fullyFeatured']).then(function() {
@@ -704,7 +704,7 @@
     }
   }, 'video.');
 
-  // Collect all UI factory methods which are basically the different built-in skins and skin types
+  // Collect all UI factory methods which are basically the different built-in types
   const configUISelect = $('#config-ui');
   const collectUIMethods = function(clazz, filter, label) {
     const convertToOption = function(value) {
@@ -730,23 +730,9 @@
     {
       className: bitmovin.playerui.UIFactory,
       filter: (member) => {
-        return member.indexOf('buildModern') === 0;
+        return member.indexOf('build') === 0;
       },
-      label: 'Default UIs',
-    },
-    {
-      className: bitmovin.playerui.UIFactory,
-      filter: (member) => {
-        return member.indexOf('buildSuperModern') === 0;
-      },
-      label: 'More modern UIs',
-    },
-    {
-      className: bitmovin.playerui.DemoFactory,
-      filter: (member) => {
-        return member.indexOf('buildDemo') === 0;
-      },
-      label: 'Demos',
+      label: 'UIs',
     },
   ];
 
@@ -758,11 +744,7 @@
   configUISelect.change(function() {
     uiManager.release();
     var factoryMethod = $(this).val();
-    if (factoryMethod.indexOf('buildDemo') === 0) {
-      uiManager = bitmovin.playerui.DemoFactory[factoryMethod](player, uiConfig);
-    } else {
-      uiManager = bitmovin.playerui.UIFactory[factoryMethod](player, uiConfig);
-    }
+    uiManager = bitmovin.playerui.UIFactory[factoryMethod](player, uiConfig);
     storeConfigInStorage();
   });
 
