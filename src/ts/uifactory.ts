@@ -56,10 +56,6 @@ import { TouchControlOverlay } from './components/touchcontroloverlay';
 import { AdStatusOverlay } from './components/adstatusoverlay';
 
 export namespace UIFactory {
-  export function buildDefaultSuperModernUI(player: PlayerAPI, config: UIConfig = {}): UIManager {
-    return UIFactory.buildSuperModernUI(player, config);
-  }
-
   export function buildDefaultUI(player: PlayerAPI, config: UIConfig = {}): UIManager {
     return UIFactory.buildModernUI(player, config);
   }
@@ -77,582 +73,6 @@ export namespace UIFactory {
   }
 
   export function modernUI(config: UIConfig) {
-    let subtitleOverlay = new SubtitleOverlay();
-
-    let mainSettingsPanelPage: SettingsPanelPage;
-
-    const components: Container<ContainerConfig>[] = [
-      new SettingsPanelItem({ label: i18n.getLocalizer('settings.video.quality'), settingComponent: new VideoQualitySelectBox() }),
-      new SettingsPanelItem({ label: i18n.getLocalizer('speed'), settingComponent: new PlaybackSpeedSelectBox() }),
-      new SettingsPanelItem({ label: i18n.getLocalizer('settings.audio.track'), settingComponent: new AudioTrackSelectBox() }),
-      new SettingsPanelItem({ label: i18n.getLocalizer('settings.audio.quality'), settingComponent: new AudioQualitySelectBox() }),
-    ];
-
-    if (config.ecoMode) {
-      const ecoModeContainer = new EcoModeContainer();
-
-      ecoModeContainer.setOnToggleCallback(() => {
-        // forces the browser to re-calculate the height of the settings panel when adding/removing elements
-        settingsPanel.getDomElement().css({ width: '', height: '' });
-      });
-
-      components.unshift(ecoModeContainer);
-    }
-
-    mainSettingsPanelPage = new SettingsPanelPage({
-      components,
-    });
-
-    let settingsPanel = new SettingsPanel({
-      components: [mainSettingsPanelPage],
-      hidden: true,
-    });
-
-    let subtitleSettingsPanelPage = new SubtitleSettingsPanelPage({
-      settingsPanel: settingsPanel,
-      overlay: subtitleOverlay,
-    });
-
-    const subtitleSelectBox = new SubtitleSelectBox();
-
-    let subtitleSettingsOpenButton = new SettingsPanelPageOpenButton({
-      targetPage: subtitleSettingsPanelPage,
-      container: settingsPanel,
-      ariaLabel: i18n.getLocalizer('settings.subtitles'),
-      text: i18n.getLocalizer('open'),
-    });
-
-    mainSettingsPanelPage.addComponent(
-      new SettingsPanelItem({
-        label: new SubtitleSettingsLabel({
-          text: i18n.getLocalizer('settings.subtitles'),
-          opener: subtitleSettingsOpenButton,
-        }),
-        settingComponent: subtitleSelectBox,
-        role: 'menubar',
-      }),
-    );
-
-    settingsPanel.addComponent(subtitleSettingsPanelPage);
-
-    let controlBar = new ControlBar({
-      components: [
-        settingsPanel,
-        new Container({
-          components: [
-            new PlaybackTimeLabel({
-              timeLabelMode: PlaybackTimeLabelMode.CurrentTime,
-              hideInLivePlayback: true,
-            }),
-            new SeekBar({ label: new SeekBarLabel() }),
-            new PlaybackTimeLabel({
-              timeLabelMode: PlaybackTimeLabelMode.TotalTime,
-              cssClasses: ['text-right'],
-            }),
-          ],
-          cssClasses: ['controlbar-top'],
-        }),
-        new Container({
-          components: [
-            new PlaybackToggleButton(),
-            new VolumeToggleButton(),
-            new VolumeSlider(),
-            new Spacer(),
-            new PictureInPictureToggleButton(),
-            new AirPlayToggleButton(),
-            new CastToggleButton(),
-            new VRToggleButton(),
-            new SettingsToggleButton({ settingsPanel: settingsPanel }),
-            new FullscreenToggleButton(),
-          ],
-          cssClasses: ['controlbar-bottom'],
-        }),
-      ],
-    });
-
-    return new UIContainer({
-      components: [
-        subtitleOverlay,
-        new BufferingOverlay(),
-        new PlaybackToggleOverlay(),
-        new CastStatusOverlay(),
-        controlBar,
-        new TitleBar(),
-        new RecommendationOverlay(),
-        new Watermark(),
-        new ErrorMessageOverlay(),
-      ],
-      hideDelay: 2000,
-      hidePlayerStateExceptions: [
-        PlayerUtils.PlayerState.Prepared,
-        PlayerUtils.PlayerState.Paused,
-        PlayerUtils.PlayerState.Finished,
-      ],
-      cssClasses: ['ui-skin-modern'],
-    });
-  }
-
-  export function modernAdsUI() {
-    return new UIContainer({
-      components: [
-        new BufferingOverlay(),
-        new AdClickOverlay(),
-        new PlaybackToggleOverlay(),
-        new Container({
-          components: [new AdMessageLabel({ text: i18n.getLocalizer('ads.remainingTime') }), new AdSkipButton()],
-          cssClass: 'ui-ads-status',
-        }),
-        new ControlBar({
-          components: [
-            new Container({
-              components: [
-                new PlaybackToggleButton(),
-                new VolumeToggleButton(),
-                new VolumeSlider(),
-                new Spacer(),
-                new FullscreenToggleButton(),
-              ],
-              cssClasses: ['controlbar-bottom'],
-            }),
-          ],
-        }),
-      ],
-      cssClasses: ['ui-skin-modern', 'ui-skin-ads'],
-      hideDelay: 2000,
-      hidePlayerStateExceptions: [
-        PlayerUtils.PlayerState.Prepared,
-        PlayerUtils.PlayerState.Paused,
-        PlayerUtils.PlayerState.Finished,
-      ],
-    });
-  }
-
-  export function modernSmallScreenUI() {
-    let subtitleOverlay = new SubtitleOverlay();
-
-    let mainSettingsPanelPage = new SettingsPanelPage({
-      components: [
-        new SettingsPanelItem({ label: i18n.getLocalizer('settings.video.quality'), settingComponent: new VideoQualitySelectBox() }),
-        new SettingsPanelItem({ label: i18n.getLocalizer('speed'), settingComponent: new PlaybackSpeedSelectBox() }),
-        new SettingsPanelItem({ label: i18n.getLocalizer('settings.audio.track'), settingComponent: new AudioTrackSelectBox() }),
-        new SettingsPanelItem({ label: i18n.getLocalizer('settings.audio.quality'), settingComponent: new AudioQualitySelectBox() }),
-      ],
-    });
-
-    let settingsPanel = new SettingsPanel({
-      components: [mainSettingsPanelPage],
-      hidden: true,
-      pageTransitionAnimation: false,
-      hideDelay: -1,
-    });
-
-    let subtitleSettingsPanelPage = new SubtitleSettingsPanelPage({
-      settingsPanel: settingsPanel,
-      overlay: subtitleOverlay,
-    });
-
-    let subtitleSettingsOpenButton = new SettingsPanelPageOpenButton({
-      targetPage: subtitleSettingsPanelPage,
-      container: settingsPanel,
-      ariaLabel: i18n.getLocalizer('settings.subtitles'),
-      text: i18n.getLocalizer('open'),
-    });
-
-    const subtitleSelectBox = new SubtitleSelectBox();
-
-    mainSettingsPanelPage.addComponent(
-      new SettingsPanelItem({
-        label: new SubtitleSettingsLabel({
-          text: i18n.getLocalizer('settings.subtitles'),
-          opener: subtitleSettingsOpenButton,
-        }),
-        settingComponent: subtitleSelectBox,
-        role: 'menubar',
-      }),
-    );
-
-    settingsPanel.addComponent(subtitleSettingsPanelPage);
-
-    settingsPanel.addComponent(new CloseButton({ target: settingsPanel }));
-    subtitleSettingsPanelPage.addComponent(new CloseButton({ target: settingsPanel }));
-
-    let controlBar = new ControlBar({
-      components: [
-        new Container({
-          components: [
-            new PlaybackTimeLabel({
-              timeLabelMode: PlaybackTimeLabelMode.CurrentTime,
-              hideInLivePlayback: true,
-            }),
-            new SeekBar({ label: new SeekBarLabel() }),
-            new PlaybackTimeLabel({
-              timeLabelMode: PlaybackTimeLabelMode.TotalTime,
-              cssClasses: ['text-right'],
-            }),
-          ],
-          cssClasses: ['controlbar-top'],
-        }),
-      ],
-    });
-
-    return new UIContainer({
-      components: [
-        subtitleOverlay,
-        new BufferingOverlay(),
-        new CastStatusOverlay(),
-        new PlaybackToggleOverlay(),
-        new RecommendationOverlay(),
-        controlBar,
-        new TitleBar({
-          components: [
-            new MetadataLabel({ content: MetadataLabelContent.Title }),
-            new CastToggleButton(),
-            new VRToggleButton(),
-            new PictureInPictureToggleButton(),
-            new AirPlayToggleButton(),
-            new VolumeToggleButton(),
-            new SettingsToggleButton({ settingsPanel: settingsPanel }),
-            new FullscreenToggleButton(),
-          ],
-        }),
-        settingsPanel,
-        new Watermark(),
-        new ErrorMessageOverlay(),
-      ],
-      cssClasses: ['ui-skin-smallscreen', 'ui-skin-modern'],
-      hideDelay: 2000,
-      hidePlayerStateExceptions: [
-        PlayerUtils.PlayerState.Prepared,
-        PlayerUtils.PlayerState.Paused,
-        PlayerUtils.PlayerState.Finished,
-      ],
-    });
-  }
-
-  export function modernSmallScreenAdsUI() {
-    return new UIContainer({
-      components: [
-        new BufferingOverlay(),
-        new AdClickOverlay(),
-        new PlaybackToggleOverlay(),
-        new TitleBar({
-          components: [
-            // dummy label with no content to move buttons to the right
-            new Label({ cssClass: 'label-metadata-title' }),
-            new FullscreenToggleButton(),
-          ],
-        }),
-        new Container({
-          components: [new AdMessageLabel({ text: 'Ad: {remainingTime} secs' }), new AdSkipButton()],
-          cssClass: 'ui-ads-status',
-        }),
-      ],
-      cssClasses: ['ui-skin-modern', 'ui-skin-smallscreen', 'ui-skin-ads'],
-      hideDelay: 2000,
-      hidePlayerStateExceptions: [
-        PlayerUtils.PlayerState.Prepared,
-        PlayerUtils.PlayerState.Paused,
-        PlayerUtils.PlayerState.Finished,
-      ],
-    });
-  }
-
-  export function modernCastReceiverUI() {
-    let controlBar = new ControlBar({
-      components: [
-        new Container({
-          components: [
-            new PlaybackTimeLabel({
-              timeLabelMode: PlaybackTimeLabelMode.CurrentTime,
-              hideInLivePlayback: true,
-            }),
-            new SeekBar({ smoothPlaybackPositionUpdateIntervalMs: -1 }),
-            new PlaybackTimeLabel({
-              timeLabelMode: PlaybackTimeLabelMode.TotalTime,
-              cssClasses: ['text-right'],
-            }),
-          ],
-          cssClasses: ['controlbar-top'],
-        }),
-      ],
-    });
-
-    return new CastUIContainer({
-      components: [
-        new SubtitleOverlay(),
-        new BufferingOverlay(),
-        new PlaybackToggleOverlay(),
-        new Watermark(),
-        controlBar,
-        new TitleBar({ keepHiddenWithoutMetadata: true }),
-        new ErrorMessageOverlay(),
-      ],
-      cssClasses: ['ui-skin-modern', 'ui-skin-cast-receiver'],
-      hideDelay: 2000,
-      hidePlayerStateExceptions: [
-        PlayerUtils.PlayerState.Prepared,
-        PlayerUtils.PlayerState.Paused,
-        PlayerUtils.PlayerState.Finished,
-      ],
-    });
-  }
-
-  export function buildModernUI(player: PlayerAPI, config: UIConfig = {}): UIManager {
-    // show smallScreen UI only on mobile/handheld devices
-    let smallScreenSwitchWidth = 600;
-
-    return new UIManager(
-      player,
-      [
-        {
-          ui: modernSmallScreenAdsUI(),
-          condition: (context: UIConditionContext) => {
-            return (
-              context.isMobile && context.documentWidth < smallScreenSwitchWidth && context.isAd && context.adRequiresUi
-            );
-          },
-        },
-        {
-          ui: modernAdsUI(),
-          condition: (context: UIConditionContext) => {
-            return context.isAd && context.adRequiresUi;
-          },
-        },
-        {
-          ui: modernSmallScreenUI(),
-          condition: (context: UIConditionContext) => {
-            return (
-              !context.isAd &&
-              !context.adRequiresUi &&
-              context.isMobile &&
-              context.documentWidth < smallScreenSwitchWidth
-            );
-          },
-        },
-        {
-          ui: modernUI(config),
-          condition: (context: UIConditionContext) => {
-            return !context.isAd && !context.adRequiresUi;
-          },
-        },
-      ],
-      config,
-    );
-  }
-
-  export function superModernMobileAdsUI() {
-    let controlBar = new ControlBar({
-      components: [
-        new Container({
-          components: [
-            new PlaybackTimeLabel({ timeLabelMode: PlaybackTimeLabelMode.CurrentTime }),
-            new SeekBar({ label: new SeekBarLabel() }),
-            new PlaybackTimeLabel({
-              timeLabelMode: PlaybackTimeLabelMode.TotalTime,
-              cssClasses: ['text-right'],
-            }),
-          ],
-          cssClasses: ['controlbar-top'],
-        }),
-        new Container({
-          components: [
-            new PlaybackToggleButton(),
-            new VolumeToggleButton(),
-            new Spacer(),
-            new FullscreenToggleButton(),
-          ],
-          cssClasses: ['controlbar-bottom'],
-        }),
-      ],
-    });
-
-    return new UIContainer({
-      components: [
-        new BufferingOverlay(),
-        new AdClickOverlay(),
-        new PlaybackToggleOverlay(),
-        controlBar,
-        new AdStatusOverlay(),
-        new ErrorMessageOverlay(),
-      ],
-      hideDelay: 2000,
-      hidePlayerStateExceptions: [
-        PlayerUtils.PlayerState.Prepared,
-        PlayerUtils.PlayerState.Paused,
-        PlayerUtils.PlayerState.Finished,
-      ],
-      cssClasses: ['ui-skin-modern', 'ui-skin-smallscreen', 'ui-skin-ads'],
-    });
-  }
-
-  export function superModernAdsUI() {
-    let controlBar = new ControlBar({
-      components: [
-        new Container({
-          components: [
-            new PlaybackTimeLabel({ timeLabelMode: PlaybackTimeLabelMode.CurrentTime }),
-            new SeekBar({ label: new SeekBarLabel() }),
-            new PlaybackTimeLabel({
-              timeLabelMode: PlaybackTimeLabelMode.TotalTime,
-              cssClasses: ['text-right'],
-            }),
-          ],
-          cssClasses: ['controlbar-top'],
-        }),
-        new Container({
-          components: [
-            new PlaybackToggleButton(),
-            new VolumeToggleButton(),
-            new Spacer(),
-            new FullscreenToggleButton(),
-          ],
-          cssClasses: ['controlbar-bottom'],
-        }),
-      ],
-    });
-
-    return new UIContainer({
-      components: [
-        new BufferingOverlay(),
-        new AdClickOverlay(),
-        new PlaybackToggleOverlay(),
-        new AdStatusOverlay(),
-        controlBar,
-        new ErrorMessageOverlay(),
-      ],
-      hideDelay: 2000,
-      hidePlayerStateExceptions: [
-        PlayerUtils.PlayerState.Prepared,
-        PlayerUtils.PlayerState.Paused,
-        PlayerUtils.PlayerState.Finished,
-      ],
-      cssClasses: ['ui-skin-modern', 'ui-skin-ads'],
-    });
-  }
-
-  export function superModernMobileUI() {
-    let subtitleOverlay = new SubtitleOverlay();
-
-    let settingsPanel = new SettingsPanel({
-      components: [],
-      hidden: true,
-      pageTransitionAnimation: true,
-      hideDelay: -1,
-    });
-
-    let mainSettingsPanelPage = new SettingsPanelPage({
-      components: [
-        new DynamicSettingsPanelItem({
-          label: i18n.getLocalizer('settings.video.quality'),
-          settingComponent: new VideoQualitySelectBox(),
-          container: settingsPanel,
-        }),
-        new DynamicSettingsPanelItem({
-          label: i18n.getLocalizer('speed'),
-          settingComponent: new PlaybackSpeedSelectBox(),
-          container: settingsPanel,
-        }),
-        new DynamicSettingsPanelItem({
-          label: i18n.getLocalizer('settings.audio.track'),
-          settingComponent: new AudioTrackSelectBox() ,
-          container: settingsPanel,
-        }),
-        new DynamicSettingsPanelItem({
-          label: i18n.getLocalizer('settings.audio.quality'),
-          settingComponent: new AudioQualitySelectBox(),
-          container: settingsPanel,
-        }),
-      ],
-    });
-
-    settingsPanel.addComponent(mainSettingsPanelPage);
-
-    let subtitleSettingsPanelPage = new SubtitleSettingsPanelPage({
-      settingsPanel: settingsPanel,
-      overlay: subtitleOverlay,
-      useDynamicSettingsPanelItem: true,
-    });
-
-    let subtitleSettingsOpenButton = new SettingsPanelPageOpenButton({
-      targetPage: subtitleSettingsPanelPage,
-      container: settingsPanel,
-      ariaLabel: i18n.getLocalizer('settings.subtitles'),
-      text: i18n.getLocalizer('open'),
-    });
-
-    const subtitleSelectBox = new SubtitleSelectBox();
-    let subtitleSelectItem = new DynamicSettingsPanelItem({
-      label: new SubtitleSettingsLabel({
-        text: i18n.getLocalizer('settings.subtitles'),
-        opener: subtitleSettingsOpenButton,
-      }),
-      settingComponent: subtitleSelectBox,
-      role: 'menubar',
-      container: settingsPanel,
-    });
-    mainSettingsPanelPage.addComponent(subtitleSelectItem);
-    settingsPanel.addComponent(subtitleSettingsPanelPage);
-
-    let controlBar = new ControlBar({
-      components: [
-        new Container({
-          components: [
-            new PlaybackTimeLabel({
-              timeLabelMode: PlaybackTimeLabelMode.CurrentTime,
-              hideInLivePlayback: true,
-            }),
-            new SeekBar({ label: new SeekBarLabel() }),
-            new PlaybackTimeLabel({
-              timeLabelMode: PlaybackTimeLabelMode.TotalTime,
-              cssClasses: ['text-right'],
-            }),
-          ],
-          cssClasses: ['controlbar-top'],
-        }),
-        new Container({
-          components: [
-            new PlaybackToggleButton(),
-            new VolumeToggleButton(),
-            new Spacer(),
-            new SettingsToggleButton({ settingsPanel: settingsPanel }),
-            // new SubtitleToggleButton(subtitleSelectItem, subtitleSelectBox),
-            new FullscreenToggleButton(),
-          ],
-          cssClasses: ['controlbar-bottom'],
-        }),
-      ],
-    });
-
-    return new UIContainer({
-      components: [
-        subtitleOverlay,
-        new BufferingOverlay(),
-        new CastStatusOverlay(),
-        new TouchControlOverlay(),
-        new RecommendationOverlay(),
-        controlBar,
-        new TitleBar({
-          components: [
-            new MetadataLabel({ content: MetadataLabelContent.Title }),
-            new CastToggleButton(),
-            new AirPlayToggleButton(),
-            new VRToggleButton(),
-          ],
-        }),
-        settingsPanel,
-        new ErrorMessageOverlay(),
-      ],
-      cssClasses: ['ui-skin-modern-smallscreen', 'ui-skin-modern'],
-      hideDelay: 2000,
-      hidePlayerStateExceptions: [
-        PlayerUtils.PlayerState.Prepared,
-        PlayerUtils.PlayerState.Paused,
-        PlayerUtils.PlayerState.Finished,
-      ],
-    });
-  }
-
-  export function superModernUI(config: UIConfig) {
     let subtitleOverlay = new SubtitleOverlay();
 
     let mainSettingsPanelPage: SettingsPanelPage;
@@ -786,7 +206,259 @@ export namespace UIFactory {
     });
   }
 
-  export function buildSuperModernUI(player: PlayerAPI, config: UIConfig = {}): UIManager {
+  export function modernAdsUI() {
+    let controlBar = new ControlBar({
+      components: [
+        new Container({
+          components: [
+            new PlaybackTimeLabel({ timeLabelMode: PlaybackTimeLabelMode.CurrentTime }),
+            new SeekBar({ label: new SeekBarLabel() }),
+            new PlaybackTimeLabel({
+              timeLabelMode: PlaybackTimeLabelMode.TotalTime,
+              cssClasses: ['text-right'],
+            }),
+          ],
+          cssClasses: ['controlbar-top'],
+        }),
+        new Container({
+          components: [
+            new PlaybackToggleButton(),
+            new VolumeToggleButton(),
+            new Spacer(),
+            new FullscreenToggleButton(),
+          ],
+          cssClasses: ['controlbar-bottom'],
+        }),
+      ],
+    });
+
+    return new UIContainer({
+      components: [
+        new BufferingOverlay(),
+        new AdClickOverlay(),
+        new PlaybackToggleOverlay(),
+        new AdStatusOverlay(),
+        controlBar,
+        new ErrorMessageOverlay(),
+      ],
+      hideDelay: 2000,
+      hidePlayerStateExceptions: [
+        PlayerUtils.PlayerState.Prepared,
+        PlayerUtils.PlayerState.Paused,
+        PlayerUtils.PlayerState.Finished,
+      ],
+      cssClasses: ['ui-skin-modern', 'ui-skin-ads'],
+    });
+  }
+
+  export function modernSmallScreenUI() {
+    let subtitleOverlay = new SubtitleOverlay();
+
+    let settingsPanel = new SettingsPanel({
+      components: [],
+      hidden: true,
+      pageTransitionAnimation: true,
+      hideDelay: -1,
+    });
+
+    let mainSettingsPanelPage = new SettingsPanelPage({
+      components: [
+        new DynamicSettingsPanelItem({
+          label: i18n.getLocalizer('settings.video.quality'),
+          settingComponent: new VideoQualitySelectBox(),
+          container: settingsPanel,
+        }),
+        new DynamicSettingsPanelItem({
+          label: i18n.getLocalizer('speed'),
+          settingComponent: new PlaybackSpeedSelectBox(),
+          container: settingsPanel,
+        }),
+        new DynamicSettingsPanelItem({
+          label: i18n.getLocalizer('settings.audio.track'),
+          settingComponent: new AudioTrackSelectBox() ,
+          container: settingsPanel,
+        }),
+        new DynamicSettingsPanelItem({
+          label: i18n.getLocalizer('settings.audio.quality'),
+          settingComponent: new AudioQualitySelectBox(),
+          container: settingsPanel,
+        }),
+      ],
+    });
+
+    settingsPanel.addComponent(mainSettingsPanelPage);
+
+    let subtitleSettingsPanelPage = new SubtitleSettingsPanelPage({
+      settingsPanel: settingsPanel,
+      overlay: subtitleOverlay,
+      useDynamicSettingsPanelItem: true,
+    });
+
+    let subtitleSettingsOpenButton = new SettingsPanelPageOpenButton({
+      targetPage: subtitleSettingsPanelPage,
+      container: settingsPanel,
+      ariaLabel: i18n.getLocalizer('settings.subtitles'),
+      text: i18n.getLocalizer('open'),
+    });
+
+    const subtitleSelectBox = new SubtitleSelectBox();
+    let subtitleSelectItem = new DynamicSettingsPanelItem({
+      label: new SubtitleSettingsLabel({
+        text: i18n.getLocalizer('settings.subtitles'),
+        opener: subtitleSettingsOpenButton,
+      }),
+      settingComponent: subtitleSelectBox,
+      role: 'menubar',
+      container: settingsPanel,
+    });
+    mainSettingsPanelPage.addComponent(subtitleSelectItem);
+    settingsPanel.addComponent(subtitleSettingsPanelPage);
+
+    let controlBar = new ControlBar({
+      components: [
+        new Container({
+          components: [
+            new PlaybackTimeLabel({
+              timeLabelMode: PlaybackTimeLabelMode.CurrentTime,
+              hideInLivePlayback: true,
+            }),
+            new SeekBar({ label: new SeekBarLabel() }),
+            new PlaybackTimeLabel({
+              timeLabelMode: PlaybackTimeLabelMode.TotalTime,
+              cssClasses: ['text-right'],
+            }),
+          ],
+          cssClasses: ['controlbar-top'],
+        }),
+        new Container({
+          components: [
+            new PlaybackToggleButton(),
+            new VolumeToggleButton(),
+            new Spacer(),
+            new SettingsToggleButton({ settingsPanel: settingsPanel }),
+            // new SubtitleToggleButton(subtitleSelectItem, subtitleSelectBox),
+            new FullscreenToggleButton(),
+          ],
+          cssClasses: ['controlbar-bottom'],
+        }),
+      ],
+    });
+
+    return new UIContainer({
+      components: [
+        subtitleOverlay,
+        new BufferingOverlay(),
+        new CastStatusOverlay(),
+        new TouchControlOverlay(),
+        new RecommendationOverlay(),
+        controlBar,
+        new TitleBar({
+          components: [
+            new MetadataLabel({ content: MetadataLabelContent.Title }),
+            new CastToggleButton(),
+            new AirPlayToggleButton(),
+            new VRToggleButton(),
+          ],
+        }),
+        settingsPanel,
+        new ErrorMessageOverlay(),
+      ],
+      cssClasses: ['ui-skin-modern-smallscreen', 'ui-skin-modern'],
+      hideDelay: 2000,
+      hidePlayerStateExceptions: [
+        PlayerUtils.PlayerState.Prepared,
+        PlayerUtils.PlayerState.Paused,
+        PlayerUtils.PlayerState.Finished,
+      ],
+    });
+  }
+
+  export function modernSmallScreenAdsUI() {
+    let controlBar = new ControlBar({
+      components: [
+        new Container({
+          components: [
+            new PlaybackTimeLabel({ timeLabelMode: PlaybackTimeLabelMode.CurrentTime }),
+            new SeekBar({ label: new SeekBarLabel() }),
+            new PlaybackTimeLabel({
+              timeLabelMode: PlaybackTimeLabelMode.TotalTime,
+              cssClasses: ['text-right'],
+            }),
+          ],
+          cssClasses: ['controlbar-top'],
+        }),
+        new Container({
+          components: [
+            new PlaybackToggleButton(),
+            new VolumeToggleButton(),
+            new Spacer(),
+            new FullscreenToggleButton(),
+          ],
+          cssClasses: ['controlbar-bottom'],
+        }),
+      ],
+    });
+
+    return new UIContainer({
+      components: [
+        new BufferingOverlay(),
+        new AdClickOverlay(),
+        new PlaybackToggleOverlay(),
+        controlBar,
+        new AdStatusOverlay(),
+        new ErrorMessageOverlay(),
+      ],
+      hideDelay: 2000,
+      hidePlayerStateExceptions: [
+        PlayerUtils.PlayerState.Prepared,
+        PlayerUtils.PlayerState.Paused,
+        PlayerUtils.PlayerState.Finished,
+      ],
+      cssClasses: ['ui-skin-modern', 'ui-skin-smallscreen', 'ui-skin-ads'],
+    });
+  }
+
+  export function modernCastReceiverUI() {
+    let controlBar = new ControlBar({
+      components: [
+        new Container({
+          components: [
+            new PlaybackTimeLabel({
+              timeLabelMode: PlaybackTimeLabelMode.CurrentTime,
+              hideInLivePlayback: true,
+            }),
+            new SeekBar({ smoothPlaybackPositionUpdateIntervalMs: -1 }),
+            new PlaybackTimeLabel({
+              timeLabelMode: PlaybackTimeLabelMode.TotalTime,
+              cssClasses: ['text-right'],
+            }),
+          ],
+          cssClasses: ['controlbar-top'],
+        }),
+      ],
+    });
+
+    return new CastUIContainer({
+      components: [
+        new SubtitleOverlay(),
+        new BufferingOverlay(),
+        new PlaybackToggleOverlay(),
+        new Watermark(),
+        controlBar,
+        new TitleBar({ keepHiddenWithoutMetadata: true }),
+        new ErrorMessageOverlay(),
+      ],
+      cssClasses: ['ui-skin-modern', 'ui-skin-cast-receiver'],
+      hideDelay: 2000,
+      hidePlayerStateExceptions: [
+        PlayerUtils.PlayerState.Prepared,
+        PlayerUtils.PlayerState.Paused,
+        PlayerUtils.PlayerState.Finished,
+      ],
+    });
+  }
+
+  export function buildModernUI(player: PlayerAPI, config: UIConfig = {}): UIManager {
     // show smallScreen UI only on mobile/handheld devices
     let smallScreenSwitchWidth = 600;
 
@@ -794,7 +466,7 @@ export namespace UIFactory {
       player,
       [
         {
-          ui: superModernMobileAdsUI(),
+          ui: modernSmallScreenAdsUI(),
           condition: (context: UIConditionContext) => {
             return (
               context.isMobile && context.documentWidth < smallScreenSwitchWidth && context.isAd && context.adRequiresUi
@@ -802,13 +474,13 @@ export namespace UIFactory {
           },
         },
         {
-          ui: superModernAdsUI(),
+          ui: modernAdsUI(),
           condition: (context: UIConditionContext) => {
             return context.isAd && context.adRequiresUi;
           },
         },
         {
-          ui: superModernMobileUI(),
+          ui: modernSmallScreenUI(),
           condition: (context: UIConditionContext) => {
             return (
               !context.isAd &&
@@ -819,7 +491,7 @@ export namespace UIFactory {
           },
         },
         {
-          ui: superModernUI(config),
+          ui: modernUI(config),
           condition: (context: UIConditionContext) => {
             return !context.isAd && !context.adRequiresUi;
           },
@@ -841,27 +513,6 @@ export namespace UIFactory {
         },
         {
           ui: modernSmallScreenUI(),
-          condition: (context: UIConditionContext) => {
-            return !context.isAd && !context.adRequiresUi;
-          },
-        },
-      ],
-      config,
-    );
-  }
-
-  export function buildSuperModernSmallScreenUI(player: PlayerAPI, config: UIConfig = {}): UIManager {
-    return new UIManager(
-      player,
-      [
-        {
-          ui: superModernMobileAdsUI(),
-          condition: (context: UIConditionContext) => {
-            return context.isAd && context.adRequiresUi;
-          },
-        },
-        {
-          ui: superModernMobileUI(),
           condition: (context: UIConditionContext) => {
             return !context.isAd && !context.adRequiresUi;
           },
