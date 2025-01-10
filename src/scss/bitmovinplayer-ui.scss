@@ -1,6 +1,6 @@
 @import 'variables';
 
-.#{$prefix}-ui-skin-modern {
+.#{$prefix}-ui {
   @import 'mixins';
   @import 'components/subtitletogglebutton';
   @import 'components/component';

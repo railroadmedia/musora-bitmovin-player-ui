@@ -1,7 +1,7 @@
 @import 'variables';
 @import 'mixins';
 
-&.#{$prefix}-ui-skin-modern-smallscreen {
+&.#{$prefix}-ui-smallscreen {
 
   // Do not display watermark in mobile view
   .#{$prefix}-ui-watermark {
