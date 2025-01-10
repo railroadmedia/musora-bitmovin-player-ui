@@ -2,39 +2,25 @@
 
 // sass-lint:disable nesting-depth
 &.#{$prefix}-ui-skin-ads {
+  @import 'components/adskipbutton';
+  @import 'components/adstatusoverlay';
 
-  .#{$prefix}-ui-ads-status {
-    background-color: $color-background-bars;
-    left: 1.5em;
-    padding: .5em 1.5em;
-    position: absolute;
-    top: 1em;
-
-    .#{$prefix}-ui-label-ad-message {
-      @extend %ui-label;
-
-      color: $color-secondary;
-      white-space: normal;
+  .#{$prefix}-ui-seekbar {
+    .#{$prefix}-seekbar,
+    .#{$prefix}-seekbar-bars,
+    .#{$prefix}-seekbar-bars > * {
+      pointer-events: none;
     }
 
-    .#{$prefix}-ui-button-ad-skip {
-      @extend %ui-button;
+    .#{$prefix}-seekbar-playbackposition-marker,
+    .#{$prefix}-seekbar-bufferlevel,
+    .#{$prefix}-seekbar-seekposition,
+    .#{$prefix}-seekbar-markers {
+      display: none;
+    }
 
-      .#{$prefix}-label {
-        display: inherit;
-
-        &:hover {
-          text-decoration: underline;
-        }
-      }
-
-      // Add the dot between ad message and skip button
-      &::before {
-        color: $color-highlight;
-        content: '●';
-        padding-left: .5em;
-        padding-right: .5em;
-      }
+    .#{$prefix}-seekbar-playbackposition {
+      background-color: $color-ads;
     }
   }
 
