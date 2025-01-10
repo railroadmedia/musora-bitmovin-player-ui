@@ -1,7 +1,7 @@
 import { Label, LabelConfig } from './label';
 import { UIInstanceManager } from '../uimanager';
 import { PlayerAPI } from 'bitmovin-player';
-import { LocalizableText } from '../localization/i18n';
+import { i18n, LocalizableText } from '../localization/i18n';
 import { ListSelector, ListSelectorConfig } from './listselector';
 import { SubtitleSelectBox } from './subtitleselectbox';
 import { SettingsPanelItem, SettingsPanelItemConfig } from './settingspanelitem';
@@ -91,7 +91,7 @@ export class DynamicSettingsPanelItem extends SettingsPanelItem<DynamicSettingsP
       let selectedOptionLabelText = selectedItem.label;
       if (this.settingComponent instanceof SubtitleSelectBox) {
         let availableSettings = this.settingComponent.getItems().length;
-        selectedOptionLabelText = selectedOptionLabelText + ' (' + (availableSettings - 1) + ')';
+        selectedOptionLabelText = i18n.performLocalization(selectedOptionLabelText) + ' (' + (availableSettings - 1) + ')';
       }
       this.selectedOptionLabel.setText(selectedOptionLabelText);
     };
