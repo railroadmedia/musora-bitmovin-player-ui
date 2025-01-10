@@ -481,7 +481,7 @@ export namespace UIFactory {
         PlayerUtils.PlayerState.Paused,
         PlayerUtils.PlayerState.Finished,
       ],
-      cssClasses: ['ui-skin-super-modern', 'ui-skin-smallscreen', 'ui-skin-ads'],
+      cssClasses: ['ui-skin-modern', 'ui-skin-smallscreen', 'ui-skin-ads'],
     });
   }
 
@@ -526,7 +526,7 @@ export namespace UIFactory {
         PlayerUtils.PlayerState.Paused,
         PlayerUtils.PlayerState.Finished,
       ],
-      cssClasses: ['ui-skin-super-modern', 'ui-skin-ads'],
+      cssClasses: ['ui-skin-modern', 'ui-skin-ads'],
     });
   }
 
@@ -642,7 +642,7 @@ export namespace UIFactory {
         settingsPanel,
         new ErrorMessageOverlay(),
       ],
-      cssClasses: ['ui-skin-modern-smallscreen', 'ui-skin-super-modern'],
+      cssClasses: ['ui-skin-modern-smallscreen', 'ui-skin-modern'],
       hideDelay: 2000,
       hidePlayerStateExceptions: [
         PlayerUtils.PlayerState.Prepared,
@@ -782,7 +782,7 @@ export namespace UIFactory {
         PlayerUtils.PlayerState.Paused,
         PlayerUtils.PlayerState.Finished,
       ],
-      cssClasses: ['ui-skin-super-modern'],
+      cssClasses: ['ui-skin-modern'],
     });
   }
 

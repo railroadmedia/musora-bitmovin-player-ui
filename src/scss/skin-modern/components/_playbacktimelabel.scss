@@ -3,6 +3,7 @@
 .#{$prefix}-ui-playbacktimelabel {
   @extend %ui-label;
 
+  font-weight: 500;
   text-transform: uppercase;
 
   &.#{$prefix}-ui-playbacktimelabel-live {

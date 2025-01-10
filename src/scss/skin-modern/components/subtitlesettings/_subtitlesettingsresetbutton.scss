@@ -4,7 +4,7 @@
   @extend %ui-button;
 
   font-size: .8em;
-  width: 12em;
+  font-weight: 500;
 
   .#{$prefix}-label {
     display: inline-block;

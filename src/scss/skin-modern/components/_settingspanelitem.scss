@@ -44,7 +44,7 @@
     width: fit-content;
 
     &::after {
-      background-image: url('../../assets/skin-super-modern/images/angle-right.svg');
+      background-image: url('../../assets/skin-modern/images/angle-right.svg');
       background-repeat: no-repeat;
       background-size: 1.5em auto;
       content: ' ';
@@ -59,7 +59,7 @@
     &.#{$prefix}-selected {
       .#{$prefix}-ui-label {
         &::before {
-          background-image: url('../../assets/skin-super-modern/images/check.svg');
+          background-image: url('../../assets/skin-modern/images/check.svg');
           background-repeat: no-repeat;
           background-size: 1.5em auto;
           content: ' ';

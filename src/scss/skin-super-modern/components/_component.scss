@@ -1,9 +1,0 @@
-@import '../variables';
-
-%ui-component {
-  outline: 0;
-}
-
-.#{$prefix}-ui-component {
-  @extend %ui-component;
-}
