@@ -149,8 +149,8 @@ export namespace UIFactory {
   /**
    * Builds a UI which is used on cast receivers.
    *
-   This UI includes variants for:
-   - Cast Receivers
+   * This UI includes variants for:
+   * - Cast Receivers
    *
    * @param player The player instance used to build the UI
    * @param config The UIConfig object
@@ -162,8 +162,8 @@ export namespace UIFactory {
   /**
    * Builds a UI which is used on TVs.
    *
-   This UI includes variants for:
-   - TVs
+   * This UI includes variants for:
+   * - TVs
    *
    * @param player The player instance used to build the UI
    * @param config The UIConfig object
