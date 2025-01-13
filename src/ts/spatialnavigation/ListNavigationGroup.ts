@@ -1,7 +1,7 @@
-import { NavigationGroup } from './navigationgroup';
+import { NavigationGroup } from './NavigationGroup';
 import { Action, Direction } from './types';
-import { Container } from '../components/container';
-import { Component } from '../components/component';
+import { Container } from '../components/Container';
+import { Component } from '../components/Component';
 
 export enum ListOrientation {
   Horizontal = 'horizontal',
