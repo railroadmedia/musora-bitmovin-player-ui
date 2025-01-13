@@ -1,20 +1,20 @@
 import type { PlayerAPI } from 'bitmovin-player';
 
-import type { Component, ViewModeChangedEventArgs } from '../../src/ts/components/component';
-import { ViewMode } from '../../src/ts/components/component';
-import type { ListSelectorConfig } from '../../src/ts/components/lists/listselector';
-import { SelectBox } from '../../src/ts/components/settings/selectbox';
-import type { Event } from '../../src/ts/eventdispatcher';
-import { PlayerUtils } from '../../src/ts/utils/playerutils';
-import type { UIInstanceManager } from '../../src/ts/uimanager';
-import { MockHelper } from '../helper/MockHelper';
+import type { Component, ViewModeChangedEventArgs } from '../../../src/ts/components/component';
+import { ViewMode } from '../../../src/ts/components/component';
+import type { ListSelectorConfig } from '../../../src/ts/components/lists/listselector';
+import { SelectBox } from '../../../src/ts/components/settings/selectbox';
+import type { Event } from '../../../src/ts/eventdispatcher';
+import { PlayerUtils } from '../../../src/ts/utils/playerutils';
+import type { UIInstanceManager } from '../../../src/ts/uimanager';
+import { MockHelper } from '../../helper/MockHelper';
 import getUiInstanceManagerMock = MockHelper.getUiInstanceManagerMock;
 import getPlayerMock = MockHelper.getPlayerMock;
 import generateDOMMock = MockHelper.generateDOMMock;
 import PlayerState = PlayerUtils.PlayerState;
-import type { DOM } from '../../src/ts/dom';
+import type { DOM } from '../../../src/ts/dom';
 
-jest.mock('../../src/ts/dom', generateDOMMock);
+jest.mock('../../../src/ts/dom', generateDOMMock);
 
 describe('SelectBox', () => {
   let selectBox: SelectBox;

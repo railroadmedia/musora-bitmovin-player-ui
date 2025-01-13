@@ -1,13 +1,13 @@
-import { MockHelper, TestingPlayerAPI } from '../helper/MockHelper';
-import { UIInstanceManager } from '../../src/ts/uimanager';
-import { SubtitleOverlay, SubtitleRegionContainerManager } from '../../src/ts/components/overlays/subtitleoverlay';
-import { DOM } from '../../src/ts/dom';
+import { MockHelper, TestingPlayerAPI } from '../../helper/MockHelper';
+import { UIInstanceManager } from '../../../src/ts/uimanager';
+import { SubtitleOverlay, SubtitleRegionContainerManager } from '../../../src/ts/components/overlays/subtitleoverlay';
+import { DOM } from '../../../src/ts/dom';
 
 let playerMock: jest.Mocked<TestingPlayerAPI>;
 let uiInstanceManagerMock: UIInstanceManager;
 let subtitleOverlay: SubtitleOverlay;
 
-jest.mock('../../src/ts/components/container');
+jest.mock('../../../src/ts/components/container');
 
 let subtitleRegionContainerManagerMock: SubtitleRegionContainerManager;
 

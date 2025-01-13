@@ -1,6 +1,6 @@
-import { SubtitleSwitchHandler } from '../src/ts/utils/subtitleutils';
-import { MockHelper } from './helper/MockHelper';
-import { ListSelector, ListSelectorConfig } from '../src/ts/components/lists/listselector';
+import { SubtitleSwitchHandler } from '../../src/ts/utils/subtitleutils';
+import { MockHelper } from '../helper/MockHelper';
+import { ListSelector, ListSelectorConfig } from '../../src/ts/components/lists/listselector';
 import { PlayerSubtitlesAPI } from 'bitmovin-player';
 
 let playerMock = MockHelper.getPlayerMock();

@@ -1,8 +1,8 @@
-import { MockHelper, TestingPlayerAPI } from '../helper/MockHelper';
-import { UIInstanceManager } from '../../src/ts/uimanager';
-import { SeekBarLabel } from '../../src/ts/components/seekbar/seekbarlabel';
-import { SeekPreviewEventArgs } from '../../src/ts/components/seekbar/seekbar';
-import { DOM } from '../../src/ts/dom';
+import { MockHelper, TestingPlayerAPI } from '../../helper/MockHelper';
+import { UIInstanceManager } from '../../../src/ts/uimanager';
+import { SeekBarLabel } from '../../../src/ts/components/seekbar/seekbarlabel';
+import { SeekPreviewEventArgs } from '../../../src/ts/components/seekbar/seekbar';
+import { DOM } from '../../../src/ts/dom';
 
 let playerMock: TestingPlayerAPI;
 let uiInstanceManagerMock: UIInstanceManager;

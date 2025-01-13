@@ -1,4 +1,4 @@
-import { i18n } from '../src/ts/localization/i18n';
+import { i18n } from '../../src/ts/localization/i18n';
 
 const fallbackTest = 'fallback test';
 const successEn = 'success';

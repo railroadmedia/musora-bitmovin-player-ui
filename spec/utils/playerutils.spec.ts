@@ -1,6 +1,6 @@
-import { PlayerUtils } from '../src/ts/utils/playerutils';
+import { PlayerUtils } from '../../src/ts/utils/playerutils';
 import { PlayerAPI } from 'bitmovin-player';
-import { MockHelper } from './helper/MockHelper';
+import { MockHelper } from '../helper/MockHelper';
 
 describe('PlayerUtils', () => {
   let playerMock: PlayerAPI;

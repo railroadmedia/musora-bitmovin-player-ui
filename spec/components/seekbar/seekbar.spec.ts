@@ -1,7 +1,7 @@
-import { MockHelper, TestingPlayerAPI } from '../helper/MockHelper';
-import { SeekBar } from '../../src/ts/components/seekbar/seekbar';
-import { UIInstanceManager } from '../../src/ts/uimanager';
-import { Timeout } from '../../src/ts/utils/timeout';
+import { MockHelper, TestingPlayerAPI } from '../../helper/MockHelper';
+import { SeekBar } from '../../../src/ts/components/seekbar/seekbar';
+import { UIInstanceManager } from '../../../src/ts/uimanager';
+import { Timeout } from '../../../src/ts/utils/timeout';
 
 let playerMock: TestingPlayerAPI;
 let uiInstanceManagerMock: UIInstanceManager;

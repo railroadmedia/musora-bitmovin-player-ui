@@ -1,6 +1,6 @@
 import { PlayerAPI } from 'bitmovin-player';
-import { isMobileV3PlayerAPI, MobileV3PlayerAPI, MobileV3PlayerEvent } from '../src/ts/utils/mobilev3playerapi';
-import { PlayerWrapper } from '../src/ts/uimanager';
+import { isMobileV3PlayerAPI, MobileV3PlayerAPI, MobileV3PlayerEvent } from '../../src/ts/utils/mobilev3playerapi';
+import { PlayerWrapper } from '../../src/ts/uimanager';
 
 describe('isMobileV3PlayerAPI', () => {
   const playerApi = { exports: { PlayerEvent: { } } } as PlayerAPI;

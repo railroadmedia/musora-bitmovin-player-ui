@@ -1,8 +1,8 @@
-import { SubtitleRegionContainer, SubtitleLabel } from '../src/ts/components/overlays/subtitleoverlay';
-import { VttUtils } from '../src/ts/utils/vttutils';
+import { SubtitleRegionContainer, SubtitleLabel } from '../../src/ts/components/overlays/subtitleoverlay';
+import { VttUtils } from '../../src/ts/utils/vttutils';
 import { VTTRegionProperties, VTTProperties } from 'bitmovin-player';
-import { MockHelper } from './helper/MockHelper';
-import { Size } from '../src/ts/dom';
+import { MockHelper } from '../helper/MockHelper';
+import { Size } from '../../src/ts/dom';
 
 describe('Vtt Utils', () => {
   describe('Vtt Region', () => {

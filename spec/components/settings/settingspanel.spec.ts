@@ -1,18 +1,18 @@
 import type { PlayerAPI } from 'bitmovin-player';
 
-import type { Component, ComponentConfig, ViewModeChangedEventArgs } from '../../src/ts/components/component';
-import { ViewMode } from '../../src/ts/components/component';
-import { SettingsPanel } from '../../src/ts/components/settings/settingspanel';
-import { SettingsPanelPage } from '../../src/ts/components/settings/settingspanelpage';
-import { EventDispatcher } from '../../src/ts/eventdispatcher';
-import type { UIInstanceManager } from '../../src/ts/uimanager';
-import { MockHelper } from '../helper/MockHelper';
+import type { Component, ComponentConfig, ViewModeChangedEventArgs } from '../../../src/ts/components/component';
+import { ViewMode } from '../../../src/ts/components/component';
+import { SettingsPanel } from '../../../src/ts/components/settings/settingspanel';
+import { SettingsPanelPage } from '../../../src/ts/components/settings/settingspanelpage';
+import { EventDispatcher } from '../../../src/ts/eventdispatcher';
+import type { UIInstanceManager } from '../../../src/ts/uimanager';
+import { MockHelper } from '../../helper/MockHelper';
 import getPlayerMock = MockHelper.getPlayerMock;
 import getUiInstanceManagerMock = MockHelper.getUiInstanceManagerMock;
-import { Label } from '../../src/ts/components/labels/label';
-import { SelectBox } from '../../src/ts/components/settings/selectbox';
-import { SettingsPanelItem } from '../../src/ts/components/settings/settingspanelitem';
-import { VolumeSlider } from '../../src/ts/components/seekbar/volumeslider';
+import { Label } from '../../../src/ts/components/labels/label';
+import { SelectBox } from '../../../src/ts/components/settings/selectbox';
+import { SettingsPanelItem } from '../../../src/ts/components/settings/settingspanelitem';
+import { VolumeSlider } from '../../../src/ts/components/seekbar/volumeslider';
 
 let settingsPanel: SettingsPanel;
 

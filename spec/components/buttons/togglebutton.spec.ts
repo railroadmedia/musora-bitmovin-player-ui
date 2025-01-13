@@ -1,8 +1,8 @@
-import { MockHelper, TestingPlayerAPI } from '../helper/MockHelper';
-import { UIInstanceManager } from '../../src/ts/uimanager';
-import { ToggleButton } from '../../src/ts/components/buttons/togglebutton';
-import { ToggleButtonConfig } from '../../src/ts/components/buttons/togglebutton';
-import { DOM } from '../../src/ts/dom';
+import { MockHelper, TestingPlayerAPI } from '../../helper/MockHelper';
+import { UIInstanceManager } from '../../../src/ts/uimanager';
+import { ToggleButton } from '../../../src/ts/components/buttons/togglebutton';
+import { ToggleButtonConfig } from '../../../src/ts/components/buttons/togglebutton';
+import { DOM } from '../../../src/ts/dom';
 
 let playerMock: TestingPlayerAPI;
 let uiInstanceManagerMock: UIInstanceManager;

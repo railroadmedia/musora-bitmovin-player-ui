@@ -1,6 +1,6 @@
 import { PlayerEvent, VolumeChangedEvent } from 'bitmovin-player';
-import { VolumeController } from '../src/ts/utils/volumecontroller';
-import { MockHelper, TestingPlayerAPI } from './helper/MockHelper';
+import { VolumeController } from '../../src/ts/utils/volumecontroller';
+import { MockHelper, TestingPlayerAPI } from '../helper/MockHelper';
 
 describe('VolumeController', () => {
   let playerMock: TestingPlayerAPI;

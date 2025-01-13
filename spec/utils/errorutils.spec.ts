@@ -1,5 +1,5 @@
-import { MobileV3PlayerErrorEvent } from '../src/ts/utils/mobilev3playerapi';
-import { ErrorUtils } from '../src/ts/utils/errorutils';
+import { MobileV3PlayerErrorEvent } from '../../src/ts/utils/mobilev3playerapi';
+import { ErrorUtils } from '../../src/ts/utils/errorutils';
 import defaultMobileV3ErrorMessageTranslator = ErrorUtils.defaultMobileV3ErrorMessageTranslator;
 import { ErrorEvent } from 'bitmovin-player';
 import defaultWebErrorMessageTranslator = ErrorUtils.defaultWebErrorMessageTranslator;
