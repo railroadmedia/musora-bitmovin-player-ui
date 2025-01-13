@@ -11,7 +11,7 @@ import LiveStreamDetectorEventArgs = PlayerUtils.LiveStreamDetectorEventArgs;
 import { TimelineMarker } from '../../uiconfig';
 import { PlayerAPI, PlayerEventBase } from 'bitmovin-player';
 import { StringUtils } from '../../utils/stringutils';
-import { SeekBarType, SeekBarController } from './seekbarcontroller';
+import { SeekBarType, SeekBarController } from '../../utils/seekbarcontroller';
 import { i18n } from '../../localization/i18n';
 import { BrowserUtils } from '../../utils/browserutils';
 import { TimelineMarkersHandler } from '../../utils/timelinemarkershandler';

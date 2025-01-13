@@ -1,7 +1,7 @@
-import { StorageUtils } from '../../../utils/storageutils';
-import { Component, ComponentConfig } from '../../component';
-import { EventDispatcher, Event } from '../../../eventdispatcher';
-import { prefixCss } from '../../dummycomponent';
+import { StorageUtils } from './storageutils';
+import { Component, ComponentConfig } from '../components/component';
+import { EventDispatcher, Event } from '../eventdispatcher';
+import { prefixCss } from '../components/dummycomponent';
 
 interface SubtitleSettings {
   fontColor?: string;

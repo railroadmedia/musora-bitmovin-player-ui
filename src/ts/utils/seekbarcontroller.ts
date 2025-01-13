@@ -1,7 +1,7 @@
-import { UIUtils } from '../../utils/uiutils';
-import { DOM } from '../../dom';
+import { UIUtils } from './uiutils';
+import { DOM } from '../dom';
 import { PlayerAPI } from 'bitmovin-player';
-import { VolumeController } from '../../utils/volumecontroller';
+import { VolumeController } from './volumecontroller';
 
 export enum SeekBarType {
   Vod,

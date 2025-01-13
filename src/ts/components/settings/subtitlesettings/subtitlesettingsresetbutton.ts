@@ -1,5 +1,5 @@
 import {UIInstanceManager} from '../../../uimanager';
-import {SubtitleSettingsManager} from './subtitlesettingsmanager';
+import {SubtitleSettingsManager} from '../../../utils/subtitlesettingsmanager';
 import {Button, ButtonConfig} from '../../buttons/button';
 import { PlayerAPI } from 'bitmovin-player';
 import { i18n } from '../../../localization/i18n';

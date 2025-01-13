@@ -14,7 +14,7 @@ import { i18n, CustomVocabulary, Vocabularies } from './localization/i18n';
 import { FocusVisibilityTracker } from './utils/focusvisibilitytracker';
 import { isMobileV3PlayerAPI, MobileV3PlayerAPI, MobileV3PlayerEvent } from './utils/mobilev3playerapi';
 import { SpatialNavigation } from './spatialnavigation/spatialnavigation';
-import { SubtitleSettingsManager } from './components/settings/subtitlesettings/subtitlesettingsmanager';
+import { SubtitleSettingsManager } from './utils/subtitlesettingsmanager';
 import { StorageUtils } from './utils/storageutils';
 
 /**

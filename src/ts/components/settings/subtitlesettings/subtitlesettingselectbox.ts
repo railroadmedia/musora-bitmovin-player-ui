@@ -1,7 +1,7 @@
 import {SubtitleOverlay} from '../../overlays/subtitleoverlay';
 import {ListSelectorConfig} from '../../lists/listselector';
 import {SelectBox} from '../selectbox';
-import {SubtitleSettingsManager} from './subtitlesettingsmanager';
+import {SubtitleSettingsManager} from '../../../utils/subtitlesettingsmanager';
 import { PlayerAPI } from 'bitmovin-player';
 import { UIInstanceManager } from '../../../uimanager';
 
