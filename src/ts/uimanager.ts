@@ -75,6 +75,10 @@ export interface UIConditionContext {
    */
   isPlaying: boolean;
   /**
+   * Tells if the player has a Source.
+   */
+  isSourceLoaded: boolean;
+  /**
    * The width of the player/UI element.
    */
   width: number;
@@ -279,6 +283,10 @@ export class UIManager {
 
     let adStartedEvent: AdEvent = null; // keep the event stored here during ad playback
 
+    let isSourceLoaded = player.getSource() != null;
+    player.on(player.exports.PlayerEvent.SourceLoaded, () => { isSourceLoaded = true });
+    player.on(player.exports.PlayerEvent.SourceUnloaded, () => { isSourceLoaded = false });
+
     // Dynamically select a UI variant that matches the current UI condition.
     let resolveUiVariant = (event: PlayerEventBase) => {
       // Make sure that the AdStarted event data is persisted through ad playback in case other events happen
@@ -341,8 +349,9 @@ export class UIManager {
       }
 
       this.resolveUiVariant({
-        isAd: isAd,
-        adRequiresUi: adRequiresUi,
+        isAd,
+        adRequiresUi,
+        isSourceLoaded,
       }, (context) => {
         // If this is an ad UI, we need to relay the saved ON_AD_STARTED event data so ad components can configure
         // themselves for the current ad.
@@ -365,6 +374,7 @@ export class UIManager {
       this.managerPlayerWrapper.getPlayer().on(this.player.exports.PlayerEvent.SourceUnloaded, resolveUiVariant);
       this.managerPlayerWrapper.getPlayer().on(this.player.exports.PlayerEvent.Play, resolveUiVariant);
       this.managerPlayerWrapper.getPlayer().on(this.player.exports.PlayerEvent.Paused, resolveUiVariant);
+      this.managerPlayerWrapper.getPlayer().on(this.player.exports.PlayerEvent.Playing, resolveUiVariant);
       this.managerPlayerWrapper.getPlayer().on(this.player.exports.PlayerEvent.AdStarted, resolveUiVariant);
       this.managerPlayerWrapper.getPlayer().on(this.player.exports.PlayerEvent.AdBreakFinished, resolveUiVariant);
       this.managerPlayerWrapper.getPlayer().on(this.player.exports.PlayerEvent.PlayerResized, resolveUiVariant);
@@ -472,6 +482,7 @@ export class UIManager {
       isMobile: BrowserUtils.isMobile,
       isTv: BrowserUtils.isTv,
       isPlaying: this.player.isPlaying(),
+      isSourceLoaded: false,
       width: this.uiContainerElement.width(),
       documentWidth: document.body.clientWidth,
     };

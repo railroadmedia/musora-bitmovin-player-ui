@@ -79,6 +79,12 @@ export namespace UIFactory {
       player,
       [
         {
+          ui: emptyStateUILayout(),
+          condition: (context) => {
+            return !context.isSourceLoaded;
+          },
+        },
+        {
           ui: smallScreenAdsUILayout(),
           condition: (context: UIConditionContext) => {
             return (
@@ -685,4 +691,18 @@ function tvUILayout() {
 function tvAdsUILayout() {
   // TODO: implement once we have a design for TV ads
   return tvUILayout();
+}
+
+/**
+ * Used for the initial startup phase of the UI. Only contains basic components.
+ */
+function emptyStateUILayout() {
+  return new UIContainer({
+    components: [
+      new BufferingOverlay(),
+      new PlaybackToggleOverlay(),
+      new ErrorMessageOverlay(),
+    ],
+    cssClasses: ['ui', 'ui-empty-state'],
+  });
 }
