@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [3.82.0] - 2025-01-13
 
 ### Added
 - Chore: Pre-commit hook for linting TypeScript file changes
@@ -1057,6 +1057,7 @@ Version 2.0 of the UI framework is built for player 7.1. If absolutely necessary
 ## 1.0.0 (2017-02-03)
 - First release
 
+[3.82.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.81.0...v3.82.0
 [3.81.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.80.0...v3.81.0
 [3.80.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.79.0...v3.80.0
 [3.79.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.78.0...v3.79.0
