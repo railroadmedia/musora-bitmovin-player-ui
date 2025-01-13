@@ -2,8 +2,8 @@
 
 // sass-lint:disable nesting-depth
 &.#{$prefix}-ui-ads {
-  @import 'components/adskipbutton';
-  @import 'components/adstatusoverlay';
+  @import 'components/ads/adskipbutton';
+  @import 'components/ads/adstatusoverlay';
 
   .#{$prefix}-ui-seekbar {
     .#{$prefix}-seekbar,

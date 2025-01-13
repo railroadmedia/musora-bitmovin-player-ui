@@ -1,0 +1,45 @@
+@import '../../variables';
+
+.#{$prefix}-ui-smallcenteredplaybacktogglebutton {
+  @extend %ui-button;
+
+  cursor: default;
+  height: 2.5em;
+  outline: none;
+  overflow: hidden; // hide overflow from scale animation
+  width: 2.5em;
+
+  &:hover {
+    @include svg-icon-shadow;
+  }
+
+  .#{$prefix}-image {
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 4em;
+    height: 100%;
+    width: 100%;
+  }
+
+  &.#{$prefix}-on {
+    .#{$prefix}-image {
+      background-image: url('../../assets/images/pause.svg');
+    }
+  }
+
+  &.#{$prefix}-off {
+    .#{$prefix}-image {
+      background-image: url('../../assets/images/play.svg');
+    }
+  }
+
+  &.#{$prefix}-no-transition-animations {
+    &.#{$prefix}-on,
+    &.#{$prefix}-off {
+      .#{$prefix}-image {
+        animation: none;
+        transition: none;
+      }
+    }
+  }
+}
