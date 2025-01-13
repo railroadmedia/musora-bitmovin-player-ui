@@ -67,6 +67,10 @@ export interface UIConditionContext {
    */
   isMobile: boolean;
   /**
+   * Tells if the UI is running in a TV browser.
+   */
+  isTv: boolean;
+  /**
    * Tells if the player is in playing or paused state.
    */
   isPlaying: boolean;
@@ -466,6 +470,7 @@ export class UIManager {
       adRequiresUi: false,
       isFullscreen: this.player.getViewMode() === this.player.exports.ViewMode.Fullscreen,
       isMobile: BrowserUtils.isMobile,
+      isTv: BrowserUtils.isTv,
       isPlaying: this.player.isPlaying(),
       width: this.uiContainerElement.width(),
       documentWidth: document.body.clientWidth,

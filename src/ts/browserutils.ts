@@ -47,6 +47,11 @@ export class BrowserUtils {
     return navigator && navigator.userAgent && navigator.platform === 'MacIntel';
   }
 
+  static get isTv(): boolean {
+    return this.isHisense || this.isPlayStation || this.isWebOs
+      || this.isTizen || this.isVizio || this.isXumo || this.isXbox;
+  }
+
   static get isHisense(): boolean {
     if (!this.windowExists()) {
       return false;
@@ -77,6 +82,29 @@ export class BrowserUtils {
       return false;
     }
     return navigator && navigator.userAgent && /Tizen/.test(navigator.userAgent);
+  }
+
+  static get isVizio(): boolean {
+    if (!this.windowExists()) {
+      return false;
+    }
+    return navigator && navigator.userAgent && /vizio/.test(navigator.userAgent.toLowerCase());
+  }
+
+  static get isXumo(): boolean {
+    if (!this.windowExists()) {
+      return false;
+    }
+    return navigator && navigator.userAgent && /sky_ott/.test(navigator.userAgent.toLowerCase()) ||
+      navigator && navigator.userAgent && /xglobal/.test(navigator.userAgent.toLowerCase())  ||
+      navigator && navigator.userAgent && /xfinity/.test(navigator.userAgent.toLowerCase());
+  }
+
+  static get isXbox(): boolean {
+    if (!this.windowExists()) {
+      return false;
+    }
+    return navigator && navigator.userAgent && /Xbox/.test(navigator.userAgent);
   }
 
   // https://hacks.mozilla.org/2013/04/detecting-touch-its-the-why-not-the-how/

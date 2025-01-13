@@ -87,12 +87,6 @@ export namespace UIFactory {
           },
         },
         {
-          ui: adsUILayout(),
-          condition: (context: UIConditionContext) => {
-            return context.isAd && context.adRequiresUi;
-          },
-        },
-        {
           ui: smallScreenUILayout(),
           condition: (context: UIConditionContext) => {
             return (
@@ -101,6 +95,24 @@ export namespace UIFactory {
               context.isMobile &&
               context.documentWidth < smallScreenSwitchWidth
             );
+          },
+        },
+        {
+          ...tvUILayout(),
+          condition: (context: UIConditionContext) => {
+            return context.isTv && !context.isAd;
+          }
+        },
+        {
+          ...tvUILayout(),
+          condition: (context: UIConditionContext) => {
+            return context.isTv && context.isAd && context.adRequiresUi;
+          }
+        },
+        {
+          ui: adsUILayout(),
+          condition: (context: UIConditionContext) => {
+            return context.isAd && context.adRequiresUi;
           },
         },
         {
@@ -668,4 +680,9 @@ function tvUILayout() {
     ui: uiContainer,
     spatialNavigation: spatialNavigation,
   };
+}
+
+function tvAdsUILayout() {
+  // TODO: implement once we have a design for TV ads
+  return tvUILayout();
 }
