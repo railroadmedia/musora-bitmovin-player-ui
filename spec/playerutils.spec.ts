@@ -1,4 +1,4 @@
-import { PlayerUtils } from '../src/ts/playerutils';
+import { PlayerUtils } from '../src/ts/utils/playerutils';
 import { PlayerAPI } from 'bitmovin-player';
 import { MockHelper } from './helper/MockHelper';
 

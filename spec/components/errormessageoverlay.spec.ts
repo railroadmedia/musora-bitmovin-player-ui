@@ -1,6 +1,6 @@
 import { UIInstanceManager } from './../../src/ts/uimanager';
-import { ErrorMessageOverlay } from '../../src/ts/components/errormessageoverlay';
-import { MobileV3PlayerEvent } from '../../src/ts/mobilev3playerapi';
+import { ErrorMessageOverlay } from '../../src/ts/components/overlays/errormessageoverlay';
+import { MobileV3PlayerEvent } from '../../src/ts/utils/mobilev3playerapi';
 import { MockHelper, TestingPlayerAPI } from '../helper/MockHelper';
 
 describe('ErrorMessageOverlay', () => {

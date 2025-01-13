@@ -1,5 +1,5 @@
 import { JSDOM } from 'jsdom';
-import { FocusVisibilityTracker } from '../src/ts/focusvisibilitytracker';
+import { FocusVisibilityTracker } from '../src/ts/utils/focusvisibilitytracker';
 
 describe('FocusVisibilityTracker', () => {
   const bitmovinUIPrefix = 'bmpui';

@@ -2,10 +2,10 @@ import type { PlayerAPI } from 'bitmovin-player';
 
 import type { Component, ViewModeChangedEventArgs } from '../../src/ts/components/component';
 import { ViewMode } from '../../src/ts/components/component';
-import type { ListSelectorConfig } from '../../src/ts/components/listselector';
-import { SelectBox } from '../../src/ts/components/selectbox';
+import type { ListSelectorConfig } from '../../src/ts/components/lists/listselector';
+import { SelectBox } from '../../src/ts/components/settings/selectbox';
 import type { Event } from '../../src/ts/eventdispatcher';
-import { PlayerUtils } from '../../src/ts/playerutils';
+import { PlayerUtils } from '../../src/ts/utils/playerutils';
 import type { UIInstanceManager } from '../../src/ts/uimanager';
 import { MockHelper } from '../helper/MockHelper';
 import getUiInstanceManagerMock = MockHelper.getUiInstanceManagerMock;

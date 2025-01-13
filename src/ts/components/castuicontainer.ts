@@ -1,6 +1,6 @@
 import {UIContainer, UIContainerConfig} from './uicontainer';
 import {UIInstanceManager} from '../uimanager';
-import {Timeout} from '../timeout';
+import {Timeout} from '../utils/timeout';
 import { PlayerAPI } from 'bitmovin-player';
 
 /**

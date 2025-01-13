@@ -1,7 +1,7 @@
 import { Component } from '../components/component';
-import { SettingsPanel } from '../components/settingspanel';
+import { SettingsPanel } from '../components/settings/settingspanel';
 import { Container } from '../components/container';
-import { ListBox } from '../components/listbox';
+import { ListBox } from '../components/lists/listbox';
 import { Action, Direction } from './types';
 
 export function isSettingsPanel(component: Component<unknown>): component is SettingsPanel {

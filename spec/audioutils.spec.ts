@@ -1,6 +1,6 @@
 import { MockHelper } from './helper/MockHelper';
-import { ListSelector, ListSelectorConfig } from '../src/ts/components/listselector';
-import { AudioTrackSwitchHandler } from '../src/ts/audiotrackutils';
+import { ListSelector, ListSelectorConfig } from '../src/ts/components/lists/listselector';
+import { AudioTrackSwitchHandler } from '../src/ts/utils/audiotrackutils';
 import { AudioTrack } from 'bitmovin-player';
 
 let playerMock = MockHelper.getPlayerMock();

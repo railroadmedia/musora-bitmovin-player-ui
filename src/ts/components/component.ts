@@ -1,4 +1,4 @@
-import {Guid} from '../guid';
+import {Guid} from '../utils/guid';
 import {DOM} from '../dom';
 import {EventDispatcher, NoArgs, Event} from '../eventdispatcher';
 import {UIInstanceManager} from '../uimanager';

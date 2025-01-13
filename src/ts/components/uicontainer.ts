@@ -1,13 +1,13 @@
 import { Container, ContainerConfig } from './container';
 import { UIInstanceManager } from '../uimanager';
 import { DOM, HTMLElementWithComponent } from '../dom';
-import { Timeout } from '../timeout';
-import { PlayerUtils } from '../playerutils';
+import { Timeout } from '../utils/timeout';
+import { PlayerUtils } from '../utils/playerutils';
 import { CancelEventArgs, Event as UiEvent, EventDispatcher } from '../eventdispatcher';
 import { PlayerAPI, PlayerResizedEvent } from 'bitmovin-player';
 import { i18n } from '../localization/i18n';
-import { Button, ButtonConfig } from './button';
-import { TouchControlOverlay, TouchControlOverlayConfig } from './touchcontroloverlay';
+import { Button, ButtonConfig } from './buttons/button';
+import { TouchControlOverlay, TouchControlOverlayConfig } from './overlays/touchcontroloverlay';
 
 /**
  * Configuration interface for a {@link UIContainer}.

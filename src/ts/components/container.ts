@@ -1,6 +1,6 @@
 import { ComponentConfig, Component, ViewModeChangedEventArgs, ViewMode } from './component';
 import {DOM} from '../dom';
-import {ArrayUtils} from '../arrayutils';
+import {ArrayUtils} from '../utils/arrayutils';
 import { i18n } from '../localization/i18n';
 
 /**

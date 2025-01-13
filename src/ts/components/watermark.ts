@@ -1,4 +1,4 @@
-import {ClickOverlay, ClickOverlayConfig} from './clickoverlay';
+import {ClickOverlay, ClickOverlayConfig} from './overlays/clickoverlay';
 import { i18n } from '../localization/i18n';
 
 /**

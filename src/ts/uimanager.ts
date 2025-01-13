@@ -2,20 +2,20 @@ import {UIContainer} from './components/uicontainer';
 import {DOM} from './dom';
 import { Component, ComponentConfig, ViewModeChangedEventArgs } from './components/component';
 import {Container} from './components/container';
-import { SeekBar, SeekBarMarker } from './components/seekbar';
+import { SeekBar, SeekBarMarker } from './components/seekbar/seekbar';
 import {NoArgs, EventDispatcher, CancelEventArgs} from './eventdispatcher';
-import {UIUtils} from './uiutils';
-import {ArrayUtils} from './arrayutils';
-import {BrowserUtils} from './browserutils';
+import {UIUtils} from './utils/uiutils';
+import {ArrayUtils} from './utils/arrayutils';
+import {BrowserUtils} from './utils/browserutils';
 import { TimelineMarker, UIConfig } from './uiconfig';
 import { PlayerAPI, PlayerEventCallback, PlayerEventBase, PlayerEvent, AdEvent, LinearAd } from 'bitmovin-player';
-import { VolumeController } from './volumecontroller';
+import { VolumeController } from './utils/volumecontroller';
 import { i18n, CustomVocabulary, Vocabularies } from './localization/i18n';
-import { FocusVisibilityTracker } from './focusvisibilitytracker';
-import { isMobileV3PlayerAPI, MobileV3PlayerAPI, MobileV3PlayerEvent } from './mobilev3playerapi';
+import { FocusVisibilityTracker } from './utils/focusvisibilitytracker';
+import { isMobileV3PlayerAPI, MobileV3PlayerAPI, MobileV3PlayerEvent } from './utils/mobilev3playerapi';
 import { SpatialNavigation } from './spatialnavigation/spatialnavigation';
-import { SubtitleSettingsManager } from './components/subtitlesettings/subtitlesettingsmanager';
-import { StorageUtils } from './storageutils';
+import { SubtitleSettingsManager } from './components/settings/subtitlesettings/subtitlesettingsmanager';
+import { StorageUtils } from './utils/storageutils';
 
 /**
  * @category Configs

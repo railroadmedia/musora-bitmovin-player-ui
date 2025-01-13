@@ -1,6 +1,6 @@
 import { MockHelper, TestingPlayerAPI } from '../helper/MockHelper';
 import { UIInstanceManager } from '../../src/ts/uimanager';
-import { PlaybackTimeLabel, PlaybackTimeLabelMode } from '../../src/ts/components/playbacktimelabel';
+import { PlaybackTimeLabel, PlaybackTimeLabelMode } from '../../src/ts/components/labels/playbacktimelabel';
 import { PlayerEvent, PlayerEventBase } from 'bitmovin-player';
 
 const liveEdgeActiveCssClassName = 'ui-playbacktimelabel-live-edge';

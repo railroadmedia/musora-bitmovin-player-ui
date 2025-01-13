@@ -1,5 +1,5 @@
 import { MockHelper } from '../helper/MockHelper';
-import { TimelineMarkersHandler } from '../../src/ts/components/timelinemarkershandler';
+import { TimelineMarkersHandler } from '../../src/ts/utils/timelinemarkershandler';
 import { PlayerAPI } from 'bitmovin-player';
 import { UIInstanceManager } from '../../src/ts/uimanager';
 import { TimelineMarker } from '../../src/ts/uiconfig';

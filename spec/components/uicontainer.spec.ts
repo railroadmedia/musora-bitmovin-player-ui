@@ -1,5 +1,5 @@
 import { UIContainer } from '../../src/ts/components/uicontainer';
-import { PlayerUtils } from '../../src/ts/playerutils';
+import { PlayerUtils } from '../../src/ts/utils/playerutils';
 import type { UIInstanceManager } from '../../src/ts/uimanager';
 import type { TestingPlayerAPI } from '../helper/MockHelper';
 import { MockHelper } from '../helper/MockHelper';

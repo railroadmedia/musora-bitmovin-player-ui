@@ -1,6 +1,6 @@
 import { MockHelper, TestingPlayerAPI } from '../helper/MockHelper';
 import { UIInstanceManager } from '../../src/ts/uimanager';
-import { FullscreenToggleButton } from '../../src/ts/components/fullscreentogglebutton';
+import { FullscreenToggleButton } from '../../src/ts/components/buttons/fullscreentogglebutton';
 import { ViewMode } from 'bitmovin-player';
 
 let playerMock: TestingPlayerAPI;

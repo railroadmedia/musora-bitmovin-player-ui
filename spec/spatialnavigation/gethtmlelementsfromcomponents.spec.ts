@@ -1,6 +1,6 @@
 import { Container } from '../../src/ts/components/container';
 import { Component } from '../../src/ts/components/component';
-import { ListBox } from '../../src/ts/components/listbox';
+import { ListBox } from '../../src/ts/components/lists/listbox';
 import { getHtmlElementsFromComponents } from '../../src/ts/spatialnavigation/gethtmlelementsfromcomponents';
 
 class DummyListBox extends ListBox {

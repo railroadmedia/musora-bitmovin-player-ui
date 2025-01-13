@@ -1,6 +1,6 @@
 import { MockHelper, TestingPlayerAPI } from '../helper/MockHelper';
 import { UIInstanceManager } from '../../src/ts/uimanager';
-import { PictureInPictureToggleButton } from '../../src/ts/components/pictureinpicturetogglebutton';
+import { PictureInPictureToggleButton } from '../../src/ts/components/buttons/pictureinpicturetogglebutton';
 import { ViewMode } from 'bitmovin-player';
 
 let playerMock: TestingPlayerAPI;

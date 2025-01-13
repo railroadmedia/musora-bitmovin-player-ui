@@ -1,4 +1,4 @@
-import { ErrorMessageMap, ErrorMessageTranslator } from './components/errormessageoverlay';
+import { ErrorMessageMap, ErrorMessageTranslator } from './components/overlays/errormessageoverlay';
 
 /**
  * @category Configs
