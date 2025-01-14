@@ -1,5 +1,5 @@
-import {ArrayUtils} from './arrayutils';
-import { Timeout } from './timeout';
+import {ArrayUtils} from './utils/arrayutils';
+import { Timeout } from './utils/timeout';
 /**
  * Function interface for event listeners on the {@link EventDispatcher}.
  */

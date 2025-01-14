@@ -2,7 +2,7 @@ import { SpatialNavigation } from '../../src/ts/spatialnavigation/spatialnavigat
 import { RootNavigationGroup } from '../../src/ts/spatialnavigation/rootnavigationgroup';
 import { UIContainer } from '../../src/ts/components/uicontainer';
 import { NavigationGroup } from '../../src/ts/spatialnavigation/navigationgroup';
-import { SettingsPanel } from '../../src/ts/components/settingspanel';
+import { SettingsPanel } from '../../src/ts/components/settings/settingspanel';
 import { NodeEventSubscriber } from '../../src/ts/spatialnavigation/nodeeventsubscriber';
 import { SeekBarHandler } from '../../src/ts/spatialnavigation/seekbarhandler';
 import { Action, Direction } from '../../src/ts/spatialnavigation/types';

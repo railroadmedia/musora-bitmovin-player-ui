@@ -1,5 +1,5 @@
 import { Action, Direction, KeyMap } from './types';
-import { BrowserUtils } from '../browserutils';
+import { BrowserUtils } from '../utils/browserutils';
 
 const TizenKeyMap = {
   isApplicable: () => BrowserUtils.isTizen,

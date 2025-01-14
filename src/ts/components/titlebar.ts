@@ -1,6 +1,6 @@
 import {Container, ContainerConfig} from './container';
 import {UIInstanceManager} from '../uimanager';
-import {MetadataLabel, MetadataLabelContent} from './metadatalabel';
+import {MetadataLabel, MetadataLabelContent} from './labels/metadatalabel';
 import { PlayerAPI } from 'bitmovin-player';
 
 /**
