@@ -50,6 +50,7 @@ import { EcoModeContainer } from './components/EcoModeContainer';
 import { DynamicSettingsPanelItem } from './components/settings/DynamicSettingsPanelItem';
 import { TouchControlOverlay } from './components/overlays/TouchControlOverlay';
 import { AdStatusOverlay } from './components/ads/AdStatusOverlay';
+import { ClickToDismissOverlay, DismissClickOverlay } from './components/overlays/DismissClickOverlay';
 
 /**
  * Provides factory methods to create Bitmovin provided UIs.
@@ -313,6 +314,7 @@ function uiLayout(config: UIConfig) {
       new TitleBar(),
       new RecommendationOverlay(),
       new Watermark(),
+      new DismissClickOverlay({ target: settingsPanel }),
       settingsPanel,
       new ErrorMessageOverlay(),
     ],
@@ -479,6 +481,7 @@ function smallScreenUILayout() {
           new VRToggleButton(),
         ],
       }),
+      new DismissClickOverlay({ target: settingsPanel }),
       settingsPanel,
       new ErrorMessageOverlay(),
     ],
