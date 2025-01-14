@@ -176,7 +176,7 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
       if (this.couldBeDoubleTapping) {
         this.onDoubleClickEvent(e);
       } else {
-        this.onSingelClickEvent(e);
+        this.onSingleClickEvent(e);
       }
       this.couldBeDoubleTapping = true;
       this.doubleTapTimeout.start();
@@ -194,7 +194,7 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
     this.touchControlEvents.onDoubleClick.dispatch(this, e);
   }
 
-  protected onSingelClickEvent(e: Event) {
+  protected onSingleClickEvent(e: Event) {
     this.touchControlEvents.onSingleClick.dispatch(this, e);
   }
 
