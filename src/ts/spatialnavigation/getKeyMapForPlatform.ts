@@ -91,6 +91,26 @@ const HisenseKeyMap = {
   },
 };
 
+const XboxKeyMap = {
+  isApplicable: () => BrowserUtils.isXbox,
+  keyCodes: {
+    // D-pad Up
+    203: Direction.UP,
+    211: Direction.UP,
+    // D-pad Down
+    204: Direction.DOWN,
+    212: Direction.DOWN,
+    // D-pad Left
+    205: Direction.LEFT,
+    214: Direction.LEFT,
+    // D-pad Right
+    206: Direction.RIGHT,
+    213: Direction.RIGHT,
+    // A
+    195: Action.SELECT,
+  },
+};
+
 // Default key map used on desktops
 const DefaultKeyMap = {
   // Arrow Up
@@ -117,6 +137,7 @@ export function getKeyMapForPlatform(): KeyMap {
     PlayStationKeyMap,
     HisenseKeyMap,
     AndroidKeyMap,
+    XboxKeyMap,
   ].find(keyMap => keyMap.isApplicable());
 
   if (applicableKeyMap) {
