@@ -7,6 +7,8 @@ import { SettingsPanelPage, SettingsPanelPageConfig } from './SettingsPanelPage'
 import { SettingsPanelItem, SettingsPanelItemConfig } from './SettingsPanelItem';
 import { PlayerAPI } from 'bitmovin-player';
 import { Component, ComponentConfig } from '../Component';
+import { getKeyMapForPlatform } from '../../spatialnavigation/getKeyMapForPlatform';
+import { Action } from '../../spatialnavigation/types';
 
 /**
  * Configuration interface for a {@link SettingsPanel}.
@@ -124,6 +126,13 @@ export class SettingsPanel extends Container<SettingsPanelConfig> {
       player.on(player.exports.PlayerEvent.PlayerResized, handleResize);
     }
 
+    const maybeCloseSettingsPanel = (event: KeyboardEvent) => {
+      const action = getKeyMapForPlatform()[event.keyCode];
+      if (action === Action.BACK) {
+        this.hide();
+      }
+    };
+
     this.onHide.subscribe(() => {
       if (config.hideDelay > -1) {
         // Clear timeout when hidden from outside
@@ -133,6 +142,8 @@ export class SettingsPanel extends Container<SettingsPanelConfig> {
       // Since we don't reset the actual navigation here we need to simulate a onInactive event in case some panel
       // needs to do something when they become invisible / inactive.
       this.activePage.onInactiveEvent();
+
+      document.removeEventListener('keyup', maybeCloseSettingsPanel);
     });
 
     this.onShow.subscribe(() => {
@@ -146,6 +157,8 @@ export class SettingsPanel extends Container<SettingsPanelConfig> {
         // Activate timeout when shown
         this.hideTimeout.start();
       }
+
+      document.addEventListener('keyup', maybeCloseSettingsPanel);
     });
 
     // pass event from root page through
