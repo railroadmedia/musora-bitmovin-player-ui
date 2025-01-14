@@ -49,7 +49,8 @@ export class BrowserUtils {
 
   static get isTv(): boolean {
     return this.isHisense || this.isPlayStation || this.isWebOs
-      || this.isTizen || this.isVizio || this.isXumo || this.isXbox;
+      || this.isTizen || this.isVizio || this.isXumo || this.isXbox
+      || this.isVidaa;
   }
 
   static get isHisense(): boolean {
@@ -105,6 +106,13 @@ export class BrowserUtils {
       return false;
     }
     return navigator && navigator.userAgent && /Xbox/.test(navigator.userAgent);
+  }
+
+  static get isVidaa(): boolean {
+    if (!this.windowExists()) {
+      return false;
+    }
+    return navigator && navigator.userAgent && /vidaa/.test(navigator.userAgent.toLowerCase());
   }
 
   // https://hacks.mozilla.org/2013/04/detecting-touch-its-the-why-not-the-how/
