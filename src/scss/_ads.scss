@@ -1,7 +1,7 @@
 @import 'variables';
 
 // sass-lint:disable nesting-depth
-&.#{$prefix}-ui-ads {
+.#{$prefix}-ui-ads {
   @import 'components/ads/adskipbutton';
   @import 'components/ads/adstatusoverlay';
 
