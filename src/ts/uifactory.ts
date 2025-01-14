@@ -310,7 +310,6 @@ function uiLayout(config: UIConfig) {
       PlayerUtils.PlayerState.Paused,
       PlayerUtils.PlayerState.Finished,
     ],
-    cssClasses: ['ui'],
   });
 }
 
@@ -355,7 +354,7 @@ function adsUILayout() {
       PlayerUtils.PlayerState.Paused,
       PlayerUtils.PlayerState.Finished,
     ],
-    cssClasses: ['ui', 'ui-ads'],
+    cssClasses: ['ui-ads'],
   });
 }
 
@@ -471,7 +470,7 @@ function smallScreenUILayout() {
       settingsPanel,
       new ErrorMessageOverlay(),
     ],
-    cssClasses: ['ui-smallscreen', 'ui'],
+    cssClasses: ['ui-smallscreen'],
     hideDelay: 2000,
     hidePlayerStateExceptions: [
       PlayerUtils.PlayerState.Prepared,
@@ -522,7 +521,7 @@ function smallScreenAdsUILayout() {
       PlayerUtils.PlayerState.Paused,
       PlayerUtils.PlayerState.Finished,
     ],
-    cssClasses: ['ui', 'ui-smallscreen', 'ui-ads'],
+    cssClasses: ['ui-smallscreen', 'ui-ads'],
   });
 }
 
@@ -556,7 +555,7 @@ function castReceiverUILayout() {
       new TitleBar({ keepHiddenWithoutMetadata: true }),
       new ErrorMessageOverlay(),
     ],
-    cssClasses: ['ui', 'ui-cast-receiver'],
+    cssClasses: ['ui-cast-receiver'],
     hideDelay: 2000,
     hidePlayerStateExceptions: [
       PlayerUtils.PlayerState.Prepared,
@@ -648,7 +647,7 @@ function tvUILayout() {
       new RecommendationOverlay(),
       new ErrorMessageOverlay(),
     ],
-    cssClasses: ['ui', 'ui-tv'],
+    cssClasses: ['ui-tv'],
     hideDelay: 2000,
     hidePlayerStateExceptions: [
       PlayerUtils.PlayerState.Prepared,
