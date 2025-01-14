@@ -1,6 +1,6 @@
 @import 'variables';
 
-.#{$prefix}-ui-skin-cast-receiver {
+.#{$prefix}-ui-cast-receiver {
 
   $background-color: transparentize($color-background, .15);
   $overscan-margin: 10%;
@@ -61,7 +61,7 @@
     // We also display a pause image while playback is paused, instead of a play action button
     .#{$prefix}-ui-hugeplaybacktogglebutton {
       .#{$prefix}-image {
-        background-image: url('../../assets/skin-modern/images/pause.svg');
+        background-image: url('../../assets/images/pause.svg');
         opacity: .7;
       }
 

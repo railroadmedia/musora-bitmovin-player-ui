@@ -1,7 +1,7 @@
 @import 'variables';
 
 // sass-lint:disable nesting-depth
-&.#{$prefix}-ui-skin-ads {
+&.#{$prefix}-ui-ads {
   @import 'components/adskipbutton';
   @import 'components/adstatusoverlay';
 
@@ -35,7 +35,7 @@
     }
   }
 
-  &.#{$prefix}-ui-skin-smallscreen {
+  &.#{$prefix}-ui-smallscreen {
     .#{$prefix}-ui-ads-status {
       bottom: 0;
       left: 0;

@@ -11,14 +11,14 @@
   }
 
   &.#{$prefix}-on {
-    background-image: url('../../assets/skin-modern/images/toggleOn.svg');
+    background-image: url('../../assets/images/toggleOn.svg');
     background-position: 20px center;
     background-size: 45% auto;
     margin-left: 2%;
   }
 
   &.#{$prefix}-off {
-    background-image: url('../../assets/skin-modern/images/toggleOff.svg');
+    background-image: url('../../assets/images/toggleOff.svg');
     background-position: 20px center;
     background-size: 45% auto;
   }
@@ -27,7 +27,7 @@
 // sass-lint:disable no-ids
 #ecomodelabel {
   &::before {
-    background-image: url('../../assets/skin-modern/images/leaf.svg');
+    background-image: url('../../assets/images/leaf.svg');
     background-repeat: no-repeat;
     background-size: 1.7em auto;
     content: ' ';
