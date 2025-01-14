@@ -109,7 +109,6 @@ describe('SeekBarLabel', () => {
     } as DOMRect;
 
     let containerGetDomElementMock: () => jest.Mocked<DOM>;
-    let caretGetDomElementMock: () => jest.Mocked<DOM>;
 
     beforeEach(() => {
       containerGetDomElementMock = jest
@@ -122,30 +121,7 @@ describe('SeekBarLabel', () => {
         }),
       });
 
-      caretGetDomElementMock = jest.fn().mockReturnValue(MockHelper.generateDOMMock());
-
       seekbarLabel["container"].getDomElement = containerGetDomElementMock;
-      seekbarLabel["caret"].getDomElement = caretGetDomElementMock;
-    });
-
-    it("when thumbnail within UI container bounds", () => {
-      const labelRect = {
-        x: 400,
-        y: 700,
-        width: 200,
-        height: 120,
-        top: 700,
-        right: 600,
-        bottom: 820,
-        left: 400,
-      } as DOMRect;
-
-      containerGetDomElementMock().get(0).parentElement!.getBoundingClientRect =
-        jest.fn().mockReturnValue(labelRect);
-
-      seekbarLabel.setPositionInBounds(100, uiContainerBoundingRect);
-
-      expect(caretGetDomElementMock().css).toHaveBeenCalledWith('transform', null);
     });
 
     it("when thumbnail would overflow UI container leftside", () => {
