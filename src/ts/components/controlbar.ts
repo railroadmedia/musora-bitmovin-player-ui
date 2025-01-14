@@ -1,12 +1,12 @@
 import {ContainerConfig, Container} from './container';
 import {UIInstanceManager} from '../uimanager';
-import {UIUtils} from '../uiutils';
+import {UIUtils} from '../utils/uiutils';
 import {Spacer} from './spacer';
 import { PlayerAPI } from 'bitmovin-player';
 import { i18n } from '../localization/i18n';
-import { BrowserUtils } from '../browserutils';
+import { BrowserUtils } from '../utils/browserutils';
 import {Component, ComponentConfig} from './component';
-import {SettingsPanel} from './settingspanel';
+import {SettingsPanel} from './settings/settingspanel';
 
 /**
  * Configuration interface for the {@link ControlBar}.

@@ -1,9 +1,9 @@
 import { PlayerAPI, SegmentPlaybackEvent, VideoQuality } from 'bitmovin-player';
 import { i18n } from '../localization/i18n';
 import { Container, ContainerConfig } from './container';
-import { EcoModeToggleButton } from './ecomodetogglebutton';
-import { Label, LabelConfig } from './label';
-import { SettingsPanelItem, SettingsPanelItemConfig } from './settingspanelitem';
+import { EcoModeToggleButton } from './buttons/ecomodetogglebutton';
+import { Label, LabelConfig } from './labels/label';
+import { SettingsPanelItem, SettingsPanelItemConfig } from './settings/settingspanelitem';
 
 /**
  * @category Containers

@@ -1,7 +1,7 @@
 import { NavigationGroup } from '../../src/ts/spatialnavigation/navigationgroup';
 import { UIContainer } from '../../src/ts/components/uicontainer';
-import { PlaybackToggleButton } from '../../src/ts/components/playbacktogglebutton';
-import { SettingsToggleButton } from '../../src/ts/components/settingstogglebutton';
+import { PlaybackToggleButton } from '../../src/ts/components/buttons/playbacktogglebutton';
+import { SettingsToggleButton } from '../../src/ts/components/settings/settingstogglebutton';
 import { getFirstDomElement, mockComponent } from '../helper/mockComponent';
 import * as navigationAlgorithm from '../../src/ts/spatialnavigation/navigationalgorithm';
 import { NodeEventSubscriber } from '../../src/ts/spatialnavigation/nodeeventsubscriber';

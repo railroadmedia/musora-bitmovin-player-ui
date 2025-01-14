@@ -7,7 +7,7 @@ import {
 } from '../src/ts/uimanager';
 import { PlayerAPI } from 'bitmovin-player';
 import { MockHelper, TestingPlayerAPI } from './helper/MockHelper';
-import { MobileV3PlayerEvent } from '../src/ts/mobilev3playerapi';
+import { MobileV3PlayerEvent } from '../src/ts/utils/mobilev3playerapi';
 import { UIContainer } from '../src/ts/components/uicontainer';
 import { Container } from '../src/ts/components/container';
 
