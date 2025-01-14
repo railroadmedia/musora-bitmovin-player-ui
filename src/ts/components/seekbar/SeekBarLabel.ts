@@ -37,7 +37,6 @@ export class SeekBarLabel extends Container<SeekBarLabelConfig> {
   private player: PlayerAPI;
   private uiManager: UIInstanceManager;
   private readonly container: Container<ContainerConfig>;
-  private readonly caret: Label<LabelConfig>;
 
   constructor(config: SeekBarLabelConfig = {}) {
     super(config);
@@ -58,11 +57,9 @@ export class SeekBarLabel extends Container<SeekBarLabelConfig> {
       cssClass: 'seekbar-label-inner',
     });
 
-    this.caret = new Label({ cssClasses: ['seekbar-label-caret'] });
-
     this.config = this.mergeConfig(config, {
       cssClass: 'ui-seekbar-label',
-      components: [this.container, this.caret],
+      components: [this.container],
       hidden: true,
     }, this.config);
   }
@@ -151,10 +148,6 @@ export class SeekBarLabel extends Container<SeekBarLabelConfig> {
 
     if (preventOverflowOffset !== 0) {
       this.getDomElement().css('left', seekPositionPx - preventOverflowOffset + 'px');
-
-      this.caret.getDomElement().css('transform', `translateX(${preventOverflowOffset}px)`);
-    } else {
-      this.caret.getDomElement().css('transform', null);
     }
   }
 
