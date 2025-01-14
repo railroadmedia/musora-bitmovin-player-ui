@@ -50,7 +50,7 @@ import { EcoModeContainer } from './components/EcoModeContainer';
 import { DynamicSettingsPanelItem } from './components/settings/DynamicSettingsPanelItem';
 import { TouchControlOverlay } from './components/overlays/TouchControlOverlay';
 import { AdStatusOverlay } from './components/ads/AdStatusOverlay';
-import { ClickToDismissOverlay, DismissClickOverlay } from './components/overlays/DismissClickOverlay';
+import { DismissClickOverlay } from './components/overlays/DismissClickOverlay';
 
 /**
  * Provides factory methods to create Bitmovin provided UIs.
