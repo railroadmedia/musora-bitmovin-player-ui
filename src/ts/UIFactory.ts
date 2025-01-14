@@ -52,21 +52,20 @@ import { TouchControlOverlay } from './components/overlays/TouchControlOverlay';
 import { AdStatusOverlay } from './components/ads/AdStatusOverlay';
 
 /**
- * Provides factory methods to create different UI layouts.
+ * Provides factory methods to create Bitmovin provided UIs.
  */
 export namespace UIFactory {
   /**
-   * Builds a fully featured UI with all basic layouts for all platforms.
+   * Builds a fully featured UI with all Bitmovin provided variants.
+   * The UI will automatically switch between the different variants based on the current context.
    *
    * This UI includes variants for:
-   * - Default
+   * - Default UI (without additional context checks)
    * - Ads
    * - Small Screens (e.g. mobile devices)
    * - Small Screen Ads
    * - TVs
    * - Cast Receivers
-   *
-   * The UI will automatically switch between the different layouts based on the current context.
    *
    * @param player The player instance used to build the UI
    * @param config The UIConfig object
@@ -116,7 +115,7 @@ export namespace UIFactory {
 
   /**
    * Builds a UI for small screens (e.g. mobile devices) only.
-   * This layout is optimized for small screens and touch input.
+   * This UI is optimized for small screens and touch input.
    *
    * This UI includes variants for:
    * - Small Screens (e.g. mobile devices)
@@ -149,8 +148,8 @@ export namespace UIFactory {
   /**
    * Builds a UI which is used on cast receivers.
    *
-   This UI includes variants for:
-   - Cast Receivers
+   * This UI includes variants for:
+   * - Cast Receivers
    *
    * @param player The player instance used to build the UI
    * @param config The UIConfig object
@@ -162,8 +161,8 @@ export namespace UIFactory {
   /**
    * Builds a UI which is used on TVs.
    *
-   This UI includes variants for:
-   - TVs
+   * This UI includes variants for:
+   * - TVs
    *
    * @param player The player instance used to build the UI
    * @param config The UIConfig object
