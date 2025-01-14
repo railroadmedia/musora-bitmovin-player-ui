@@ -1,10 +1,10 @@
 import { PlayerAPI, PlayerEvent } from 'bitmovin-player';
-import { UIInstanceManager } from '../../src/ts/uimanager';
-import { DOM } from '../../src/ts/dom';
+import { UIInstanceManager } from '../../src/ts/UIManager';
+import { DOM } from '../../src/ts/DOM';
 import { PlayerEventEmitter } from './PlayerEventEmitter';
-import { UIContainer } from '../../src/ts/components/uicontainer';
+import { UIContainer } from '../../src/ts/components/UIContainer';
 
-jest.mock('../../src/ts/dom');
+jest.mock('../../src/ts/DOM');
 
 export interface TestingPlayerAPI extends PlayerAPI {
   eventEmitter: PlayerEventEmitter;
