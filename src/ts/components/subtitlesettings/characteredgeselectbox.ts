@@ -27,20 +27,34 @@ export class CharacterEdgeSelectBox extends SubtitleSettingSelectBox {
     this.addItem('uniform', i18n.getLocalizer('settings.subtitles.characterEdge.uniform'));
     this.addItem('dropshadowed', i18n.getLocalizer('settings.subtitles.characterEdge.dropshadowed'));
 
-    this.settingsManager.characterEdge.onChanged.subscribe((sender, property) => {
-      if (property.isSet()) {
-        this.toggleOverlayClass('characteredge-' + property.value);
+    const setColorAndEdgeType = () => {
+      if (this.settingsManager.characterEdge.isSet() && this.settingsManager.characterEdgeColor.isSet()) {
+        this.toggleOverlayClass('characteredge-' + this.settingsManager.characterEdge.value + '-' + this.settingsManager.characterEdgeColor.value);
       } else {
         this.toggleOverlayClass(null);
       }
-
-      // Select the item in case the property was set from outside
-      this.selectItem(property.value);
-    });
+    }
 
     this.onItemSelected.subscribe((sender, key: string) => {
       this.settingsManager.characterEdge.value = key;
     });
+    
+    this.settingsManager.characterEdge.onChanged.subscribe((sender, property) => {
+      // Edge type and color go together, so we need to...
+      if (!this.settingsManager.characterEdge.isSet()) {
+        // ... clear the color when the edge type is not set
+        this.settingsManager.characterEdgeColor.clear();
+      } else if (!this.settingsManager.characterEdgeColor.isSet()) {
+        // ... set a color when the edge type is set
+        this.settingsManager.characterEdgeColor.value = 'black';
+      }
+      this.selectItem(property.value);
+      setColorAndEdgeType();
+    });
+
+    this.settingsManager.characterEdgeColor.onChanged.subscribe(() => {
+      setColorAndEdgeType();
+    });    
 
     // Load initial value
     if (this.settingsManager.characterEdge.isSet()) {

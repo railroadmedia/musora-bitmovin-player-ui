@@ -5,10 +5,12 @@ import {ContainerConfig} from '../container';
 import {SubtitleSettingsManager} from './subtitlesettingsmanager';
 import {Component, ComponentConfig} from '../component';
 import {FontSizeSelectBox} from './fontsizeselectbox';
+import {FontStyleSelectBox} from './fontstyleselectbox';
 import {FontFamilySelectBox} from './fontfamilyselectbox';
 import {FontColorSelectBox} from './fontcolorselectbox';
 import {FontOpacitySelectBox} from './fontopacityselectbox';
 import {CharacterEdgeSelectBox} from './characteredgeselectbox';
+import {CharacterEdgeColorSelectBox} from './characteredgecolorselectbox';
 import {BackgroundColorSelectBox} from './backgroundcolorselectbox';
 import {BackgroundOpacitySelectBox} from './backgroundopacityselectbox';
 import {WindowColorSelectBox} from './windowcolorselectbox';
@@ -48,6 +50,9 @@ export class SubtitleSettingsPanelPage extends SettingsPanelPage {
         new SettingsPanelItem(i18n.getLocalizer('settings.subtitles.font.size'), new FontSizeSelectBox({
           overlay: this.overlay,
         })),
+        new SettingsPanelItem(i18n.getLocalizer('settings.subtitles.font.style'), new FontStyleSelectBox({
+          overlay: this.overlay,
+        })),
         new SettingsPanelItem(i18n.getLocalizer('settings.subtitles.font.family'), new FontFamilySelectBox({
           overlay: this.overlay,
         })),
@@ -58,6 +63,9 @@ export class SubtitleSettingsPanelPage extends SettingsPanelPage {
           overlay: this.overlay,
         })),
         new SettingsPanelItem(i18n.getLocalizer('settings.subtitles.characterEdge'), new CharacterEdgeSelectBox({
+          overlay: this.overlay,
+        })),
+        new SettingsPanelItem(i18n.getLocalizer('settings.subtitles.characterEdge.color'), new CharacterEdgeColorSelectBox({
           overlay: this.overlay,
         })),
         new SettingsPanelItem(i18n.getLocalizer('settings.subtitles.background.color'), new BackgroundColorSelectBox({
