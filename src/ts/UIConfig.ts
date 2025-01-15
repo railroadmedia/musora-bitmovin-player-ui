@@ -131,4 +131,11 @@ export interface UIConfig {
    * Specifies if the `EcoModeToggleButton` should be displayed within the `SettingsPanel`
    */
   ecoMode?: boolean;
+  /**
+   * Specifies if the Watermark element should be included in the UI.
+   * Per default the Watermark shows the Bitmovin Logo.
+   *
+   * Default: false
+   */
+  includeWatermark?: boolean;
 }
