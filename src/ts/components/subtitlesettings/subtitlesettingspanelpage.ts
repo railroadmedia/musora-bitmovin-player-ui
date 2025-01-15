@@ -10,6 +10,7 @@ import {FontFamilySelectBox} from './fontfamilyselectbox';
 import {FontColorSelectBox} from './fontcolorselectbox';
 import {FontOpacitySelectBox} from './fontopacityselectbox';
 import {CharacterEdgeSelectBox} from './characteredgeselectbox';
+import {CharacterEdgeColorSelectBox} from './characteredgecolorselectbox';
 import {BackgroundColorSelectBox} from './backgroundcolorselectbox';
 import {BackgroundOpacitySelectBox} from './backgroundopacityselectbox';
 import {WindowColorSelectBox} from './windowcolorselectbox';
@@ -62,6 +63,9 @@ export class SubtitleSettingsPanelPage extends SettingsPanelPage {
           overlay: this.overlay,
         })),
         new SettingsPanelItem(i18n.getLocalizer('settings.subtitles.characterEdge'), new CharacterEdgeSelectBox({
+          overlay: this.overlay,
+        })),
+        new SettingsPanelItem(i18n.getLocalizer('settings.subtitles.characterEdge.color'), new CharacterEdgeColorSelectBox({
           overlay: this.overlay,
         })),
         new SettingsPanelItem(i18n.getLocalizer('settings.subtitles.background.color'), new BackgroundColorSelectBox({

@@ -29,6 +29,7 @@
   "settings.subtitles.characterEdge.depressed": "depressed",
   "settings.subtitles.characterEdge.uniform": "uniform",
   "settings.subtitles.characterEdge.dropshadowed": "drop shadowed",
+  "settings.subtitles.characterEdge.color": "Character edge color",
   "settings.subtitles.font.family": "Font family",
   "settings.subtitles.font.family.monospacedserif": "monospaced serif",
   "settings.subtitles.font.family.proportionalserif": "proportional serif",

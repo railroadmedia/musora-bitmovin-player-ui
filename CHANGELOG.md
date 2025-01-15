@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - Support for changing the font style of subtitles and closed captions
+- Support for changing the edge color of characters of subtitles and closed captions
 
 ## [3.83.0] - 2025-01-14
 

@@ -23,10 +23,10 @@
 
   $character-edges: (
     'none': 'none',
-    'raised': '0px 0px 4px rgba(0, 0, 0, 0.9), 0px 1px 4px rgba(0, 0, 0, 0.9), 0px 2px 4px rgba(0, 0, 0, 0.9)',
-    'depressed': 'rgba(0, 0, 0, 0.8) 0px -2px 1px',
-    'uniform': '-2px 0px 1px rgba(0, 0, 0, 0.8), 2px 0px 1px rgba(0, 0, 0, 0.8), 0px -2px 1px rgba(0, 0, 0, 0.8), 0px 2px 1px rgba(0, 0, 0, 0.8), -1px 1px 1px rgba(0, 0, 0, 0.8), 1px 1px 1px rgba(0, 0, 0, 0.8), 1px -1px 1px rgba(0, 0, 0, 0.8), 1px 1px 1px rgba(0, 0, 0, 0.8)',
-    'dropshadowed': ' 0px 2px 1px rgba(0, 0, 0, 0.8)',
+    'raised': '0px 0px 4px $COLOR$, 0px 1px 4px $COLOR$, 0px 2px 4px $COLOR$',
+    'depressed': '$COLOR$ 0px -2px 1px',
+    'uniform': '-2px 0px 1px $COLOR$, 2px 0px 1px $COLOR$, 0px -2px 1px $COLOR$, 0px 2px 1px $COLOR$, -1px 1px 1px $COLOR$, 1px 1px 1px $COLOR$, 1px -1px 1px $COLOR$, 1px 1px 1px $COLOR$',
+    'dropshadowed': ' 0px 2px 1px $COLOR$',
   );
 
   $font-sizes: (
@@ -79,11 +79,13 @@
     }
   }
 
-  // Font character edge
-  @each $name, $value in $character-edges {
-    &.#{$prefix}-characteredge-#{$name} {
-      .#{$prefix}-ui-subtitle-label {
-        text-shadow: unquote($value);
+  // Font character edge and character edge color
+  @each $color-name, $color-value in $colors {
+    @each $name, $value in $character-edges {
+      &.#{$prefix}-characteredge-#{$name}-#{$color-name} {
+        .#{$prefix}-ui-subtitle-label {
+          text-shadow: unquote(str-replace($value, '$COLOR$', $color-value));
+        }
       }
     }
   }

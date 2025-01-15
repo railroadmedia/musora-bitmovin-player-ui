@@ -26,6 +26,7 @@
   "settings.subtitles.font.color": "Farbe",
   "settings.subtitles.font.opacity": "Deckkraft",
   "settings.subtitles.characterEdge": "Ränder",
+  "settings.subtitles.characterEdge.color": "Buchstabenrandfarbe",
   "settings.subtitles.background.color": "Hintergrundfarbe",
   "settings.subtitles.background.opacity": "Hintergrunddeckkraft",
   "settings.subtitles.window.color": "Hintergrundfarbe",
