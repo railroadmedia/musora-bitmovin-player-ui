@@ -7,6 +7,7 @@ interface SubtitleSettings {
   fontOpacity?: string;
   fontFamily?: string;
   fontSize?: string;
+  fontStyle?: string;
   characterEdge?: string;
   backgroundColor?: string;
   backgroundOpacity?: string;
@@ -30,6 +31,7 @@ export class SubtitleSettingsManager {
     fontOpacity: new SubtitleSettingsProperty<string>(this),
     fontFamily: new SubtitleSettingsProperty<string>(this),
     fontSize: new SubtitleSettingsProperty<string>(this),
+    fontStyle: new SubtitleSettingsProperty<string>(this),
     characterEdge: new SubtitleSettingsProperty<string>(this),
     backgroundColor: new SubtitleSettingsProperty<string>(this),
     backgroundOpacity: new SubtitleSettingsProperty<string>(this),
@@ -63,6 +65,10 @@ export class SubtitleSettingsManager {
 
   public get fontSize(): SubtitleSettingsProperty<string> {
     return this._properties.fontSize;
+  }
+
+  public get fontStyle(): SubtitleSettingsProperty<string> {
+    return this._properties.fontStyle;
   }
 
   public get characterEdge(): SubtitleSettingsProperty<string> {

@@ -5,6 +5,7 @@ import {ContainerConfig} from '../container';
 import {SubtitleSettingsManager} from './subtitlesettingsmanager';
 import {Component, ComponentConfig} from '../component';
 import {FontSizeSelectBox} from './fontsizeselectbox';
+import {FontStyleSelectBox} from './fontstyleselectbox';
 import {FontFamilySelectBox} from './fontfamilyselectbox';
 import {FontColorSelectBox} from './fontcolorselectbox';
 import {FontOpacitySelectBox} from './fontopacityselectbox';
@@ -46,6 +47,9 @@ export class SubtitleSettingsPanelPage extends SettingsPanelPage {
     this.config = this.mergeConfig(config, {
       components: <Component<ComponentConfig>[]>[
         new SettingsPanelItem(i18n.getLocalizer('settings.subtitles.font.size'), new FontSizeSelectBox({
+          overlay: this.overlay,
+        })),
+        new SettingsPanelItem(i18n.getLocalizer('settings.subtitles.font.style'), new FontStyleSelectBox({
           overlay: this.overlay,
         })),
         new SettingsPanelItem(i18n.getLocalizer('settings.subtitles.font.family'), new FontFamilySelectBox({

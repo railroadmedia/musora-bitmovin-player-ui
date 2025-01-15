@@ -131,4 +131,17 @@
       font-variant: small-caps;
     }
   }
+
+  // Font Style
+  &.#{$prefix}-fontstyle-italic {
+    .#{$prefix}-ui-subtitle-label {
+      font-style: italic;
+    }
+  }
+
+  &.#{$prefix}-fontstyle-bold {
+    .#{$prefix}-ui-subtitle-label {
+      font-weight: bold;
+    }
+  }
 }
