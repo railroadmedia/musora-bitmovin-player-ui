@@ -154,19 +154,19 @@
       poster: 'https://cdn.bitmovin.com/content/assets/sintel/poster.png',
     },
     basicDash: {
-      dash: 'http://cdn.bitmovin.com/content/assets/sintel/sintel.mpd'
+      dash: 'https://cdn.bitmovin.com/content/assets/sintel/sintel.mpd'
     },
     basicDashAudioOnly: {
-      dash: 'http://cdn.bitmovin.com/content/assets/sintel/sintel-audio.mpd'
+      dash: 'https://cdn.bitmovin.com/content/assets/sintel/sintel-audio.mpd'
     },
     basicDashVideoOnly: {
-      dash: 'http://cdn.bitmovin.com/content/assets/sintel/sintel-video.mpd'
+      dash: 'https://cdn.bitmovin.com/content/assets/sintel/sintel-video.mpd'
     },
     errorInvalidHost: {
       dash: 'http://invalid/url/to/nonexistent/mpd.mpd'
     },
     errorMissingMpd: {
-      dash: 'http://cdn.bitmovin.com/content/assets/sintel/sintellll.mpd'
+      dash: 'https://cdn.bitmovin.com/content/assets/sintel/sintellll.mpd'
     },
     vr: {
       dash: 'https://cdn.bitmovin.com/content/assets/playhouse-vr/mpds/105560.mpd',
@@ -410,7 +410,7 @@
       });
     },
     'Add subtitle': function() {
-      return player.subtitles.add({ url: 'http://cdn.bitmovin.com/content/assets/sintel/subtitles/subtitles_en.vtt', id: 'test', lang: 'ru', kind: 'subtitle', label: 'Test Subtitle' });
+      return player.subtitles.add({ url: 'https://cdn.bitmovin.com/content/assets/sintel/subtitles/subtitles_en.vtt', id: 'test', lang: 'ru', kind: 'subtitle', label: 'Test Subtitle' });
     },
     'Remove subtitle': function() {
       return player.subtitles.remove('test');
