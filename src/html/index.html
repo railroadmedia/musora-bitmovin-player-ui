@@ -111,15 +111,15 @@
 <script type="text/javascript">
   var sources = {
     fullyFeatured: {
-      dash: '//bitdash-a.akamaihd.net/content/sintel/sintel.mpd',
-      hls: '//bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8',
+      dash: 'https://cdn.bitmovin.com/content/assets/sintel/sintel.mpd',
+      hls: 'https://cdn.bitmovin.com/content/assets/sintel/hls/playlist.m3u8',
       progressive: [
-        {url: '//bitdash-a.akamaihd.net/content/sintel/Sintel.mp4', type: 'video/mp4'},
-        {url: '//bitdash-a.akamaihd.net/content/sintel/Sintel.webm', type: 'video/webm'}
+        {url: 'https://cdn.bitmovin.com/content/assets/sintel/Sintel.mp4', type: 'video/mp4'},
+        {url: 'https://cdn.bitmovin.com/content/assets/sintel/Sintel.webm', type: 'video/webm'}
       ],
-      poster: '//bitdash-a.akamaihd.net/content/sintel/poster.png',
+      poster: 'https://cdn.bitmovin.com/content/assets/sintel/poster.png',
       thumbnailTrack: {
-        url: '//bitdash-a.akamaihd.net/content/sintel/sprite/sprite.vtt',
+        url: 'https://cdn.bitmovin.com/content/assets/sintel/sprite/sprite.vtt',
       },
       title: 'Sintel',
       description: 'A woman, Sintel, is attacked while traveling through a wintry mountainside. After defeating her attacker and taking his spear, she finds refuge in a shaman\'s hut...',
@@ -140,47 +140,47 @@
       ],
     },
     basicProgressive: {
-      progressive: '//bitdash-a.akamaihd.net/content/sintel/Sintel.mp4',
-      poster: '//bitdash-a.akamaihd.net/content/sintel/poster.png',
+      progressive: 'https://cdn.bitmovin.com/content/assets/sintel/Sintel.mp4',
+      poster: 'https://cdn.bitmovin.com/content/assets/sintel/poster.png',
     },
     basicMultiProgressive: {
       progressive: [
-        {url: '//bitdash-a.akamaihd.net/content/sintel/Sintel.mp4', type: 'video/mp4', label: 'quality1'},
-        {url: '//bitdash-a.akamaihd.net/content/sintel/Sintel.mp4', type: 'video/mp4', label: 'quality2'},
+        {url: 'https://cdn.bitmovin.com/content/assets/sintel/Sintel.mp4', type: 'video/mp4', label: 'quality1'},
+        {url: 'https://cdn.bitmovin.com/content/assets/sintel/Sintel.mp4', type: 'video/mp4', label: 'quality2'},
       ],
     },
     basicHls: {
-      hls: "//bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8",
-      poster: '//bitdash-a.akamaihd.net/content/sintel/poster.png',
+      hls: "//cdn.bitmovin.com/content/assets/sintel/hls/playlist.m3u8",
+      poster: 'https://cdn.bitmovin.com/content/assets/sintel/poster.png',
     },
     basicDash: {
-      dash: 'http://bitdash-a.akamaihd.net/content/sintel/sintel.mpd'
+      dash: 'https://cdn.bitmovin.com/content/assets/sintel/sintel.mpd'
     },
     basicDashAudioOnly: {
-      dash: 'http://bitmovin-a.akamaihd.net/content/sintel/sintel-audio.mpd'
+      dash: 'https://cdn.bitmovin.com/content/assets/sintel/sintel-audio.mpd'
     },
     basicDashVideoOnly: {
-      dash: 'http://bitmovin-a.akamaihd.net/content/sintel/sintel-video.mpd'
+      dash: 'https://cdn.bitmovin.com/content/assets/sintel/sintel-video.mpd'
     },
     errorInvalidHost: {
       dash: 'http://invalid/url/to/nonexistent/mpd.mpd'
     },
     errorMissingMpd: {
-      dash: 'http://bitdash-a.akamaihd.net/content/sintel/sintellll.mpd'
+      dash: 'https://cdn.bitmovin.com/content/assets/sintel/sintellll.mpd'
     },
     vr: {
-      dash: 'https://bitmovin-a.akamaihd.net/content/playhouse-vr/mpds/105560.mpd',
+      dash: 'https://cdn.bitmovin.com/content/assets/playhouse-vr/mpds/105560.mpd',
       vr: {
         contentType: 'single'
       }
     },
     posterAndThumbnails: {
-      dash: '//bitdash-a.akamaihd.net/content/MI201109210084_1/mpds/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.mpd',
-      hls: '//bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8',
-      progressive: '//bitdash-a.akamaihd.net/content/MI201109210084_1/MI201109210084_mpeg-4_hd_high_1080p25_10mbits.mp4',
-      poster: '//bitdash-a.akamaihd.net/content/art-of-motion_drm/art-of-motion_poster.jpg',
+      dash: 'https://cdn.bitmovin.com/content/assets/MI201109210084/mpds/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.mpd',
+      hls: 'https://cdn.bitmovin.com/content/assets/MI201109210084/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8',
+      progressive: 'https://cdn.bitmovin.com/content/assets/MI201109210084/MI201109210084_mpeg-4_hd_high_1080p25_10mbits.mp4',
+      poster: 'https://cdn.bitmovin.com/content/assets/art-of-motion_drm/art-of-motion_poster.jpg',
       thumbnailTrack: {
-        url: 'https://bitdash-a.akamaihd.net/content/MI201109210084_1/thumbnails/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.vtt',
+        url: 'https://cdn.bitmovin.com/content/assets/MI201109210084/thumbnails/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.vtt',
       },
       userId: 'demo_html5_vts', videoId: 'art-of-motion'
     },
@@ -410,7 +410,7 @@
       });
     },
     'Add subtitle': function() {
-      return player.subtitles.add({ url: 'http://bitdash-a.akamaihd.net/content/sintel/subtitles/subtitles_en.vtt', id: 'test', lang: 'ru', kind: 'subtitle', label: 'Test Subtitle' });
+      return player.subtitles.add({ url: 'https://cdn.bitmovin.com/content/assets/sintel/subtitles/subtitles_en.vtt', id: 'test', lang: 'ru', kind: 'subtitle', label: 'Test Subtitle' });
     },
     'Remove subtitle': function() {
       return player.subtitles.remove('test');
