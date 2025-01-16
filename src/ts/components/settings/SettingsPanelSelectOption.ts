@@ -57,7 +57,11 @@ export class SettingsPanelSelectOption extends SettingsPanelItem<SettingsPanelSe
     const handleItemClick = () => {
       this.settingComponent.selectItem(this.settingsValue);
     };
-    this.getDomElement().on('click', () => handleItemClick());
+    this.getDomElement().on('click touchend', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      handleItemClick();
+    });
 
     // Initial state
     handleSelectedOptionChanged();
