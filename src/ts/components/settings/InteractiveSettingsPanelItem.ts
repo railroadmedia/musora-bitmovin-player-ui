@@ -40,14 +40,14 @@ export class InteractiveSettingsPanelItem<Config extends SettingsPanelItemConfig
       }
     };
 
-    // Only listen to keyboard events when the element is focused
-    this.getDomElement().on('focusin', () => {
-      this.getDomElement().on('keydown', handleKeyDown);
-    });
-
-    // Unregister the keyboard event listener when the element loses focus
-    this.getDomElement().on('focusout', () => {
-      this.getDomElement().off('keydown', handleKeyDown);
+    this.onFocusedChanged.subscribe((_, args) => {
+      if (args.focused) {
+        // Only listen to keyboard events when the element is focused
+        this.getDomElement().on('keydown', handleKeyDown);
+      } else {
+        // Unregister the keyboard event listener when the element loses focus
+        this.getDomElement().off('keydown', handleKeyDown);
+      }
     });
   }
 
