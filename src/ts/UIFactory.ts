@@ -309,7 +309,7 @@ function uiLayout(config: UIConfig) {
     ],
   });
 
-  const conditionalElements = [
+  const conditionalComponents = [
     config.includeWatermark ? new Watermark() : null,
   ].filter((e) => e);
 
@@ -323,7 +323,7 @@ function uiLayout(config: UIConfig) {
       new TitleBar(),
       new RecommendationOverlay(),
       settingsPanel,
-      ...conditionalElements,
+      ...conditionalComponents,
       new ErrorMessageOverlay(),
     ],
     hideDelay: 2000,
@@ -567,7 +567,7 @@ function castReceiverUILayout(config: UIConfig) {
     ],
   });
 
-  const conditionalElements = [
+  const conditionalComponents = [
     config.includeWatermark ? new Watermark() : null,
   ].filter((e) => e);
 
@@ -578,7 +578,7 @@ function castReceiverUILayout(config: UIConfig) {
       new PlaybackToggleOverlay(),
       controlBar,
       new TitleBar({ keepHiddenWithoutMetadata: true }),
-      ...conditionalElements,
+      ...conditionalComponents,
       new ErrorMessageOverlay(),
     ],
     cssClasses: ['ui-cast-receiver'],
