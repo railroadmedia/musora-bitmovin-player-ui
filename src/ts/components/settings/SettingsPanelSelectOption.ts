@@ -1,7 +1,8 @@
-import { SettingsPanelItem, SettingsPanelItemConfig } from './SettingsPanelItem';
+import { SettingsPanelItemConfig } from './SettingsPanelItem';
 import { PlayerAPI } from 'bitmovin-player';
 import { UIInstanceManager } from '../../UIManager';
 import { ListSelector, ListSelectorConfig } from '../lists/ListSelector';
+import { InteractiveSettingsPanelItem } from './InteractiveSettingsPanelItem';
 
 /**
  * Configuration interface for a {@link SettingsPanelSelectOption}.
@@ -25,7 +26,7 @@ export interface SettingsPanelSelectOptionConfig extends SettingsPanelItemConfig
  *
  * @category Components
  */
-export class SettingsPanelSelectOption extends SettingsPanelItem<SettingsPanelSelectOptionConfig> {
+export class SettingsPanelSelectOption extends InteractiveSettingsPanelItem<SettingsPanelSelectOptionConfig> {
   private settingsValue: string | undefined;
   protected settingComponent: ListSelector<ListSelectorConfig>;
 
@@ -55,13 +56,8 @@ export class SettingsPanelSelectOption extends SettingsPanelItem<SettingsPanelSe
     };
     this.settingComponent.onItemSelected.subscribe(handleSelectedOptionChanged);
 
-    const handleItemClick = () => {
+    this.onClick.subscribe(() => {
       this.settingComponent.selectItem(this.settingsValue);
-    };
-    this.getDomElement().on('click touchend', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      handleItemClick();
     });
 
     // Initial state
