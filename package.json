@@ -1,11 +1,12 @@
 {
   "name": "bitmovin-player-ui",
-  "version": "3.80.0",
+  "version": "3.85.0",
   "description": "Bitmovin Player UI Framework",
   "main": "./dist/js/framework/main.js",
   "types": "./dist/js/framework/main.d.ts",
   "scripts": {
-    "test": "npx jest"
+    "test": "npx jest",
+    "prepare": "husky"
   },
   "repository": {
     "type": "git",
@@ -22,6 +23,11 @@
     "last 2 versions",
     "Firefox ESR"
   ],
+  "lint-staged": {
+    "*.ts": [
+      "eslint --fix"
+    ]
+  },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
     "@inrupt/jest-jsdom-polyfills": "^1.6.0",
@@ -46,8 +52,10 @@
     "gulp-sourcemaps": "^3.0.0",
     "gulp-typescript": "^5.0.1",
     "gulp-uglify": "^3.0.2",
+    "husky": "^9.1.7",
     "jest": "^29.5.0",
     "jest-environment-jsdom": "^29.5.0",
+    "lint-staged": "^15.3.0",
     "merge2": "^1.4.1",
     "postcss-svg": "^3.0.0",
     "sass": "^1.59.3",

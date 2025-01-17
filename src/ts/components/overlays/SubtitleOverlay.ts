@@ -325,7 +325,7 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
       }
 
       label.getDomElement().css({
-        'margin-left': `${event.position.column * SubtitleOverlay.CEA608_COLUMN_OFFSET}%`,
+        'left': `${event.position.column * SubtitleOverlay.CEA608_COLUMN_OFFSET}%`,
         'font-size': `${fontSize}px`,
         'letter-spacing': `${fontLetterSpacing}px`,
       });
