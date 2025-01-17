@@ -8,7 +8,9 @@ interface SubtitleSettings {
   fontOpacity?: string;
   fontFamily?: string;
   fontSize?: string;
+  fontStyle?: string;
   characterEdge?: string;
+  characterEdgeColor?: string;
   backgroundColor?: string;
   backgroundOpacity?: string;
   windowColor?: string;
@@ -31,7 +33,9 @@ export class SubtitleSettingsManager {
     fontOpacity: new SubtitleSettingsProperty<string>(this),
     fontFamily: new SubtitleSettingsProperty<string>(this),
     fontSize: new SubtitleSettingsProperty<string>(this),
+    fontStyle: new SubtitleSettingsProperty<string>(this),
     characterEdge: new SubtitleSettingsProperty<string>(this),
+    characterEdgeColor: new SubtitleSettingsProperty<string>(this),
     backgroundColor: new SubtitleSettingsProperty<string>(this),
     backgroundOpacity: new SubtitleSettingsProperty<string>(this),
     windowColor: new SubtitleSettingsProperty<string>(this),
@@ -65,8 +69,16 @@ export class SubtitleSettingsManager {
     return this._properties.fontSize;
   }
 
+  public get fontStyle(): SubtitleSettingsProperty<string> {
+    return this._properties.fontStyle;
+  }
+
   public get characterEdge(): SubtitleSettingsProperty<string> {
     return this._properties.characterEdge;
+  }
+
+  public get characterEdgeColor(): SubtitleSettingsProperty<string> {
+    return this._properties.characterEdgeColor;
   }
 
   public get backgroundColor(): SubtitleSettingsProperty<string> {

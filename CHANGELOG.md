@@ -4,6 +4,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.84.0] - 2025-01-15
+
+### Added
+- Support for changing the font style of subtitles and closed captions
+- Support for changing the edge color of characters of subtitles and closed captions
+
+## [3.83.0] - 2025-01-14
+
+## Fixed
+- Exception when disabling smooth playback position updating by setting `SeekbarConfig.smoothPlaybackPositionUpdateIntervalMs` to `-1`
+
+## [3.82.0] - 2025-01-13
+
+### Added
+- Chore: Pre-commit hook for linting TypeScript file changes
+
+## [3.81.0] - 2025-01-10
+
+### Fixed
+- Positioning of CEA-608 caption cues when multiple cues are displayed on the same line
+
 ## [3.80.0] - 2025-01-08
 
 ### Fixed
@@ -1047,6 +1068,11 @@ Version 2.0 of the UI framework is built for player 7.1. If absolutely necessary
 ## 1.0.0 (2017-02-03)
 - First release
 
+[3.85.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.84.0...v3.85.0
+[3.84.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.83.0...v3.84.0
+[3.83.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.82.0...v3.83.0
+[3.82.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.81.0...v3.82.0
+[3.81.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.80.0...v3.81.0
 [3.80.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.79.0...v3.80.0
 [3.79.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.78.0...v3.79.0
 [3.78.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.77.0...v3.78.0
