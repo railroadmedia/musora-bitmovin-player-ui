@@ -4,6 +4,7 @@ import {UIInstanceManager} from '../../UIManager';
 import {Event, EventDispatcher, NoArgs} from '../../EventDispatcher';
 import { PlayerAPI } from 'bitmovin-player';
 import { BrowserUtils } from '../../utils/BrowserUtils';
+import { InteractiveSettingsPanelItem } from './InteractiveSettingsPanelItem';
 
 /**
  * Configuration interface for a {@link SettingsPanelPage}
@@ -94,7 +95,11 @@ export class SettingsPanelPage extends Container<SettingsPanelPageConfig> {
     this.settingsPanelPageEvents.onActive.dispatch(this);
     // Disable focus for iOS and iPadOS 13. They open select boxes automatically on focus and we want to avoid that.
     if (activeItems.length > 0 && !BrowserUtils.isIOS && !(BrowserUtils.isMacIntel && BrowserUtils.isTouchSupported)) {
-      activeItems[0].getDomElement().focusToFirstInput();
+      if (activeItems[0] instanceof InteractiveSettingsPanelItem) {
+        activeItems[0].getDomElement().get(0).focus();
+      } else {
+        activeItems[0].getDomElement().focusToFirstInput();
+      }
     }
   }
 
