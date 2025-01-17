@@ -298,6 +298,10 @@ export class Component<Config extends ComponentConfig> {
       'role': this.config.role,
     }, this);
 
+    if (typeof this.config.tabIndex === 'number') {
+      element.attr('tabindex', this.config.tabIndex.toString());
+    }
+
     return element;
   }
 
