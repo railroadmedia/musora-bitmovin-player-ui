@@ -33,7 +33,7 @@ export class SubtitleSettingSelectBox extends SelectBox {
    * Removes a previously set class and adds the passed in class.
    * @param cssClass The new class to replace the previous class with or null to just remove the previous class
    */
-  protected toggleOverlayClass(cssClass: string): void {
+  protected toggleOverlayClass(cssClass: string|null): void {
     // Remove previous class if existing
     if (this.currentCssClass) {
       this.overlay.getDomElement().removeClass(this.currentCssClass);

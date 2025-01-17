@@ -246,7 +246,7 @@ export class SeekBar extends Component<SeekBarConfig> {
 
     uimanager.onControlsShow.subscribe(() => {
       this.isUiShown = true;
-      if (!player.isLive() && !this.smoothPlaybackPositionUpdater.isActive()) {
+      if (this.smoothPlaybackPositionUpdater && !player.isLive() && !this.smoothPlaybackPositionUpdater.isActive()) {
         playbackPositionHandler(null, true);
         this.smoothPlaybackPositionUpdater.start();
       }
@@ -254,7 +254,7 @@ export class SeekBar extends Component<SeekBarConfig> {
 
     uimanager.onControlsHide.subscribe(() => {
       this.isUiShown = false;
-      if (this.smoothPlaybackPositionUpdater.isActive()) {
+      if (this.smoothPlaybackPositionUpdater && this.smoothPlaybackPositionUpdater.isActive()) {
         this.smoothPlaybackPositionUpdater.clear();
       }
     });

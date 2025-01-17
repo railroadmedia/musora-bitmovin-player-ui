@@ -111,7 +111,7 @@ export abstract class ListSelector<Config extends ListSelectorConfig> extends Co
    * @param sortedInsert whether the item should be added respecting the order of keys
    * @param ariaLabel custom aria label for the listItem
    */
-  addItem(key: string, label: LocalizableText, sortedInsert = false, ariaLabel = '') {
+  addItem(key: string|null, label: LocalizableText, sortedInsert = false, ariaLabel = '') {
     const listItem = { key: key, label: i18n.performLocalization(label), ...(ariaLabel && { ariaLabel })};
 
     // Apply filter function

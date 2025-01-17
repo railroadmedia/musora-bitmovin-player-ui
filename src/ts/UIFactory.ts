@@ -79,6 +79,12 @@ export namespace UIFactory {
       player,
       [
         {
+          ui: emptyStateUILayout(),
+          condition: (context) => {
+            return !context.isSourceLoaded;
+          },
+        },
+        {
           ui: smallScreenAdsUILayout(),
           condition: (context: UIConditionContext) => {
             return (
@@ -168,7 +174,7 @@ export namespace UIFactory {
    * @param config The UIConfig object
    */
   export function buildCastReceiverUI(player: PlayerAPI, config: UIConfig = {}): UIManager {
-    return new UIManager(player, castReceiverUILayout(), config);
+    return new UIManager(player, castReceiverUILayout(config), config);
   }
 
   /**
@@ -304,6 +310,10 @@ function uiLayout(config: UIConfig) {
     ],
   });
 
+  const conditionalComponents = [
+    config.includeWatermark ? new Watermark() : null,
+  ].filter((e) => e);
+
   return new UIContainer({
     components: [
       subtitleOverlay,
@@ -313,7 +323,7 @@ function uiLayout(config: UIConfig) {
       controlBar,
       new TitleBar(),
       new RecommendationOverlay(),
-      new Watermark(),
+      ...conditionalComponents,
       new DismissClickOverlay({ target: settingsPanel }),
       settingsPanel,
       new ErrorMessageOverlay(),
@@ -540,7 +550,7 @@ function smallScreenAdsUILayout() {
   });
 }
 
-function castReceiverUILayout() {
+function castReceiverUILayout(config: UIConfig) {
   let controlBar = new ControlBar({
     components: [
       new Container({
@@ -560,14 +570,18 @@ function castReceiverUILayout() {
     ],
   });
 
+  const conditionalComponents = [
+    config.includeWatermark ? new Watermark() : null,
+  ].filter((e) => e);
+
   return new CastUIContainer({
     components: [
       new SubtitleOverlay(),
       new BufferingOverlay(),
       new PlaybackToggleOverlay(),
-      new Watermark(),
       controlBar,
       new TitleBar({ keepHiddenWithoutMetadata: true }),
+      ...conditionalComponents,
       new ErrorMessageOverlay(),
     ],
     cssClasses: ['ui-cast-receiver'],
@@ -686,4 +700,18 @@ function tvUILayout() {
 function tvAdsUILayout() {
   // TODO: implement once we have a design for TV ads
   return tvUILayout();
+}
+
+/**
+ * Used for the initial startup phase of the UI. Only contains basic components.
+ */
+function emptyStateUILayout() {
+  return new UIContainer({
+    components: [
+      new BufferingOverlay(),
+      new PlaybackToggleOverlay(),
+      new ErrorMessageOverlay(),
+    ],
+    cssClasses: ['ui', 'ui-empty-state'],
+  });
 }

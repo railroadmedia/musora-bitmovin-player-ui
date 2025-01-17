@@ -19,6 +19,8 @@ import { PlayerAPI } from 'bitmovin-player';
 import { i18n, LocalizableText } from '../../../localization/i18n';
 import { DynamicSettingsPanelItem } from '../DynamicSettingsPanelItem';
 import { ListSelector, ListSelectorConfig } from '../../lists/ListSelector';
+import { FontStyleSelectBox } from './FontStyleSelectBox';
+import { CharacterEdgeColorSelectBox } from './CharacterEdgeColorSelectBox';
 
 /**
  * @category Configs
@@ -52,6 +54,13 @@ export class SubtitleSettingsPanelPage extends SettingsPanelPage {
         config.useDynamicSettingsPanelItem,
       ),
       this.buildSettingsPanelItem(
+        i18n.getLocalizer('settings.subtitles.font.style'),
+        new FontStyleSelectBox({
+          overlay: this.overlay,
+        }),
+        config.useDynamicSettingsPanelItem,
+      ),
+      this.buildSettingsPanelItem(
         i18n.getLocalizer('settings.subtitles.font.family'),
         new FontFamilySelectBox({
           overlay: this.overlay,
@@ -75,6 +84,13 @@ export class SubtitleSettingsPanelPage extends SettingsPanelPage {
       this.buildSettingsPanelItem(
         i18n.getLocalizer('settings.subtitles.characterEdge'),
         new CharacterEdgeSelectBox({
+          overlay: this.overlay,
+        }),
+        config.useDynamicSettingsPanelItem,
+      ),
+      this.buildSettingsPanelItem(
+        i18n.getLocalizer('settings.subtitles.characterEdge.color'),
+        new CharacterEdgeColorSelectBox({
           overlay: this.overlay,
         }),
         config.useDynamicSettingsPanelItem,
