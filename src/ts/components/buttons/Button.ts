@@ -77,6 +77,10 @@ export class Button<Config extends ButtonConfig> extends Component<Config> {
       this.onClickEvent();
     });
 
+    buttonElement.on('focusin focusout', (e) => {
+      e.stopPropagation();
+    });
+
     return buttonElement;
   }
 
