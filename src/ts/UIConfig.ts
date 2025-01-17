@@ -133,7 +133,7 @@ export interface UIConfig {
   ecoMode?: boolean;
   /**
    * Specifies if the Watermark element should be included in the UI.
-   * Per default the Watermark shows the Bitmovin Logo.
+   * Per default, the Watermark shows the Bitmovin Logo.
    *
    * Default: false
    */
