@@ -63,6 +63,7 @@ export class DynamicSettingsPanelItem extends SettingsPanelItem<DynamicSettingsP
       cssClass: 'ui-settings-panel-item',
       role: 'menuitem',
       addSettingAsComponent: false,
+      tabIndex: 0,
     }, this.config);
   }
 

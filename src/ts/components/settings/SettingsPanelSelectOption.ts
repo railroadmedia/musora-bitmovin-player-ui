@@ -37,6 +37,7 @@ export class SettingsPanelSelectOption extends SettingsPanelItem<SettingsPanelSe
     this.config = this.mergeConfig(config, {
       cssClasses: ['ui-settings-panel-item-select-option'],
       role: 'menuitem',
+      tabIndex: 0,
     } as SettingsPanelSelectOptionConfig, this.config);
   }
 

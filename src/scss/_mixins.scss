@@ -129,9 +129,13 @@
   width: $marker-dimension;
 }
 
-@mixin focusable {
+@mixin focusable($inset: false) {
   &:focus {
-    box-shadow: $focus-element-box-shadow;
+    @if $inset == false {
+      box-shadow: $focus-element-box-shadow;
+    } @else {
+      box-shadow: inset $focus-element-box-shadow;
+    }
     outline: none;
 
     &:not(.#{$prefix}-focus-visible) {
