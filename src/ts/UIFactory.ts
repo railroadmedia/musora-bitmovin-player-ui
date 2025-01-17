@@ -269,7 +269,6 @@ function uiLayout(config: UIConfig) {
       opener: subtitleSettingsOpenButton,
     }),
     settingComponent: subtitleSelectBox,
-    role: 'menubar',
     container: settingsPanel,
   });
   mainSettingsPanelPage.addComponent(subtitleSelectItem);
