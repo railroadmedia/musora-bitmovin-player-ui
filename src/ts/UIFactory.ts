@@ -173,7 +173,7 @@ export namespace UIFactory {
    * @param config The UIConfig object
    */
   export function buildCastReceiverUI(player: PlayerAPI, config: UIConfig = {}): UIManager {
-    return new UIManager(player, castReceiverUILayout(), config);
+    return new UIManager(player, castReceiverUILayout(config), config);
   }
 
   /**
@@ -308,6 +308,10 @@ function uiLayout(config: UIConfig) {
     ],
   });
 
+  const conditionalComponents = [
+    config.includeWatermark ? new Watermark() : null,
+  ].filter((e) => e);
+
   return new UIContainer({
     components: [
       subtitleOverlay,
@@ -317,8 +321,8 @@ function uiLayout(config: UIConfig) {
       controlBar,
       new TitleBar(),
       new RecommendationOverlay(),
-      new Watermark(),
       settingsPanel,
+      ...conditionalComponents,
       new ErrorMessageOverlay(),
     ],
     hideDelay: 2000,
@@ -542,7 +546,7 @@ function smallScreenAdsUILayout() {
   });
 }
 
-function castReceiverUILayout() {
+function castReceiverUILayout(config: UIConfig) {
   let controlBar = new ControlBar({
     components: [
       new Container({
@@ -562,14 +566,18 @@ function castReceiverUILayout() {
     ],
   });
 
+  const conditionalComponents = [
+    config.includeWatermark ? new Watermark() : null,
+  ].filter((e) => e);
+
   return new CastUIContainer({
     components: [
       new SubtitleOverlay(),
       new BufferingOverlay(),
       new PlaybackToggleOverlay(),
-      new Watermark(),
       controlBar,
       new TitleBar({ keepHiddenWithoutMetadata: true }),
+      ...conditionalComponents,
       new ErrorMessageOverlay(),
     ],
     cssClasses: ['ui-cast-receiver'],
