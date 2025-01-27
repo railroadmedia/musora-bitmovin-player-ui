@@ -103,6 +103,7 @@ export class DynamicSettingsPanelItem extends SettingsPanelItem<DynamicSettingsP
       this.displayItemsSubPage();
     };
     this.getDomElement().on('click', (e) => {
+      e.preventDefault();
       e.stopPropagation();
       handleItemClick();
     });

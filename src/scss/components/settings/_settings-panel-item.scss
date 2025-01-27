@@ -10,7 +10,13 @@
     cursor: pointer;
   }
 
-  &:hover {
+  @media (hover: hover) {
+    &:hover {
+      background-color: transparentize($color-item-hover, .15);
+    }
+  }
+
+  &:active {
     background-color: transparentize($color-item-hover, .15);
   }
 
