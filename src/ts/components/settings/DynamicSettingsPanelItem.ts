@@ -102,7 +102,7 @@ export class DynamicSettingsPanelItem extends SettingsPanelItem<DynamicSettingsP
     const handleItemClick = () => {
       this.displayItemsSubPage();
     };
-    this.getDomElement().on('click touchend', (e) => {
+    this.getDomElement().on('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
       handleItemClick();
