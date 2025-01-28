@@ -93,6 +93,13 @@ export interface ViewModeChangedEventArgs extends NoArgs {
   mode: ViewMode;
 }
 
+export interface ComponentFocusChangedEventArgs extends NoArgs {
+  /**
+   * True is the component is focused, else false.
+   */
+  focused: boolean;
+}
+
 /**
  * The base class of the UI framework.
  * Each component must extend this class and optionally the config interface.
@@ -208,6 +215,7 @@ export class Component<Config extends ComponentConfig> {
     onHoverChanged: new EventDispatcher<Component<Config>, ComponentHoverChangedEventArgs>(),
     onEnabled: new EventDispatcher<Component<Config>, NoArgs>(),
     onDisabled: new EventDispatcher<Component<Config>, NoArgs>(),
+    onFocusChanged: new EventDispatcher<Component<Config>, ComponentFocusChangedEventArgs>(),
   };
 
   /**
@@ -273,6 +281,10 @@ export class Component<Config extends ComponentConfig> {
     // Track the hovered state of the element
     this.getDomElement().on('mouseenter', () => this.onHoverChangedEvent(true));
     this.getDomElement().on('mouseleave', () => this.onHoverChangedEvent(false));
+
+    // Track the focused state of the element
+    this.getDomElement().on('focusin', () => this.onFocusChangedEvent(true));
+    this.getDomElement().on('focusout', () => this.onFocusChangedEvent(false));
   }
 
   /**
@@ -297,6 +309,10 @@ export class Component<Config extends ComponentConfig> {
       'class': this.getCssClasses(),
       'role': this.config.role,
     }, this);
+
+    if (typeof this.config.tabIndex === 'number') {
+      element.attr('tabindex', this.config.tabIndex.toString());
+    }
 
     return element;
   }
@@ -531,6 +547,10 @@ export class Component<Config extends ComponentConfig> {
     this.componentEvents.onHoverChanged.dispatch(this, { hovered: hovered });
   }
 
+  protected onFocusChangedEvent(focused: boolean): void {
+    this.componentEvents.onFocusChanged.dispatch(this, { focused: focused });
+  }
+
   /**
    * Gets the event that is fired when the component is showing.
    * See the detailed explanation on event architecture on the {@link #componentEvents events list}.
@@ -581,5 +601,13 @@ export class Component<Config extends ComponentConfig> {
    */
   get onViewModeChanged(): Event<Component<Config>, ViewModeChangedEventArgs> {
     return this.componentEvents.onViewModeChanged.getEvent();
+  }
+
+  /**
+   * Gets the event that is fired when the component's focus-state is changing.
+   * @returns {Event<Component<Config>, ComponentFocusChangedEventArgs>}
+   */
+  get onFocusedChanged(): Event<Component<Config>, ComponentFocusChangedEventArgs> {
+    return this.componentEvents.onFocusChanged.getEvent();
   }
 }

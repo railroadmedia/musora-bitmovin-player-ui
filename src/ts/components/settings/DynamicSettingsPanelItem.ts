@@ -11,6 +11,7 @@ import { SubtitleSettingsLabel } from './subtitlesettings/SubtitleSettingsLabel'
 import { SettingsPanel } from './SettingsPanel';
 import { SettingsPanelPageBackButton } from './SettingsPanelPageBackButton';
 import { SubtitleSettingSelectBox } from './subtitlesettings/SubtitleSettingSelectBox';
+import { InteractiveSettingsPanelItem } from './InteractiveSettingsPanelItem';
 
 /**
  * Configuration interface for a {@link DynamicSettingsPanelItem}.
@@ -35,10 +36,10 @@ export interface DynamicSettingsPanelItemConfig extends SettingsPanelItemConfig 
 /**
  * A dynamic settings panel item which can build a sub page with the items of a {@link ListSelector}.
  * The page will be dynamically added and removed from the {@link SettingsPanel}.
-*
+ *
  * @category Components
  */
-export class DynamicSettingsPanelItem extends SettingsPanelItem<DynamicSettingsPanelItemConfig> {
+export class DynamicSettingsPanelItem extends InteractiveSettingsPanelItem<DynamicSettingsPanelItemConfig> {
   private selectedOptionLabel: Label<LabelConfig>;
   protected settingComponent: ListSelector<ListSelectorConfig>;
 
@@ -63,6 +64,7 @@ export class DynamicSettingsPanelItem extends SettingsPanelItem<DynamicSettingsP
       cssClass: 'ui-settings-panel-item',
       role: 'menuitem',
       addSettingAsComponent: false,
+      tabIndex: 0,
     }, this.config);
   }
 
@@ -99,13 +101,8 @@ export class DynamicSettingsPanelItem extends SettingsPanelItem<DynamicSettingsP
 
     handleSelectedItemChanged();
 
-    const handleItemClick = () => {
+    this.onClick.subscribe(() => {
       this.displayItemsSubPage();
-    };
-    this.getDomElement().on('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      handleItemClick();
     });
   }
 
