@@ -6,13 +6,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-### Chores
-- Update github actions to v4
+### Changed
+- Chore: Update github actions to v4
 
 ## [3.85.0] - 2025-01-16
 
-### Chores
-- Update assets to Bitmovin CDN
+### Changed
+- Chore: Update assets to use Bitmovin CDN
 
 ## [3.84.0] - 2025-01-15
 
