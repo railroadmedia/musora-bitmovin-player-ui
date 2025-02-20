@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+
+## Fixed
+- Setting font color in subtitle customization settings not working on Comcast X1 Set-Top Boxes and other older WebKit-based platforms
+
 ## [3.84.0] - 2025-01-15
 
 ### Added
