@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Chores
 - Update github actions to v4
 
+## [3.85.0] - 2025-01-16
+
+### Chores
+- Update
+
 ## [3.84.0] - 2025-01-15
 
 ### Added
