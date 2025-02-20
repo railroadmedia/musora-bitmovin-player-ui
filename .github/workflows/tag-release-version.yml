@@ -12,6 +12,9 @@ jobs:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
+      - name: Ensure Changelog
+        run: gh pr view ${{github.event.pull_request.number}} --json files -q '.files[].path' | grep CHANGELOG.md
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
