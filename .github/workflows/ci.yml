@@ -23,6 +23,7 @@ jobs:
         run: |
           git config --global user.name 'Automated Release'
           git config --global user.email 'release-automation@bitmovin.com'
+          git fetch origin develop
           changes=$(git diff --name-only origin/develop...origin/feature/fix-release)
           if echo $changes | grep -q CHANGELOG.md; then
             echo "CHANGELOG.md has been updated"
