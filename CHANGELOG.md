@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.87.0] - 2025-02-20
+
+## Fixed
+- Setting font color in subtitle customization settings not working on Comcast X1 Set-Top Boxes and other older WebKit-based platforms
+
+## [3.86.0] - 2025-02-20
+
+### Changed
+- Chore: Update github actions to v4
+
+## [3.85.0] - 2025-01-16
+
+### Changed
+- Chore: Update assets to use Bitmovin CDN
+
 ## [3.84.0] - 2025-01-15
 
 ### Added
@@ -1068,7 +1083,8 @@ Version 2.0 of the UI framework is built for player 7.1. If absolutely necessary
 ## 1.0.0 (2017-02-03)
 - First release
 
-[3.86.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.84.0...v3.86.0
+[3.87.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.86.0...v3.87.0
+[3.86.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.85.0...v3.86.0
 [3.85.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.84.0...v3.85.0
 [3.84.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.83.0...v3.84.0
 [3.83.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.82.0...v3.83.0
