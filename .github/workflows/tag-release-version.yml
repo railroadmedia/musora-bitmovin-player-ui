@@ -17,6 +17,8 @@ jobs:
     - name: Ensure Changelog
       shell: bash
       run: |
+        git config --global user.name 'Automated Release'
+        git config --global user.email 'release-automation@bitmovin.com'
         changes=$(git diff --name-only $GITHUB_BASE_REF)
         if echo $changes | grep -q CHANGELOG.md; then
           echo "CHANGELOG.md has been updated"
@@ -24,8 +26,6 @@ jobs:
         else
           echo "CHANGELOG.md has not been updated, skipping release"
         fi
-      with:
-        ssh-key: ${{ secrets.RELEASE_DEPLOY_KEY }}
 
   trigger-ui-release:
     needs: verify-changelog
