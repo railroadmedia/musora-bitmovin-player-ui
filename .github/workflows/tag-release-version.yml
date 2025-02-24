@@ -14,6 +14,9 @@ jobs:
       HAS_CHANGELOG: ${{ steps.ensure-changelog.outputs.HAS_CHANGELOG }}
     runs-on: ubuntu-latest
     steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
     - name: Ensure Changelog
       shell: bash
       run: |
