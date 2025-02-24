@@ -10,6 +10,24 @@ on:
   workflow_call:
 
 jobs:
+  verify-changelog:
+    outputs:
+      HAS_CHANGELOG: ${{ steps.ensure-changelog.outputs.HAS_CHANGELOG }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ensure Changelog
+        shell: bash
+        run: |
+          changes=$(git diff --name-only $GITHUB_BASE_REF)
+          if echo $changes | grep -q CHANGELOG.md; then
+            echo "CHANGELOG.md has been updated"
+            echo "HAS_CHANGELOG=true" >> $GITHUB_OUTPUT
+          else
+            echo "CHANGELOG.md has not been updated, skipping release"
+          fi
+        with:
+          ssh-key: ${{ secrets.RELEASE_DEPLOY_KEY }}
+
   test_and_build:
     runs-on: ubuntu-latest
 
