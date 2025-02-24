@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [3.87.0] - 2025-02-20
 
-## Fixed
+### Fixed
 - Setting font color in subtitle customization settings not working on Comcast X1 Set-Top Boxes and other older WebKit-based platforms
 
 ## [3.86.0] - 2025-02-20
