@@ -17,13 +17,15 @@ jobs:
     - name: Ensure Changelog
       shell: bash
       run: |
-        changes=$(gh pr view ${{github.event.pull_request.number}} --json files -q '.files[].path')
+        changes=$(git diff --name-only $GITHUB_BASE_REF)
         if echo $changes | grep -q CHANGELOG.md; then
           echo "CHANGELOG.md has been updated"
           echo "HAS_CHANGELOG=true" >> $GITHUB_OUTPUT
         else
           echo "CHANGELOG.md has not been updated, skipping release"
         fi
+      with:
+        ssh-key: ${{ secrets.RELEASE_DEPLOY_KEY }}
 
   trigger-ui-release:
     needs: verify-changelog
