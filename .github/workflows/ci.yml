@@ -18,6 +18,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Ensure Changelog
+        shell: bash
+        run: |
+          changes=$(gh pr view ${{github.event.pull_request.number}} --json files -q '.files[].path')
+          if echo $changes | grep -q CHANGELOG.md; then
+            echo "CHANGELOG.md has been updated"
+            echo "HAS_CHANGELOG=true" >> $GITHUB_OUTPUT
+          else
+            echo "CHANGELOG.md has not been updated, skipping release"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Set up node.js
         uses: actions/setup-node@v4
         with:
