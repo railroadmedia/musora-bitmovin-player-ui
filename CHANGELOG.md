@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Chore: Skip releasing a new version when no changelog entry was added
 - Chore: Fix release workflow
 - Chore: Fix release workflow again
+- Chore: Fix release condition
 
 ## [3.87.0] - 2025-02-20
 
