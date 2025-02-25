@@ -16,21 +16,19 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
 
     - name: Ensure Changelog
       shell: bash
       run: |
-        git config --global user.name 'Automated Release'
-        git config --global user.email 'release-automation@bitmovin.com'
-        changes=$(git diff --name-only ${{github.event.pull_request.base.ref}})
+        changes=$(gh pr view 680 --json files -q '.files[].path')
         if echo $changes | grep -q CHANGELOG.md; then
           echo "CHANGELOG.md has been updated"
           echo "HAS_CHANGELOG=true" >> $GITHUB_OUTPUT
         else
           echo "CHANGELOG.md has not been updated, skipping release"
         fi
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   trigger-ui-release:
     needs: verify-changelog
