@@ -14,10 +14,17 @@ jobs:
       HAS_CHANGELOG: ${{ steps.ensure-changelog.outputs.HAS_CHANGELOG }}
     runs-on: ubuntu-latest
     steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
     - name: Ensure Changelog
       shell: bash
       run: |
-        changes=$(gh pr view ${{github.event.pull_request.number}} --json files -q '.files[].path')
+        git config --global user.name 'Automated Release'
+        git config --global user.email 'release-automation@bitmovin.com'
+        changes=$(git diff --name-only ${{github.event.pull_request.base.ref}})
         if echo $changes | grep -q CHANGELOG.md; then
           echo "CHANGELOG.md has been updated"
           echo "HAS_CHANGELOG=true" >> $GITHUB_OUTPUT
