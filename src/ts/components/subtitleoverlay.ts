@@ -1,14 +1,14 @@
-import { Container, ContainerConfig } from './container';
-import { UIInstanceManager } from '../uimanager';
-import { Label, LabelConfig } from './label';
-import { ComponentConfig, Component } from './component';
-import { ControlBar } from './controlbar';
-import { EventDispatcher } from '../eventdispatcher';
-import { DOM, Size } from '../dom';
-import { PlayerAPI, SubtitleCueEvent } from 'bitmovin-player';
-import { i18n } from '../localization/i18n';
-import { VttUtils } from '../vttutils';
-import { VTTProperties } from 'bitmovin-player/types/subtitles/vtt/API';
+import { Container, ContainerConfig } from "./container";
+import { UIInstanceManager } from "../uimanager";
+import { Label, LabelConfig } from "./label";
+import { ComponentConfig, Component } from "./component";
+import { ControlBar } from "./controlbar";
+import { EventDispatcher } from "../eventdispatcher";
+import { DOM, Size } from "../dom";
+import { PlayerAPI, SubtitleCueEvent } from "bitmovin-player";
+import { i18n } from "../localization/i18n";
+import { VttUtils } from "../vttutils";
+import { VTTProperties } from "bitmovin-player/types/subtitles/vtt/API";
 
 interface SubtitleCropDetectionResult {
   top: boolean;
@@ -17,39 +17,68 @@ interface SubtitleCropDetectionResult {
   left: boolean;
 }
 
+const FONT_SIZE_FACTOR = 1;
+
 /**
  * Overlays the player to display subtitles.
  *
  * @category Components
  */
 export class SubtitleOverlay extends Container<ContainerConfig> {
-
   private subtitleManager: ActiveSubtitleManager;
   private previewSubtitleActive: boolean;
   private previewSubtitle: SubtitleLabel;
 
-  private preprocessLabelEventCallback = new EventDispatcher<SubtitleCueEvent, SubtitleLabel>();
+  private preprocessLabelEventCallback = new EventDispatcher<
+    SubtitleCueEvent,
+    SubtitleLabel
+  >();
   private subtitleContainerManager: SubtitleRegionContainerManager;
 
-  private static readonly CLASS_CONTROLBAR_VISIBLE = 'controlbar-visible';
-  private static readonly CLASS_CEA_608 = 'cea608';
+  private static readonly CLASS_CONTROLBAR_VISIBLE = "controlbar-visible";
+  private static readonly CLASS_CEA_608 = "cea608";
+
+  /**
+   * Factor by which to multiply the automatically computed font size for CEA-608.
+   * 1.0 = 100% (default), 0.5 = 50%, 2.0 = 200%, etc.
+   */
+  private static fontSizeFactor: number = FONT_SIZE_FACTOR;
 
   // The number of rows in a cea608 grid
-  private static readonly CEA608_NUM_ROWS = 15;
+  private static readonly CEA608_NUM_ROWS = 15 / FONT_SIZE_FACTOR;
   // The number of columns in a cea608 grid
-  private static readonly CEA608_NUM_COLUMNS = 32;
+  private static readonly CEA608_NUM_COLUMNS = 32 / FONT_SIZE_FACTOR;
   // The offset in percent for one column (which is also the width of a column)
-  private static readonly CEA608_COLUMN_OFFSET = 100 / SubtitleOverlay.CEA608_NUM_COLUMNS;
+  private static readonly CEA608_COLUMN_OFFSET =
+    100 / SubtitleOverlay.CEA608_NUM_COLUMNS;
 
   constructor(config: ContainerConfig = {}) {
     super(config);
 
     this.previewSubtitleActive = false;
-    this.previewSubtitle = new SubtitleLabel({ text: i18n.getLocalizer('subtitle.example') });
+    this.previewSubtitle = new SubtitleLabel({
+      text: i18n.getLocalizer("subtitle.example"),
+    });
 
-    this.config = this.mergeConfig(config, {
-      cssClass: 'ui-subtitle-overlay',
-    }, this.config);
+    this.config = this.mergeConfig(
+      config,
+      {
+        cssClass: "ui-subtitle-overlay",
+      },
+      this.config
+    );
+  }
+
+  /**
+   * Allows external code (e.g. your UI settings) to set a percentage-based font size factor.
+   * If the user selects "50%", call setFontSizeFactor(0.5); "200%" => setFontSizeFactor(2.0); etc.
+   */
+  setFontSizeFactor(factor: number): void {
+    SubtitleOverlay.fontSizeFactor = factor;
+    // Optionally, you could force an immediate refresh if you want active cues updated right away:
+    // if (this.subtitleManager && this.subtitleManager.hasCues) {
+    //   this.refreshCea608Captions();
+    // }
   }
 
   configure(player: PlayerAPI, uimanager: UIInstanceManager): void {
@@ -60,40 +89,49 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
 
     this.subtitleContainerManager = new SubtitleRegionContainerManager(this);
 
-    player.on(player.exports.PlayerEvent.CueEnter, (event: SubtitleCueEvent) => {
-      const label = this.generateLabel(event);
-      subtitleManager.cueEnter(event, label);
+    player.on(
+      player.exports.PlayerEvent.CueEnter,
+      (event: SubtitleCueEvent) => {
+        const label = this.generateLabel(event);
+        subtitleManager.cueEnter(event, label);
 
-      this.preprocessLabelEventCallback.dispatch(event, label);
+        this.preprocessLabelEventCallback.dispatch(event, label);
 
-      if (this.previewSubtitleActive) {
-        this.subtitleContainerManager.removeLabel(this.previewSubtitle);
+        if (this.previewSubtitleActive) {
+          this.subtitleContainerManager.removeLabel(this.previewSubtitle);
+        }
+
+        this.show();
+
+        this.subtitleContainerManager.addLabel(
+          label,
+          this.getDomElement().size()
+        );
+        this.updateComponents();
+
+        if (uimanager.getConfig().forceSubtitlesIntoViewContainer) {
+          this.handleSubtitleCropping(label);
+        }
       }
+    );
 
-      this.show();
+    player.on(
+      player.exports.PlayerEvent.CueUpdate,
+      (event: SubtitleCueEvent) => {
+        const label = this.generateLabel(event);
+        const labelToReplace = subtitleManager.cueUpdate(event, label);
 
-      this.subtitleContainerManager.addLabel(label, this.getDomElement().size());
-      this.updateComponents();
+        this.preprocessLabelEventCallback.dispatch(event, label);
 
-      if (uimanager.getConfig().forceSubtitlesIntoViewContainer) {
-        this.handleSubtitleCropping(label);
+        if (labelToReplace) {
+          this.subtitleContainerManager.replaceLabel(labelToReplace, label);
+        }
+
+        if (uimanager.getConfig().forceSubtitlesIntoViewContainer) {
+          this.handleSubtitleCropping(label);
+        }
       }
-    });
-
-    player.on(player.exports.PlayerEvent.CueUpdate, (event: SubtitleCueEvent) => {
-      const label = this.generateLabel(event);
-      const labelToReplace = subtitleManager.cueUpdate(event, label);
-
-      this.preprocessLabelEventCallback.dispatch(event, label);
-
-      if (labelToReplace) {
-        this.subtitleContainerManager.replaceLabel(labelToReplace, label);
-      }
-
-      if (uimanager.getConfig().forceSubtitlesIntoViewContainer) {
-        this.handleSubtitleCropping(label);
-      }
-    });
+    );
 
     player.on(player.exports.PlayerEvent.CueExit, (event: SubtitleCueEvent) => {
       let labelToRemove = subtitleManager.cueExit(event);
@@ -122,29 +160,45 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
     };
 
     const clearInactiveCues = () => {
-      const removedActiveCues = subtitleManager.clearInactiveCues(player.getCurrentTime());
-      removedActiveCues.forEach(toRemove => {
+      const removedActiveCues = subtitleManager.clearInactiveCues(
+        player.getCurrentTime()
+      );
+      removedActiveCues.forEach((toRemove) => {
         this.subtitleContainerManager.removeLabel(toRemove.label);
       });
     };
 
     player.on(player.exports.PlayerEvent.AudioChanged, subtitleClearHandler);
-    player.on(player.exports.PlayerEvent.SubtitleDisabled, subtitleClearHandler);
+    player.on(
+      player.exports.PlayerEvent.SubtitleDisabled,
+      subtitleClearHandler
+    );
     player.on(player.exports.PlayerEvent.Seeked, clearInactiveCues);
     player.on(player.exports.PlayerEvent.TimeShifted, clearInactiveCues);
-    player.on(player.exports.PlayerEvent.PlaybackFinished, subtitleClearHandler);
+    player.on(
+      player.exports.PlayerEvent.PlaybackFinished,
+      subtitleClearHandler
+    );
     player.on(player.exports.PlayerEvent.SourceUnloaded, subtitleClearHandler);
 
-    uimanager.onComponentShow.subscribe((component: Component<ComponentConfig>) => {
-      if (component instanceof ControlBar) {
-        this.getDomElement().addClass(this.prefixCss(SubtitleOverlay.CLASS_CONTROLBAR_VISIBLE));
+    uimanager.onComponentShow.subscribe(
+      (component: Component<ComponentConfig>) => {
+        if (component instanceof ControlBar) {
+          this.getDomElement().addClass(
+            this.prefixCss(SubtitleOverlay.CLASS_CONTROLBAR_VISIBLE)
+          );
+        }
       }
-    });
-    uimanager.onComponentHide.subscribe((component: Component<ComponentConfig>) => {
-      if (component instanceof ControlBar) {
-        this.getDomElement().removeClass(this.prefixCss(SubtitleOverlay.CLASS_CONTROLBAR_VISIBLE));
+    );
+    uimanager.onComponentHide.subscribe(
+      (component: Component<ComponentConfig>) => {
+        if (component instanceof ControlBar) {
+          this.getDomElement().removeClass(
+            this.prefixCss(SubtitleOverlay.CLASS_CONTROLBAR_VISIBLE)
+          );
+        }
       }
-    });
+    );
 
     this.configureCea608Captions(player, uimanager);
     // Init
@@ -152,7 +206,7 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
   }
 
   detectCroppedSubtitleLabel(
-    labelElement: HTMLElement,
+    labelElement: HTMLElement
   ): SubtitleCropDetectionResult {
     const parent = this.getDomElement().get(0);
 
@@ -170,27 +224,27 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
   handleSubtitleCropping(label: SubtitleLabel) {
     const labelDomElement = label.getDomElement();
     const cropDetection = this.detectCroppedSubtitleLabel(
-      labelDomElement.get(0),
+      labelDomElement.get(0)
     );
 
     if (cropDetection.top) {
-      labelDomElement.css('top', '0');
-      labelDomElement.removeCss('bottom');
+      labelDomElement.css("top", "0");
+      labelDomElement.removeCss("bottom");
     }
 
     if (cropDetection.right) {
-      labelDomElement.css('right', '0');
-      labelDomElement.removeCss('left');
+      labelDomElement.css("right", "0");
+      labelDomElement.removeCss("left");
     }
 
     if (cropDetection.bottom) {
-      labelDomElement.css('bottom', '0');
-      labelDomElement.removeCss('top');
+      labelDomElement.css("bottom", "0");
+      labelDomElement.removeCss("top");
     }
 
     if (cropDetection.left) {
-      labelDomElement.css('left', '0');
-      labelDomElement.removeCss('right');
+      labelDomElement.css("left", "0");
+      labelDomElement.removeCss("right");
     }
   }
 
@@ -209,7 +263,10 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
     const label = new SubtitleLabel({
       // Prefer the HTML subtitle text if set, else try generating a image tag as string from the image attribute,
       // else use the plain text
-      text: event.html || ActiveSubtitleManager.generateImageTagText(event.image) || event.text,
+      text:
+        event.html ||
+        ActiveSubtitleManager.generateImageTagText(event.image) ||
+        event.text,
       vtt: event.vtt,
       region: region,
       regionStyle: event.regionStyle,
@@ -218,7 +275,10 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
     return label;
   }
 
-  configureCea608Captions(player: PlayerAPI, uimanager: UIInstanceManager): void {
+  configureCea608Captions(
+    player: PlayerAPI,
+    uimanager: UIInstanceManager
+  ): void {
     // The calculated font size
     let fontSize = 0;
     // The required letter spacing spread the text characters evenly across the grid
@@ -228,21 +288,36 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
     // Flag telling if the CEA-608 mode is enabled
     let enabled = false;
 
+    const settingsManager = uimanager.getSubtitleSettingsManager();
+
+    settingsManager.fontSize.onChanged.subscribe((sender, property) => {
+      if (property.isSet()) {
+        // We need to convert from percent
+        const factorValue = parseInt(property.value) / 100;
+        this.setFontSizeFactor(factorValue);
+      } else {
+        this.setFontSizeFactor(1);
+      }
+      updateCEA608FontSize();
+    });
+
     const updateCEA608FontSize = () => {
-      const dummyLabel = new SubtitleLabel({ text: 'X' });
+      const dummyLabel = new SubtitleLabel({ text: "X" });
       dummyLabel.getDomElement().css({
         // By using a large font size we do not need to use multiple letters and can get still an
         // accurate measurement even though the returned size is an integer value
-        'font-size': '200px',
-        'line-height': '200px',
-        'visibility': 'hidden',
+        "font-size": "200px",
+        "line-height": "200px",
+        visibility: "hidden",
       });
       this.addComponent(dummyLabel);
       this.updateComponents();
       this.show();
 
-      const dummyLabelCharWidth = dummyLabel.getDomElement().width();
-      const dummyLabelCharHeight = dummyLabel.getDomElement().height();
+      const dummyLabelCharWidth =
+        dummyLabel.getDomElement().width() * SubtitleOverlay.fontSizeFactor;
+      const dummyLabelCharHeight =
+        dummyLabel.getDomElement().height() * SubtitleOverlay.fontSizeFactor;
       const fontSizeRatio = dummyLabelCharWidth / dummyLabelCharHeight;
 
       this.removeComponent(dummyLabel);
@@ -260,37 +335,51 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
       const subtitleOverlayHeight = this.getDomElement().height();
 
       // The size ratio of the letter grid
-      const fontGridSizeRatio = (dummyLabelCharWidth * SubtitleOverlay.CEA608_NUM_COLUMNS) /
+      const fontGridSizeRatio =
+        (dummyLabelCharWidth * SubtitleOverlay.CEA608_NUM_COLUMNS) /
         (dummyLabelCharHeight * SubtitleOverlay.CEA608_NUM_ROWS);
       // The size ratio of the available space for the grid
-      const subtitleOverlaySizeRatio = subtitleOverlayWidth / subtitleOverlayHeight;
+      const subtitleOverlaySizeRatio =
+        subtitleOverlayWidth / subtitleOverlayHeight;
 
       if (subtitleOverlaySizeRatio > fontGridSizeRatio) {
         // When the available space is wider than the text grid, the font size is simply
         // determined by the height of the available space.
         fontSize = subtitleOverlayHeight / SubtitleOverlay.CEA608_NUM_ROWS;
+        fontSize *= SubtitleOverlay.fontSizeFactor;
 
         // Calculate the additional letter spacing required to evenly spread the text across the grid's width
-        const gridSlotWidth = subtitleOverlayWidth / SubtitleOverlay.CEA608_NUM_COLUMNS;
+        const gridSlotWidth =
+          subtitleOverlayWidth / SubtitleOverlay.CEA608_NUM_COLUMNS;
         const fontCharWidth = fontSize * fontSizeRatio;
         fontLetterSpacing = gridSlotWidth - fontCharWidth;
+        fontLetterSpacing = fontLetterSpacing / SubtitleOverlay.fontSizeFactor;
       } else {
         // When the available space is not wide enough, texts would vertically overlap if we take
         // the height as a base for the font size, so we need to limit the height. We do that
         // by determining the font size by the width of the available space.
-        fontSize = subtitleOverlayWidth / SubtitleOverlay.CEA608_NUM_COLUMNS / fontSizeRatio;
+        fontSize =
+          subtitleOverlayWidth /
+          SubtitleOverlay.CEA608_NUM_COLUMNS /
+          fontSizeRatio;
+        fontSize *= SubtitleOverlay.fontSizeFactor;
         fontLetterSpacing = 0;
       }
 
+      console.warn("Label update", this.getComponents());
       // Update font-size of all active subtitle labels
       for (let label of this.getComponents()) {
+        console.warn("Label", label);
         if (label instanceof SubtitleLabel) {
-          label.getDomElement().css({
-            'font-size': `${fontSize}px`,
-            'letter-spacing': `${fontLetterSpacing}px`,
+          const el = label.getDomElement();
+          el.css({
+            "font-size": `${fontSize}px`,
+            "letter-spacing": `${fontLetterSpacing}px`,
           });
 
-          label.regionStyle = `line-height: ${fontSize}px;`;
+          label.regionStyle = `line-height: ${fontSize}px; height: ${
+            el.height() * SubtitleOverlay.fontSizeFactor
+          }px;`;
         }
       }
     };
@@ -303,38 +392,46 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
       }
     });
 
-    this.preprocessLabelEventCallback.subscribe((event: SubtitleCueEvent, label: SubtitleLabel) => {
-      const isCEA608 = event.position != null;
-      if (!isCEA608) {
-        // Skip all non-CEA608 cues
-        return;
-      }
-
-      if (!enabled) {
-        enabled = true;
-        this.getDomElement().addClass(this.prefixCss(SubtitleOverlay.CLASS_CEA_608));
-
-        // We conditionally update the font size by this flag here to avoid updating every time a subtitle
-        // is added into an empty overlay. Because we reset the overlay when all subtitles are gone, this
-        // would trigger an unnecessary update every time, but it's only required under certain conditions,
-        // e.g. after the player size has changed.
-        if (fontSizeCalculationRequired) {
-          updateCEA608FontSize();
-          fontSizeCalculationRequired = false;
+    this.preprocessLabelEventCallback.subscribe(
+      (event: SubtitleCueEvent, label: SubtitleLabel) => {
+        const isCEA608 = event.position != null;
+        if (!isCEA608) {
+          // Skip all non-CEA608 cues
+          return;
         }
+
+        if (!enabled) {
+          enabled = true;
+          this.getDomElement().addClass(
+            this.prefixCss(SubtitleOverlay.CLASS_CEA_608)
+          );
+
+          // We conditionally update the font size by this flag here to avoid updating every time a subtitle
+          // is added into an empty overlay. Because we reset the overlay when all subtitles are gone, this
+          // would trigger an unnecessary update every time, but it's only required under certain conditions,
+          // e.g. after the player size has changed.
+          if (fontSizeCalculationRequired) {
+            updateCEA608FontSize();
+            fontSizeCalculationRequired = false;
+          }
+        }
+
+        label.getDomElement().css({
+          left: `${
+            event.position.column * SubtitleOverlay.CEA608_COLUMN_OFFSET
+          }%`,
+          "font-size": `${fontSize}px`,
+          "letter-spacing": `${fontLetterSpacing}px`,
+        });
+
+        label.regionStyle = `line-height: ${fontSize}px;`;
       }
-
-      label.getDomElement().css({
-        'left': `${event.position.column * SubtitleOverlay.CEA608_COLUMN_OFFSET}%`,
-        'font-size': `${fontSize}px`,
-        'letter-spacing': `${fontLetterSpacing}px`,
-      });
-
-      label.regionStyle = `line-height: ${fontSize}px;`;
-    });
+    );
 
     const reset = () => {
-      this.getDomElement().removeClass(this.prefixCss(SubtitleOverlay.CLASS_CEA_608));
+      this.getDomElement().removeClass(
+        this.prefixCss(SubtitleOverlay.CLASS_CEA_608)
+      );
       enabled = false;
     };
 
@@ -385,13 +482,16 @@ interface SubtitleLabelConfig extends LabelConfig {
 }
 
 export class SubtitleLabel extends Label<SubtitleLabelConfig> {
-
   constructor(config: SubtitleLabelConfig = {}) {
     super(config);
 
-    this.config = this.mergeConfig(config, {
-      cssClass: 'ui-subtitle-label',
-    }, this.config);
+    this.config = this.mergeConfig(
+      config,
+      {
+        cssClass: "ui-subtitle-label",
+      },
+      this.config
+    );
   }
 
   get vtt(): VTTProperties {
@@ -412,7 +512,6 @@ export class SubtitleLabel extends Label<SubtitleLabelConfig> {
 }
 
 class ActiveSubtitleManager {
-
   private activeSubtitleCueMap: ActiveSubtitleCueMap;
   private activeSubtitleCueCount: number;
 
@@ -432,10 +531,10 @@ class ActiveSubtitleManager {
    * @return {string}
    */
   private static calculateId(event: SubtitleCueEvent): string {
-    let id = event.start + '-' + event.text;
+    let id = event.start + "-" + event.text;
 
     if (event.position) {
-      id += '-' + event.position.row + '-' + event.position.column;
+      id += "-" + event.position.row + "-" + event.position.column;
     }
 
     return id;
@@ -445,7 +544,10 @@ class ActiveSubtitleManager {
     this.addCueToMap(event, label);
   }
 
-  cueUpdate(event: SubtitleCueEvent, label: SubtitleLabel): SubtitleLabel | undefined {
+  cueUpdate(
+    event: SubtitleCueEvent,
+    label: SubtitleLabel
+  ): SubtitleLabel | undefined {
     const labelToReplace = this.popCueFromMap(event);
 
     if (labelToReplace) {
@@ -493,9 +595,9 @@ class ActiveSubtitleManager {
    */
   public clearInactiveCues(time: number): ActiveSubtitleCue[] {
     const removedCues: ActiveSubtitleCue[] = [];
-    Object.keys(this.activeSubtitleCueMap).forEach(key => {
+    Object.keys(this.activeSubtitleCueMap).forEach((key) => {
       const activeCues = this.activeSubtitleCueMap[key];
-      activeCues.forEach(cue => {
+      activeCues.forEach((cue) => {
         if (time < cue.event.start || time > cue.event.end) {
           this.popCueFromMap(cue.event);
           removedCues.push(cue);
@@ -510,10 +612,10 @@ class ActiveSubtitleManager {
       return;
     }
 
-    const imgTag = new DOM('img', {
+    const imgTag = new DOM("img", {
       src: imageData,
     });
-    imgTag.css('width', '100%');
+    imgTag.css("width", "100%");
     return imgTag.get(0).outerHTML; // return the html as string
   }
 
@@ -567,7 +669,9 @@ class ActiveSubtitleManager {
 }
 
 export class SubtitleRegionContainerManager {
-  private subtitleRegionContainers: { [regionName: string]: SubtitleRegionContainer } = {};
+  private subtitleRegionContainers: {
+    [regionName: string]: SubtitleRegionContainer;
+  } = {};
 
   /**
    * @param subtitleOverlay Reference to the subtitle overlay for adding and removing the containers.
@@ -576,17 +680,21 @@ export class SubtitleRegionContainerManager {
     this.subtitleOverlay = subtitleOverlay;
   }
 
-  private getRegion(label: SubtitleLabel): { regionContainerId: string, regionName: string } {
+  private getRegion(label: SubtitleLabel): {
+    regionContainerId: string;
+    regionName: string;
+  } {
     if (label.vtt) {
       return {
-        regionContainerId: label.vtt.region && label.vtt.region.id ? label.vtt.region.id : 'vtt',
-        regionName: 'vtt',
+        regionContainerId:
+          label.vtt.region && label.vtt.region.id ? label.vtt.region.id : "vtt",
+        regionName: "vtt",
       };
     }
 
     return {
-      regionContainerId: label.region || 'default',
-      regionName: label.region || 'default',
+      regionContainerId: label.region || "default",
+      regionName: label.region || "default",
     };
   }
 
@@ -611,24 +719,29 @@ export class SubtitleRegionContainerManager {
       this.subtitleRegionContainers[regionContainerId] = regionContainer;
 
       if (label.regionStyle) {
-        regionContainer.getDomElement().attr('style', label.regionStyle);
+        regionContainer.getDomElement().attr("style", label.regionStyle);
       } else if (label.vtt && !label.vtt.region) {
         /**
          * If there is no region present to wrap the Cue Box, the Cue box becomes the
          * region itself. Therefore the positioning values have to come from the box.
          */
-        regionContainer.getDomElement().css('position', 'static');
+        regionContainer.getDomElement().css("position", "static");
       } else {
         // getDomElement needs to be called at least once to ensure the component exists
         regionContainer.getDomElement();
       }
 
       for (const regionContainerId in this.subtitleRegionContainers) {
-        this.subtitleOverlay.addComponent(this.subtitleRegionContainers[regionContainerId]);
+        this.subtitleOverlay.addComponent(
+          this.subtitleRegionContainers[regionContainerId]
+        );
       }
     }
 
-    this.subtitleRegionContainers[regionContainerId].addLabel(label, overlaySize);
+    this.subtitleRegionContainers[regionContainerId].addLabel(
+      label,
+      overlaySize
+    );
   }
 
   replaceLabel(previousLabel: SubtitleLabel, newLabel: SubtitleLabel): void {
@@ -645,16 +758,19 @@ export class SubtitleRegionContainerManager {
     let regionContainerId;
 
     if (label.vtt) {
-      regionContainerId = label.vtt.region && label.vtt.region.id ? label.vtt.region.id : 'vtt';
+      regionContainerId =
+        label.vtt.region && label.vtt.region.id ? label.vtt.region.id : "vtt";
     } else {
-      regionContainerId = label.region || 'default';
+      regionContainerId = label.region || "default";
     }
 
     this.subtitleRegionContainers[regionContainerId].removeLabel(label);
 
     // Remove container if no more labels are displayed
     if (this.subtitleRegionContainers[regionContainerId].isEmpty()) {
-      this.subtitleOverlay.removeComponent(this.subtitleRegionContainers[regionContainerId]);
+      this.subtitleOverlay.removeComponent(
+        this.subtitleRegionContainers[regionContainerId]
+      );
       delete this.subtitleRegionContainers[regionContainerId];
     }
   }
@@ -664,7 +780,9 @@ export class SubtitleRegionContainerManager {
    */
   clear(): void {
     for (const regionName in this.subtitleRegionContainers) {
-      this.subtitleOverlay.removeComponent(this.subtitleRegionContainers[regionName]);
+      this.subtitleOverlay.removeComponent(
+        this.subtitleRegionContainers[regionName]
+      );
     }
 
     this.subtitleRegionContainers = {};
@@ -677,9 +795,13 @@ export class SubtitleRegionContainer extends Container<ContainerConfig> {
   constructor(config: ContainerConfig = {}) {
     super(config);
 
-    this.config = this.mergeConfig(config, {
-      cssClass: 'subtitle-region-container',
-    }, this.config);
+    this.config = this.mergeConfig(
+      config,
+      {
+        cssClass: "subtitle-region-container",
+      },
+      this.config
+    );
   }
 
   addLabel(labelToAdd: SubtitleLabel, overlaySize?: Size) {
