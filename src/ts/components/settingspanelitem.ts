@@ -1,15 +1,16 @@
-import {Container, ContainerConfig} from './container';
-import {Component, ComponentConfig} from './component';
-import {Event, EventDispatcher, NoArgs} from '../eventdispatcher';
-import { Label, LabelConfig } from './label';
-import {UIInstanceManager} from '../uimanager';
-import {SelectBox} from './selectbox';
-import {ListBox} from './listbox';
-import {VideoQualitySelectBox} from './videoqualityselectbox';
-import {AudioQualitySelectBox} from './audioqualityselectbox';
-import {PlaybackSpeedSelectBox} from './playbackspeedselectbox';
 import { PlayerAPI } from 'bitmovin-player';
+import { Event, EventDispatcher, NoArgs } from '../eventdispatcher';
 import { LocalizableText } from '../localization/i18n';
+import { UIInstanceManager } from '../uimanager';
+import { AudioQualitySelectBox } from './audioqualityselectbox';
+import { Component, ComponentConfig } from './component';
+import { Container, ContainerConfig } from './container';
+import { Label, LabelConfig } from './label';
+import { ListBox } from './listbox';
+import { PlaybackSpeedSelectBox } from './playbackspeedselectbox';
+import { SelectBox } from './selectbox';
+import { VideoQualityListBox } from './videoqualitylistbox';
+import { VideoQualitySelectBox } from './videoqualityselectbox';
 
 /**
  * An item for a {@link SettingsPanelPage},
@@ -60,8 +61,11 @@ export class SettingsPanelItem extends Container<ContainerConfig> {
         let minItemsToDisplay = 2;
         // Audio/video quality select boxes contain an additional 'auto' mode, which in combination with a single
         // available quality also does not make sense
-        if ((this.setting instanceof VideoQualitySelectBox && this.setting.hasAutoItem())
-          || this.setting instanceof AudioQualitySelectBox) {
+        if (
+          ((this.setting instanceof VideoQualitySelectBox || this.setting instanceof VideoQualityListBox) &&
+            this.setting.hasAutoItem()) ||
+          this.setting instanceof AudioQualitySelectBox
+        ) {
           minItemsToDisplay = 3;
         }
 

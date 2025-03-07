@@ -70,6 +70,7 @@
 
   // Increase icon sizes and texts in the controlbar such as current time
   .#{$prefix}-ui-subtitlesettingstogglebutton,
+  .#{$prefix}-ui-videosettingstogglebutton,
   .#{$prefix}-ui-audiotracksettingstogglebutton {
     font-size: 5vh;
   }

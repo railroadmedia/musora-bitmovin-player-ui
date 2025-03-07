@@ -1,56 +1,57 @@
-import { SubtitleOverlay } from './components/subtitleoverlay';
-import { SettingsPanelPage } from './components/settingspanelpage';
-import { SettingsPanelItem } from './components/settingspanelitem';
-import { VideoQualitySelectBox } from './components/videoqualityselectbox';
-import { PlaybackSpeedSelectBox } from './components/playbackspeedselectbox';
-import { AudioTrackSelectBox } from './components/audiotrackselectbox';
-import { AudioQualitySelectBox } from './components/audioqualityselectbox';
-import { SettingsPanel } from './components/settingspanel';
-import { SubtitleSettingsPanelPage } from './components/subtitlesettings/subtitlesettingspanelpage';
-import { SettingsPanelPageOpenButton } from './components/settingspanelpageopenbutton';
-import { SubtitleSettingsLabel } from './components/subtitlesettings/subtitlesettingslabel';
-import { SubtitleSelectBox } from './components/subtitleselectbox';
-import { ControlBar } from './components/controlbar';
-import { Container, ContainerConfig } from './components/container';
-import { PlaybackTimeLabel, PlaybackTimeLabelMode } from './components/playbacktimelabel';
-import { SeekBar } from './components/seekbar';
-import { SeekBarLabel } from './components/seekbarlabel';
-import { PlaybackToggleButton } from './components/playbacktogglebutton';
-import { VolumeToggleButton } from './components/volumetogglebutton';
-import { VolumeSlider } from './components/volumeslider';
-import { Spacer } from './components/spacer';
-import { PictureInPictureToggleButton } from './components/pictureinpicturetogglebutton';
-import { AirPlayToggleButton } from './components/airplaytogglebutton';
-import { CastToggleButton } from './components/casttogglebutton';
-import { VRToggleButton } from './components/vrtogglebutton';
-import { SettingsToggleButton } from './components/settingstogglebutton';
-import { FullscreenToggleButton } from './components/fullscreentogglebutton';
-import { UIContainer } from './components/uicontainer';
-import { BufferingOverlay } from './components/bufferingoverlay';
-import { PlaybackToggleOverlay } from './components/playbacktoggleoverlay';
-import { CastStatusOverlay } from './components/caststatusoverlay';
-import { TitleBar } from './components/titlebar';
-import { RecommendationOverlay } from './components/recommendationoverlay';
-import { Watermark } from './components/watermark';
-import { ErrorMessageOverlay } from './components/errormessageoverlay';
+import { PlayerAPI } from 'bitmovin-player';
 import { AdClickOverlay } from './components/adclickoverlay';
 import { AdMessageLabel } from './components/admessagelabel';
 import { AdSkipButton } from './components/adskipbutton';
-import { CloseButton } from './components/closebutton';
-import { MetadataLabel, MetadataLabelContent } from './components/metadatalabel';
-import { PlayerUtils } from './playerutils';
-import { Label } from './components/label';
-import { CastUIContainer } from './components/castuicontainer';
-import { UIConditionContext, UIManager } from './uimanager';
-import { UIConfig } from './uiconfig';
-import { PlayerAPI } from 'bitmovin-player';
-import { i18n } from './localization/i18n';
-import { SubtitleListBox } from './components/subtitlelistbox';
+import { AirPlayToggleButton } from './components/airplaytogglebutton';
+import { AudioQualitySelectBox } from './components/audioqualityselectbox';
 import { AudioTrackListBox } from './components/audiotracklistbox';
-import { SpatialNavigation } from './spatialnavigation/spatialnavigation';
-import { RootNavigationGroup } from './spatialnavigation/rootnavigationgroup';
-import { ListNavigationGroup, ListOrientation } from './spatialnavigation/ListNavigationGroup';
+import { AudioTrackSelectBox } from './components/audiotrackselectbox';
+import { BufferingOverlay } from './components/bufferingoverlay';
+import { CastStatusOverlay } from './components/caststatusoverlay';
+import { CastToggleButton } from './components/casttogglebutton';
+import { CastUIContainer } from './components/castuicontainer';
+import { CloseButton } from './components/closebutton';
+import { Container, ContainerConfig } from './components/container';
+import { ControlBar } from './components/controlbar';
 import { EcoModeContainer } from './components/ecomodecontainer';
+import { ErrorMessageOverlay } from './components/errormessageoverlay';
+import { FullscreenToggleButton } from './components/fullscreentogglebutton';
+import { Label } from './components/label';
+import { MetadataLabel, MetadataLabelContent } from './components/metadatalabel';
+import { PictureInPictureToggleButton } from './components/pictureinpicturetogglebutton';
+import { PlaybackSpeedSelectBox } from './components/playbackspeedselectbox';
+import { PlaybackTimeLabel, PlaybackTimeLabelMode } from './components/playbacktimelabel';
+import { PlaybackToggleButton } from './components/playbacktogglebutton';
+import { PlaybackToggleOverlay } from './components/playbacktoggleoverlay';
+import { RecommendationOverlay } from './components/recommendationoverlay';
+import { SeekBar } from './components/seekbar';
+import { SeekBarLabel } from './components/seekbarlabel';
+import { SettingsPanel } from './components/settingspanel';
+import { SettingsPanelItem } from './components/settingspanelitem';
+import { SettingsPanelPage } from './components/settingspanelpage';
+import { SettingsPanelPageOpenButton } from './components/settingspanelpageopenbutton';
+import { SettingsToggleButton } from './components/settingstogglebutton';
+import { Spacer } from './components/spacer';
+import { SubtitleListBox } from './components/subtitlelistbox';
+import { SubtitleOverlay } from './components/subtitleoverlay';
+import { SubtitleSelectBox } from './components/subtitleselectbox';
+import { SubtitleSettingsLabel } from './components/subtitlesettings/subtitlesettingslabel';
+import { SubtitleSettingsPanelPage } from './components/subtitlesettings/subtitlesettingspanelpage';
+import { TitleBar } from './components/titlebar';
+import { UIContainer } from './components/uicontainer';
+import { VideoQualityListBox } from './components/videoqualitylistbox';
+import { VideoQualitySelectBox } from './components/videoqualityselectbox';
+import { VolumeSlider } from './components/volumeslider';
+import { VolumeToggleButton } from './components/volumetogglebutton';
+import { VRToggleButton } from './components/vrtogglebutton';
+import { Watermark } from './components/watermark';
+import { i18n } from './localization/i18n';
+import { PlayerUtils } from './playerutils';
+import { ListNavigationGroup, ListOrientation } from './spatialnavigation/ListNavigationGroup';
+import { RootNavigationGroup } from './spatialnavigation/rootnavigationgroup';
+import { SpatialNavigation } from './spatialnavigation/spatialnavigation';
+import { UIConfig } from './uiconfig';
+import { UIConditionContext, UIManager } from './uimanager';
 
 export namespace UIFactory {
   export function buildDefaultUI(player: PlayerAPI, config: UIConfig = {}): UIManager {
@@ -474,6 +475,16 @@ export namespace UIFactory {
   }
 
   export function modernTvUI() {
+    const videoQualityListBox = new VideoQualityListBox();
+    const videoQualityListPanel = new SettingsPanel({
+      components: [
+        new SettingsPanelPage({
+          components: [new SettingsPanelItem(null, videoQualityListBox)],
+        }),
+      ],
+      hidden: true,
+    });
+
     const subtitleListBox = new SubtitleListBox();
     const subtitleListPanel = new SettingsPanel({
       components: [
@@ -496,6 +507,13 @@ export namespace UIFactory {
 
     const seekBar = new SeekBar({ label: new SeekBarLabel() });
     const playbackToggleOverlay = new PlaybackToggleOverlay();
+    const videoQualityToggleButton = new SettingsToggleButton({
+      settingsPanel: videoQualityListPanel,
+      autoHideWhenNoActiveSettings: true,
+      cssClass: 'ui-videosettingstogglebutton',
+      ariaLabel: i18n.getLocalizer('settings.video.quality'),
+      text: i18n.getLocalizer('settings.video.quality'),
+    });
     const subtitleToggleButton = new SettingsToggleButton({
       settingsPanel: subtitleListPanel,
       autoHideWhenNoActiveSettings: true,
@@ -539,6 +557,7 @@ export namespace UIFactory {
                 new MetadataLabel({ content: MetadataLabelContent.Title }),
                 subtitleToggleButton,
                 audioToggleButton,
+                videoQualityToggleButton,
               ],
               cssClasses: ['ui-titlebar-top'],
             }),
@@ -547,6 +566,7 @@ export namespace UIFactory {
                 new MetadataLabel({ content: MetadataLabelContent.Description }),
                 subtitleListPanel,
                 audioTrackListPanel,
+                videoQualityListPanel,
               ],
               cssClasses: ['ui-titlebar-bottom'],
             }),
@@ -565,9 +585,17 @@ export namespace UIFactory {
     });
 
     const spatialNavigation = new SpatialNavigation(
-      new RootNavigationGroup(uiContainer, playbackToggleOverlay, seekBar, audioToggleButton, subtitleToggleButton),
+      new RootNavigationGroup(
+        uiContainer,
+        playbackToggleOverlay,
+        seekBar,
+        videoQualityToggleButton,
+        audioToggleButton,
+        subtitleToggleButton
+      ),
       new ListNavigationGroup(ListOrientation.Vertical, subtitleListPanel, subtitleListBox),
       new ListNavigationGroup(ListOrientation.Vertical, audioTrackListPanel, audioTrackListBox),
+      new ListNavigationGroup(ListOrientation.Vertical, videoQualityListPanel, videoQualityListBox)
     );
 
     return {

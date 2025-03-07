@@ -1,0 +1,11 @@
+@import '../variables';
+
+.#{$prefix}-ui-videosettingstogglebutton {
+  @extend %ui-settingstogglebutton;
+
+  background-image: url('../../assets/skin-modern/images/settings.svg');
+
+  &.#{$prefix}-on {
+    background-image: url('../../assets/skin-modern/images/settingsX.svg');
+  }
+}
