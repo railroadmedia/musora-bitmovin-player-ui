@@ -302,6 +302,7 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
     });
 
     const updateCEA608FontSize = () => {
+      fontSizeCalculationRequired = true;
       const dummyLabel = new SubtitleLabel({ text: "X" });
       dummyLabel.getDomElement().css({
         // By using a large font size we do not need to use multiple letters and can get still an
@@ -331,8 +332,23 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
       // layouting, but the actual reason could not be determined. Aiming for a target width - 1px would work in
       // most browsers, but Safari has a "quantized" font size rendering with huge steps in between so we need
       // to subtract some more pixels to avoid line breaks there as well.
-      const subtitleOverlayWidth = this.getDomElement().width() - 10;
-      const subtitleOverlayHeight = this.getDomElement().height();
+      const overlayElement = this.getDomElement();
+      const subtitleOverlayWidth = overlayElement.width() - 10;
+      const subtitleOverlayHeight = overlayElement.height();
+
+      // After computing overlay dimensions:
+      const newRowHeight =
+        (subtitleOverlayHeight / SubtitleOverlay.CEA608_NUM_ROWS) *
+        SubtitleOverlay.fontSizeFactor;
+
+      // Update the CSS custom property on the overlay DOM element
+      console.warn(overlayElement);
+      overlayElement.css("--cea608-row-height", newRowHeight + "px");
+      overlayElement["elements"][0].style.setProperty(
+        "--cea608-row-height",
+        `${newRowHeight}px`
+      );
+      this.subtitleContainerManager.updateRegionsHeight(newRowHeight);
 
       // The size ratio of the letter grid
       const fontGridSizeRatio =
@@ -696,6 +712,20 @@ export class SubtitleRegionContainerManager {
       regionContainerId: label.region || "default",
       regionName: label.region || "default",
     };
+  }
+
+  updateRegionsHeight(newRowHeight: number) {
+    (
+      document.querySelectorAll(
+        ".bmpui-subtitle-region-container"
+      ) as NodeListOf<HTMLElement>
+    ).forEach((e, i) => {
+       
+      e.style.setProperty("--cea608-row-height", `${newRowHeight}px`);
+    });
+    // Object.values(this.subtitleRegionContainers).forEach((r, i) => {
+    //   console.warn("Update container height " + i, newRowHeight);
+    // });
   }
 
   /**

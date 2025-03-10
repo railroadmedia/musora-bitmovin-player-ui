@@ -1,6 +1,8 @@
 @use 'sass:math';
 
 .#{$prefix}-ui-subtitle-overlay {
+  --cea608-row-height: calc(100% / 15);
+
   &.#{$prefix}-cea608 {
 
     bottom: 2em;
@@ -9,7 +11,7 @@
     top: 2em;
 
     .#{$prefix}-subtitle-region-container {
-      height: math.div(100%, 15);
+      height: var(--cea608-row-height);
       left: 0;
       line-height: 1em;
       right: 0;
@@ -18,7 +20,7 @@
       // Define positions for all 15 rows
       @for $i from 0 through 14 {
         &.#{$prefix}-subtitle-position-cea608-row-#{$i} {
-          top: math.div($i, 15) * 100%;
+          top: calc(var(--cea608-row-height) * #{$i});
         }
       }
     }
