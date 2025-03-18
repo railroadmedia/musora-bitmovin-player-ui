@@ -17,7 +17,7 @@ interface SubtitleCropDetectionResult {
   left: boolean;
 }
 
-const FONT_SIZE_FACTOR = 1;
+const DEFAULT_FONT_SIZE_FACTOR = 1;
 
 /**
  * Overlays the player to display subtitles.
@@ -42,12 +42,12 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
    * Factor by which to multiply the automatically computed font size for CEA-608.
    * 1.0 = 100% (default), 0.5 = 50%, 2.0 = 200%, etc.
    */
-  private static fontSizeFactor: number = FONT_SIZE_FACTOR;
+  private static FONT_SIZE_FACTOR: number = DEFAULT_FONT_SIZE_FACTOR;
 
   // The number of rows in a cea608 grid
-  private static readonly CEA608_NUM_ROWS = 15 / FONT_SIZE_FACTOR;
+  private static readonly CEA608_NUM_ROWS = 15 / DEFAULT_FONT_SIZE_FACTOR;
   // The number of columns in a cea608 grid
-  private static readonly CEA608_NUM_COLUMNS = 32 / FONT_SIZE_FACTOR;
+  private static readonly CEA608_NUM_COLUMNS = 32 / DEFAULT_FONT_SIZE_FACTOR;
   // The offset in percent for one column (which is also the width of a column)
   private static readonly CEA608_COLUMN_OFFSET =
     100 / SubtitleOverlay.CEA608_NUM_COLUMNS;
@@ -74,11 +74,7 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
    * If the user selects "50%", call setFontSizeFactor(0.5); "200%" => setFontSizeFactor(2.0); etc.
    */
   setFontSizeFactor(factor: number): void {
-    SubtitleOverlay.fontSizeFactor = factor;
-    // Optionally, you could force an immediate refresh if you want active cues updated right away:
-    // if (this.subtitleManager && this.subtitleManager.hasCues) {
-    //   this.refreshCea608Captions();
-    // }
+    SubtitleOverlay.FONT_SIZE_FACTOR = factor;
   }
 
   configure(player: PlayerAPI, uimanager: UIInstanceManager): void {
@@ -316,9 +312,9 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
       this.show();
 
       const dummyLabelCharWidth =
-        dummyLabel.getDomElement().width() * SubtitleOverlay.fontSizeFactor;
+        dummyLabel.getDomElement().width() * SubtitleOverlay.FONT_SIZE_FACTOR;
       const dummyLabelCharHeight =
-        dummyLabel.getDomElement().height() * SubtitleOverlay.fontSizeFactor;
+        dummyLabel.getDomElement().height() * SubtitleOverlay.FONT_SIZE_FACTOR;
       const fontSizeRatio = dummyLabelCharWidth / dummyLabelCharHeight;
 
       this.removeComponent(dummyLabel);
@@ -339,7 +335,7 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
       // After computing overlay dimensions:
       const newRowHeight =
         (subtitleOverlayHeight / SubtitleOverlay.CEA608_NUM_ROWS) *
-        SubtitleOverlay.fontSizeFactor;
+        SubtitleOverlay.FONT_SIZE_FACTOR;
 
       // Update the CSS custom property on the overlay DOM element
       console.warn(overlayElement);
@@ -362,14 +358,14 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
         // When the available space is wider than the text grid, the font size is simply
         // determined by the height of the available space.
         fontSize = subtitleOverlayHeight / SubtitleOverlay.CEA608_NUM_ROWS;
-        fontSize *= SubtitleOverlay.fontSizeFactor;
+        fontSize *= SubtitleOverlay.FONT_SIZE_FACTOR;
 
         // Calculate the additional letter spacing required to evenly spread the text across the grid's width
         const gridSlotWidth =
           subtitleOverlayWidth / SubtitleOverlay.CEA608_NUM_COLUMNS;
         const fontCharWidth = fontSize * fontSizeRatio;
         fontLetterSpacing = gridSlotWidth - fontCharWidth;
-        fontLetterSpacing = fontLetterSpacing / SubtitleOverlay.fontSizeFactor;
+        fontLetterSpacing = fontLetterSpacing / SubtitleOverlay.FONT_SIZE_FACTOR;
       } else {
         // When the available space is not wide enough, texts would vertically overlap if we take
         // the height as a base for the font size, so we need to limit the height. We do that
@@ -378,7 +374,7 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
           subtitleOverlayWidth /
           SubtitleOverlay.CEA608_NUM_COLUMNS /
           fontSizeRatio;
-        fontSize *= SubtitleOverlay.fontSizeFactor;
+        fontSize *= SubtitleOverlay.FONT_SIZE_FACTOR;
         fontLetterSpacing = 0;
       }
 
@@ -394,7 +390,7 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
           });
 
           label.regionStyle = `line-height: ${fontSize}px; height: ${
-            el.height() * SubtitleOverlay.fontSizeFactor
+            el.height() * SubtitleOverlay.FONT_SIZE_FACTOR
           }px;`;
         }
       }
@@ -720,7 +716,7 @@ export class SubtitleRegionContainerManager {
         ".bmpui-subtitle-region-container"
       ) as NodeListOf<HTMLElement>
     ).forEach((e, i) => {
-       
+
       e.style.setProperty("--cea608-row-height", `${newRowHeight}px`);
     });
     // Object.values(this.subtitleRegionContainers).forEach((r, i) => {
