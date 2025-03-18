@@ -34,12 +34,13 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
   private static readonly CLASS_CONTROLBAR_VISIBLE = 'controlbar-visible';
   private static readonly CLASS_CEA_608 = 'cea608';
 
+  private FONT_SIZE_FACTOR: number = 1;
   // The number of rows in a cea608 grid
-  private static readonly CEA608_NUM_ROWS = 15;
+  private CEA608_NUM_ROWS = 15 / this.FONT_SIZE_FACTOR;
   // The number of columns in a cea608 grid
-  private static readonly CEA608_NUM_COLUMNS = 32;
+  private CEA608_NUM_COLUMNS = 32 / this.FONT_SIZE_FACTOR;
   // The offset in percent for one column (which is also the width of a column)
-  private static readonly CEA608_COLUMN_OFFSET = 100 / SubtitleOverlay.CEA608_NUM_COLUMNS;
+  private CEA608_COLUMN_OFFSET = 100 / this.CEA608_NUM_COLUMNS;
 
   constructor(config: ContainerConfig = {}) {
     super(config);
@@ -151,6 +152,19 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
     subtitleClearHandler();
   }
 
+  setFontSizeFactor(factor: number): void {
+    // We only allow range from 50% to 200% as suggested by spec
+    this.FONT_SIZE_FACTOR = Math.max(0.5, Math.min(2.0, factor));;
+
+    this.recalculateCEAGrid();
+  }
+
+  recalculateCEAGrid() {
+    this.CEA608_NUM_ROWS = 15 / this.FONT_SIZE_FACTOR;
+    this.CEA608_NUM_COLUMNS = 32 / this.FONT_SIZE_FACTOR;
+    this.CEA608_COLUMN_OFFSET = 100 / this.CEA608_NUM_COLUMNS;
+  }
+
   detectCroppedSubtitleLabel(
     labelElement: HTMLElement,
   ): SubtitleCropDetectionResult {
@@ -228,6 +242,20 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
     // Flag telling if the CEA-608 mode is enabled
     let enabled = false;
 
+
+    const settingsManager = uimanager.getSubtitleSettingsManager();
+
+    settingsManager.fontSize.onChanged.subscribe((_sender, property) => {
+      if (property.isSet()) {
+        // We need to convert from percent
+        const factorValue = parseInt(property.value) / 100;
+        this.setFontSizeFactor(factorValue);
+      } else {
+        this.setFontSizeFactor(1);
+      }
+      updateCEA608FontSize();
+    });
+
     const updateCEA608FontSize = () => {
       const dummyLabel = new SubtitleLabel({ text: 'X' });
       dummyLabel.getDomElement().css({
@@ -241,8 +269,8 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
       this.updateComponents();
       this.show();
 
-      const dummyLabelCharWidth = dummyLabel.getDomElement().width();
-      const dummyLabelCharHeight = dummyLabel.getDomElement().height();
+      const dummyLabelCharWidth = dummyLabel.getDomElement().width() * this.FONT_SIZE_FACTOR;
+      const dummyLabelCharHeight = dummyLabel.getDomElement().height() * this.FONT_SIZE_FACTOR;
       const fontSizeRatio = dummyLabelCharWidth / dummyLabelCharHeight;
 
       this.removeComponent(dummyLabel);
@@ -256,29 +284,38 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
       // layouting, but the actual reason could not be determined. Aiming for a target width - 1px would work in
       // most browsers, but Safari has a "quantized" font size rendering with huge steps in between so we need
       // to subtract some more pixels to avoid line breaks there as well.
-      const subtitleOverlayWidth = this.getDomElement().width() - 10;
-      const subtitleOverlayHeight = this.getDomElement().height();
+      const overlayElement = this.getDomElement();
+      const subtitleOverlayWidth = overlayElement.width() - 10;
+      const subtitleOverlayHeight = overlayElement.height();
+
+      // After computing overlay dimensions:
+      const newRowHeight = (subtitleOverlayHeight / this.CEA608_NUM_ROWS) * this.FONT_SIZE_FACTOR;
+
+      // Update the CSS custom property on the overlay DOM element
+      overlayElement.css("--cea608-row-height", newRowHeight + "px");
+      overlayElement["elements"][0].style.setProperty("--cea608-row-height",`${newRowHeight}px`);
+      this.subtitleContainerManager.updateRegionsHeight(newRowHeight);
 
       // The size ratio of the letter grid
-      const fontGridSizeRatio = (dummyLabelCharWidth * SubtitleOverlay.CEA608_NUM_COLUMNS) /
-        (dummyLabelCharHeight * SubtitleOverlay.CEA608_NUM_ROWS);
+      const fontGridSizeRatio = (dummyLabelCharWidth * this.CEA608_NUM_COLUMNS) /
+        (dummyLabelCharHeight * this.CEA608_NUM_ROWS);
       // The size ratio of the available space for the grid
       const subtitleOverlaySizeRatio = subtitleOverlayWidth / subtitleOverlayHeight;
 
       if (subtitleOverlaySizeRatio > fontGridSizeRatio) {
         // When the available space is wider than the text grid, the font size is simply
         // determined by the height of the available space.
-        fontSize = subtitleOverlayHeight / SubtitleOverlay.CEA608_NUM_ROWS;
+        fontSize = subtitleOverlayHeight / this.CEA608_NUM_ROWS;
 
         // Calculate the additional letter spacing required to evenly spread the text across the grid's width
-        const gridSlotWidth = subtitleOverlayWidth / SubtitleOverlay.CEA608_NUM_COLUMNS;
+        const gridSlotWidth = subtitleOverlayWidth / this.CEA608_NUM_COLUMNS;
         const fontCharWidth = fontSize * fontSizeRatio;
         fontLetterSpacing = gridSlotWidth - fontCharWidth;
       } else {
         // When the available space is not wide enough, texts would vertically overlap if we take
         // the height as a base for the font size, so we need to limit the height. We do that
         // by determining the font size by the width of the available space.
-        fontSize = subtitleOverlayWidth / SubtitleOverlay.CEA608_NUM_COLUMNS / fontSizeRatio;
+        fontSize = subtitleOverlayWidth / this.CEA608_NUM_COLUMNS / fontSizeRatio;
         fontLetterSpacing = 0;
       }
 
@@ -325,7 +362,7 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
       }
 
       label.getDomElement().css({
-        'left': `${event.position.column * SubtitleOverlay.CEA608_COLUMN_OFFSET}%`,
+        'left': `${event.position.column * this.CEA608_COLUMN_OFFSET}%`,
         'font-size': `${fontSize}px`,
         'letter-spacing': `${fontLetterSpacing}px`,
       });
@@ -668,6 +705,11 @@ export class SubtitleRegionContainerManager {
     }
 
     this.subtitleRegionContainers = {};
+  }
+
+  updateRegionsHeight(newRowHeight: number) {
+    (document.querySelectorAll(".bmpui-subtitle-region-container") as NodeListOf<HTMLElement>)
+      .forEach((e, _i) => e.style.setProperty("--cea608-row-height", `${newRowHeight}px`));
   }
 }
 
