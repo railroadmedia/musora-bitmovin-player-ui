@@ -154,6 +154,7 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
 
   setFontSizeFactor(factor: number): void {
     // We only allow range from 50% to 200% as suggested by spec
+    // https://www.ecfr.gov/current/title-47/part-79/section-79.103#p-79.103(c)(4)
     this.FONT_SIZE_FACTOR = Math.max(0.5, Math.min(2.0, factor));;
 
     this.recalculateCEAGrid();
