@@ -289,10 +289,9 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
       const subtitleOverlayHeight = overlayElement.height();
 
       // After computing overlay dimensions:
-      const newRowHeight = (subtitleOverlayHeight / this.CEA608_NUM_ROWS) * this.FONT_SIZE_FACTOR;
+      const newRowHeight = subtitleOverlayHeight / this.CEA608_NUM_ROWS;
 
       // Update the CSS custom property on the overlay DOM element
-      overlayElement.css("--cea608-row-height", newRowHeight + "px");
       overlayElement.get().forEach((el) => {
         el.style.setProperty("--cea608-row-height", `${newRowHeight}px`);
       });
@@ -363,11 +362,14 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
         }
       }
 
+      // We disable the grid and wrapping in case enlarged font size is used to prevent
+      // line and characters overflows
+      const isLargerFontSize = this.FONT_SIZE_FACTOR > 1
       label.getDomElement().css({
-        // We disable the grid if the font factor is greater than 1
-        'left': `${this.FONT_SIZE_FACTOR > 1 ? 0 : event.position.column * this.CEA608_COLUMN_OFFSET}%`,
+        'left': `${isLargerFontSize ? 0 : event.position.column * this.CEA608_COLUMN_OFFSET}%`,
         'font-size': `${fontSize}px`,
-        'letter-spacing': `${this.FONT_SIZE_FACTOR > 1 ? 0 : fontLetterSpacing}px`,
+        'letter-spacing': `${isLargerFontSize ? 0 : fontLetterSpacing}px`,
+        'white-space': `${isLargerFontSize ? 'nowrap' : 'normal'}`,
       });
 
       label.regionStyle = `line-height: ${fontSize}px;`;
