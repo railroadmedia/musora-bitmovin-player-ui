@@ -1,7 +1,7 @@
 @use 'sass:math';
 
 .#{$prefix}-ui-subtitle-overlay {
-  --cea608-row-height: calc(100% / 15);
+  --cea608-row-height: math.div(100%, 15);
 
   &.#{$prefix}-cea608 {
 
