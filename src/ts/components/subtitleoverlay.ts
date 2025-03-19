@@ -243,7 +243,6 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
     // Flag telling if the CEA-608 mode is enabled
     let enabled = false;
 
-
     const settingsManager = uimanager.getSubtitleSettingsManager();
 
     settingsManager.fontSize.onChanged.subscribe((_sender, property) => {
