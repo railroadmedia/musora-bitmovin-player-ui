@@ -325,14 +325,9 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
         label.getDomElement().css({
           'font-size': `${fontSize}px`,
           'letter-spacing': `${isLargerFontSize ? 0 : fontLetterSpacing}px`,
+          'white-space': `${isLargerFontSize ? 'nowrap' : 'normal'}`,
+          'left': isLargerFontSize && '0%',
         });
-
-        if (isLargerFontSize) {
-          label.getDomElement().css({
-            'left': '0%',
-            'white-space': 'nowrap',
-          });
-        }
 
         label.regionStyle = `line-height: ${fontSize}px;`;
       }
