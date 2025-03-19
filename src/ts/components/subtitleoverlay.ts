@@ -320,14 +320,32 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
       }
 
       // Update font-size of all active subtitle labels
-      for (let label of this.getComponents()) {
-        if (label instanceof SubtitleLabel) {
-          label.getDomElement().css({
-            'font-size': `${fontSize}px`,
-            'letter-spacing': `${fontLetterSpacing}px`,
-          });
+      const updateLabel = (label: SubtitleLabel) => {
+        const isLargerFontSize = this.FONT_SIZE_FACTOR > 1
+        label.getDomElement().css({
+          'font-size': `${fontSize}px`,
+          'letter-spacing': `${isLargerFontSize ? 0 : fontLetterSpacing}px`,
+        });
 
-          label.regionStyle = `line-height: ${fontSize}px;`;
+        if (isLargerFontSize) {
+          label.getDomElement().css({
+            'left': '0%',
+            'white-space': 'nowrap',
+          });
+        }
+
+        label.regionStyle = `line-height: ${fontSize}px;`;
+      }
+
+      for (let label of this.getComponents()) {
+        if (label instanceof SubtitleRegionContainer) {
+          label.getComponents().forEach((l: SubtitleLabel) => {
+            updateLabel(l);
+          })
+        }
+
+        if (label instanceof SubtitleLabel) {
+          updateLabel(label);
         }
       }
     };
