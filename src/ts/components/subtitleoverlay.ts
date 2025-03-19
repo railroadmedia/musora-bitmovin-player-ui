@@ -296,7 +296,6 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
       overlayElement.get().forEach((el) => {
         el.style.setProperty("--cea608-row-height", `${newRowHeight}px`);
       });
-      this.subtitleContainerManager.updateRegionsHeight(newRowHeight);
 
       // The size ratio of the letter grid
       const fontGridSizeRatio = (dummyLabelCharWidth * this.CEA608_NUM_COLUMNS) /
@@ -711,11 +710,6 @@ export class SubtitleRegionContainerManager {
     }
 
     this.subtitleRegionContainers = {};
-  }
-
-  updateRegionsHeight(newRowHeight: number) {
-    (document.querySelectorAll(".bmpui-subtitle-region-container") as NodeListOf<HTMLElement>)
-      .forEach((e, _i) => e.style.setProperty("--cea608-row-height", `${newRowHeight}px`));
   }
 }
 
