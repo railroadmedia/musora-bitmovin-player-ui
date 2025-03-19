@@ -103,7 +103,8 @@ gulp.task('lint-sass', function() {
   return gulp.src(paths.source.sass)
   .pipe(sassLint({
     rules: {
-      'no-css-comments': 0
+      'no-css-comments': 0,
+      'property-sort-order': 0
     }
   }))
   .pipe(sassLint.format())
