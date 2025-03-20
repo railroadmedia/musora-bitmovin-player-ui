@@ -87,34 +87,30 @@ describe('SubtitleOverlay', () => {
       subtitleOverlay.configure(playerMock, uiInstanceManagerMock);
     });
 
-    it('correctly applies font size factor within allowed range (0.5 to 2.0)', () => {
-      // Set to minimum allowed factor
-      subtitleOverlay.setFontSizeFactor(0.2);
-      expect(subtitleOverlay['FONT_SIZE_FACTOR']).toBe(0.5); // Should be clamped to 0.5
-
-      // Set to maximum allowed factor
-      subtitleOverlay.setFontSizeFactor(3.0);
-      expect(subtitleOverlay['FONT_SIZE_FACTOR']).toBe(2.0); // Should be clamped to 2.0
-
-      // Set a valid value within range
-      subtitleOverlay.setFontSizeFactor(1.5);
-      expect(subtitleOverlay['FONT_SIZE_FACTOR']).toBe(1.5);
+    // Font size factor clamping
+    test.each([
+      [0.2, 0.5],  // Clamped to minimum
+      [3.0, 2.0],  // Clamped to maximum
+      [1.5, 1.5],  // Within range, no clamping
+      [0.5, 0.5],  // Exact minimum
+      [2.0, 2.0],  // Exact maximum
+      [1.0, 1.0],  // Default value
+    ])('setFontSizeFactor(%f) results in FONT_SIZE_FACTOR = %f', (inputFactor, expectedFactor) => {
+      subtitleOverlay.setFontSizeFactor(inputFactor);
+      expect(subtitleOverlay['FONT_SIZE_FACTOR']).toBe(expectedFactor);
     });
 
-    it('recalculates CEA 608 grid values correctly based on font size factor', () => {
-      subtitleOverlay.setFontSizeFactor(1.0);
+    // Grid recalculations
+    test.each([
+      [1.0, 15 / 1.0, 32 / 1.0],  // Standard grid
+      [2.0, 15 / 2.0, 32 / 2.0],  // Larger factor, smaller grid
+      [0.5, 15 / 1.0, 32 / 0.5],  // Factor <1 → rows stay 15, columns grow
+    ])('setFontSizeFactor(%f) recalculates grid: ROWS = %f, COLUMNS = %f', (factor, expectedRows, expectedColumns) => {
+      subtitleOverlay.setFontSizeFactor(factor);
       subtitleOverlay.recalculateCEAGrid();
 
-      expect(subtitleOverlay['CEA608_NUM_ROWS']).toBe(15 / 1.0);
-      expect(subtitleOverlay['CEA608_NUM_COLUMNS']).toBe(32 / 1.0);
-
-      // Test with a different font size factor
-      subtitleOverlay.setFontSizeFactor(2.0);
-      subtitleOverlay.recalculateCEAGrid();
-
-      expect(subtitleOverlay['CEA608_NUM_ROWS']).toBe(15 / 2.0);
-      expect(subtitleOverlay['CEA608_NUM_COLUMNS']).toBe(32 / 2.0);
+      expect(subtitleOverlay['CEA608_NUM_ROWS']).toBe(expectedRows);
+      expect(subtitleOverlay['CEA608_NUM_COLUMNS']).toBe(expectedColumns);
     });
   });
-
 });
