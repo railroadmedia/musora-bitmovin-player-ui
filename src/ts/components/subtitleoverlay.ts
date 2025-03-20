@@ -36,14 +36,16 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
 
   private FONT_SIZE_FACTOR: number = 1;
   // The number of rows in a cea608 grid
-  private CEA608_NUM_ROWS = 15 / Math.max(this.FONT_SIZE_FACTOR, 1);
+  private CEA608_NUM_ROWS = 15;
   // The number of columns in a cea608 grid
-  private CEA608_NUM_COLUMNS = 32 / this.FONT_SIZE_FACTOR;
+  private CEA608_NUM_COLUMNS = 32;
   // The offset in percent for one column (which is also the width of a column)
   private CEA608_COLUMN_OFFSET = 100 / this.CEA608_NUM_COLUMNS;
 
   constructor(config: ContainerConfig = {}) {
     super(config);
+
+    this.recalculateCEAGrid();
 
     this.previewSubtitleActive = false;
     this.previewSubtitle = new SubtitleLabel({ text: i18n.getLocalizer('subtitle.example') });
@@ -161,6 +163,7 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
   }
 
   recalculateCEAGrid() {
+    // Needs to get recalculated in case the font size will change
     this.CEA608_NUM_ROWS = 15 / Math.max(this.FONT_SIZE_FACTOR, 1);
     this.CEA608_NUM_COLUMNS = 32 / this.FONT_SIZE_FACTOR;
     this.CEA608_COLUMN_OFFSET = 100 / this.CEA608_NUM_COLUMNS;
