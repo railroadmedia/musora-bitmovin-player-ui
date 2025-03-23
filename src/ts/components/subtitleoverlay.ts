@@ -327,6 +327,7 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
         const isLargerFontSize = this.FONT_SIZE_FACTOR > 1
         label.getDomElement().css({
           'font-size': `${fontSize}px`,
+          'line-height': `${fontSize}px`,
           'letter-spacing': `${isLargerFontSize ? 0 : fontLetterSpacing}px`,
           'white-space': `${isLargerFontSize ? 'nowrap' : 'normal'}`,
           'left': isLargerFontSize && '0%',
