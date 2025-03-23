@@ -94,7 +94,6 @@ export class SubtitleSettingsPanelPage extends SettingsPanelPage {
     super.configure(player, uimanager);
 
     this.onActive.subscribe(() => {
-      console.log('font size selector show event', this.config);
       this.overlay.enablePreviewSubtitleLabel();
 
       // Dynamically reapply font size filter
