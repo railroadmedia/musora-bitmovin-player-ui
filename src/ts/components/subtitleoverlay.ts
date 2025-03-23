@@ -9,6 +9,7 @@ import { PlayerAPI, SubtitleCueEvent } from 'bitmovin-player';
 import { i18n } from '../localization/i18n';
 import { VttUtils } from '../vttutils';
 import { VTTProperties } from 'bitmovin-player/types/subtitles/vtt/API';
+import { ListItemFilter } from './listselector';
 
 interface SubtitleCropDetectionResult {
   top: boolean;
@@ -41,6 +42,8 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
   private CEA608_NUM_COLUMNS = 32;
   // The offset in percent for one column (which is also the width of a column)
   private CEA608_COLUMN_OFFSET = 100 / this.CEA608_NUM_COLUMNS;
+
+  private cea608Enabled = false;
 
   constructor(config: ContainerConfig = {}) {
     super(config);
@@ -236,6 +239,15 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
     return label;
   }
 
+  filterFontSizeOptions: ListItemFilter = (listItem) => {
+    if (this.cea608Enabled) {
+      const percent = parseInt(listItem.key, 10);
+      return !isNaN(percent) && percent <= 200;
+    }
+
+    return true
+  };
+
   configureCea608Captions(player: PlayerAPI, uimanager: UIInstanceManager): void {
     // The calculated font size
     let fontSize = 0;
@@ -244,7 +256,8 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
     // Flag telling if a font size calculation is required of if the current values are valid
     let fontSizeCalculationRequired = true;
     // Flag telling if the CEA-608 mode is enabled
-    let enabled = false;
+    this.cea608Enabled = false;
+
 
     const settingsManager = uimanager.getSubtitleSettingsManager();
 
@@ -350,7 +363,7 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
     };
 
     player.on(player.exports.PlayerEvent.PlayerResized, () => {
-      if (enabled) {
+      if (this.cea608Enabled) {
         updateCEA608FontSize();
       } else {
         fontSizeCalculationRequired = true;
@@ -364,8 +377,8 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
         return;
       }
 
-      if (!enabled) {
-        enabled = true;
+      if (!this.cea608Enabled) {
+        this.cea608Enabled = true;
         this.getDomElement().addClass(this.prefixCss(SubtitleOverlay.CLASS_CEA_608));
 
         // We conditionally update the font size by this flag here to avoid updating every time a subtitle
@@ -393,7 +406,7 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
 
     const reset = () => {
       this.getDomElement().removeClass(this.prefixCss(SubtitleOverlay.CLASS_CEA_608));
-      enabled = false;
+      this.cea608Enabled = false;
     };
 
     player.on(player.exports.PlayerEvent.CueExit, () => {

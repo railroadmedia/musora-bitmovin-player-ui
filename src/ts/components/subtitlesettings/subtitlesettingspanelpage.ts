@@ -44,11 +44,11 @@ export class SubtitleSettingsPanelPage extends SettingsPanelPage {
     this.overlay = config.overlay;
     this.settingsPanel = config.settingsPanel;
 
-
     this.config = this.mergeConfig(config, {
       components: <Component<ComponentConfig>[]>[
         new SettingsPanelItem(i18n.getLocalizer('settings.subtitles.font.size'), new FontSizeSelectBox({
           overlay: this.overlay,
+          filter: (item) => this.overlay.filterFontSizeOptions(item),
         })),
         new SettingsPanelItem(i18n.getLocalizer('settings.subtitles.font.style'), new FontStyleSelectBox({
           overlay: this.overlay,
@@ -94,7 +94,19 @@ export class SubtitleSettingsPanelPage extends SettingsPanelPage {
     super.configure(player, uimanager);
 
     this.onActive.subscribe(() => {
+      console.log('font size selector show event', this.config);
       this.overlay.enablePreviewSubtitleLabel();
+
+      // Dynamically reapply font size filter
+      const fontSizeComponent = this.getComponents().find((component: any) =>
+        component instanceof SettingsPanelItem &&
+        component.getComponents().some((c) => c instanceof FontSizeSelectBox)
+      ) as SettingsPanelItem;
+
+      if (fontSizeComponent) {
+        const fontSizeSelectBox = fontSizeComponent.getComponents().find(c => c instanceof FontSizeSelectBox) as FontSizeSelectBox;
+        fontSizeSelectBox?.reapplyFilterAndReload();
+      }
     });
 
     this.onInactive.subscribe(() => {
