@@ -312,14 +312,6 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
       const subtitleOverlayWidth = overlayElement.width() - 10;
       const subtitleOverlayHeight = overlayElement.height();
 
-      // After computing overlay dimensions:
-      const newRowHeight = subtitleOverlayHeight / this.CEA608_NUM_ROWS;
-
-      // Update the CSS custom property on the overlay DOM element
-      overlayElement.get().forEach((el) => {
-        el.style.setProperty("--cea608-row-height", `${newRowHeight}px`);
-      });
-
       // The size ratio of the letter grid
       const fontGridSizeRatio = (dummyLabelCharWidth * this.CEA608_NUM_COLUMNS) /
         (dummyLabelCharHeight * this.CEA608_NUM_ROWS);
@@ -342,6 +334,14 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
         fontSize = subtitleOverlayWidth / this.CEA608_NUM_COLUMNS / fontSizeRatio;
         fontLetterSpacing = 0;
       }
+
+      // After computing overlay dimensions:
+      const newRowHeight = fontSize;
+
+      // Update the CSS custom property on the overlay DOM element
+      overlayElement.get().forEach((el) => {
+        el.style.setProperty("--cea608-row-height", `${newRowHeight}px`);
+      });
 
       // Update font-size of all active subtitle labels
       const updateLabel = (label: SubtitleLabel) => {
