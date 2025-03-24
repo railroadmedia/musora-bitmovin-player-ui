@@ -3,6 +3,7 @@ import { UIInstanceManager } from '../../src/ts/uimanager';
 import { DOM } from '../../src/ts/dom';
 import { PlayerEventEmitter } from './PlayerEventEmitter';
 import { UIContainer } from '../../src/ts/components/uicontainer';
+import { SubtitleSettingsManager } from '../../src/ts/components/subtitlesettings/subtitlesettingsmanager';
 
 jest.mock('../../src/ts/dom');
 
@@ -29,6 +30,7 @@ export namespace MockHelper {
     const uiMock = getUiMock();
     const UiInstanceManagerMockClass: jest.Mock<UIInstanceManager> = jest.fn().mockImplementation(() => ({
       onConfigured: getEventDispatcherMock(),
+      getSubtitleSettingsManager: jest.fn().mockReturnValue(new SubtitleSettingsManager()),
       getConfig: jest.fn().mockReturnValue({
         events: {
           onUpdated: getEventDispatcherMock(),

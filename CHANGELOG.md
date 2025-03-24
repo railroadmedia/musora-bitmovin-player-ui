@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+
+### Added
+- Changing font size now also takes an effect in CEA-608 captions with cap from 50% to 200%. Larger than default font size also disables the grid view.
+
 ## [3.88.0] - 2025-02-25
 
 ### Changed

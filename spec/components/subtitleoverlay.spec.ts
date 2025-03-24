@@ -78,4 +78,39 @@ describe('SubtitleOverlay', () => {
       expect(removeLabelSpy).toHaveBeenCalled();
     });
   });
+
+  describe('CEA 608 Font Size Factor', () => {
+    beforeEach(() => {
+      playerMock = MockHelper.getPlayerMock() as jest.Mocked<TestingPlayerAPI>;
+      uiInstanceManagerMock = MockHelper.getUiInstanceManagerMock();
+      subtitleOverlay = new SubtitleOverlay();
+      subtitleOverlay.configure(playerMock, uiInstanceManagerMock);
+    });
+
+    // Font size factor clamping
+    test.each([
+      [0.2, 0.5],  // Clamped to minimum
+      [3.0, 2.0],  // Clamped to maximum
+      [1.5, 1.5],  // Within range, no clamping
+      [0.5, 0.5],  // Exact minimum
+      [2.0, 2.0],  // Exact maximum
+      [1.0, 1.0],  // Default value
+    ])('setFontSizeFactor(%f) results in FONT_SIZE_FACTOR = %f', (inputFactor, expectedFactor) => {
+      subtitleOverlay.setFontSizeFactor(inputFactor);
+      expect(subtitleOverlay['FONT_SIZE_FACTOR']).toBe(expectedFactor);
+    });
+
+    // Grid recalculations
+    test.each([
+      [1.0, 15 / 1.0, 32 / 1.0],  // Standard grid
+      [2.0, 15 / 2.0, 32 / 2.0],  // Larger factor, smaller grid
+      [0.5, 15 / 1.0, 32 / 0.5],  // Factor <1 → rows stay 15, columns grow
+    ])('setFontSizeFactor(%f) recalculates grid: ROWS = %f, COLUMNS = %f', (factor, expectedRows, expectedColumns) => {
+      subtitleOverlay.setFontSizeFactor(factor);
+      subtitleOverlay.recalculateCEAGrid();
+
+      expect(subtitleOverlay['CEA608_NUM_ROWS']).toBe(expectedRows);
+      expect(subtitleOverlay['CEA608_NUM_COLUMNS']).toBe(expectedColumns);
+    });
+  });
 });
