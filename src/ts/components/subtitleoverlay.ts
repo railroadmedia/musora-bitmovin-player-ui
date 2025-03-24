@@ -250,6 +250,10 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
     return true
   };
 
+  resolveFontSizeFactor(value: string): number {
+    return parseInt(value) / 100;;
+  }
+
   configureCea608Captions(player: PlayerAPI, uimanager: UIInstanceManager): void {
     // The calculated font size
     let fontSize = 0;
@@ -262,11 +266,13 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
 
 
     const settingsManager = uimanager.getSubtitleSettingsManager();
+    const fontSizeFactorSettings = this.resolveFontSizeFactor(settingsManager.fontSize.value);
+    this.setFontSizeFactor(fontSizeFactorSettings);
 
     settingsManager.fontSize.onChanged.subscribe((_sender, property) => {
       if (property.isSet()) {
         // We need to convert from percent
-        const factorValue = parseInt(property.value) / 100;
+        const factorValue = this.resolveFontSizeFactor(property.value);
         this.setFontSizeFactor(factorValue);
       } else {
         this.setFontSizeFactor(1);
