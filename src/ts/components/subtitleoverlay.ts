@@ -34,12 +34,14 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
 
   private static readonly CLASS_CONTROLBAR_VISIBLE = 'controlbar-visible';
   private static readonly CLASS_CEA_608 = 'cea608';
+  private static readonly DEFAULT_CEA608_NUM_ROWS = 15;
+  private static readonly DEFAULT_CEA608_NUM_COLUMNS = 32;
 
   private FONT_SIZE_FACTOR: number = 1;
   // The number of rows in a cea608 grid
-  private CEA608_NUM_ROWS = 15;
+  private CEA608_NUM_ROWS = SubtitleOverlay.DEFAULT_CEA608_NUM_ROWS;
   // The number of columns in a cea608 grid
-  private CEA608_NUM_COLUMNS = 32;
+  private CEA608_NUM_COLUMNS = SubtitleOverlay.DEFAULT_CEA608_NUM_COLUMNS;
   // The offset in percent for one column (which is also the width of a column)
   private CEA608_COLUMN_OFFSET = 100 / this.CEA608_NUM_COLUMNS;
 
@@ -167,8 +169,8 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
 
   recalculateCEAGrid() {
     // Needs to get recalculated in case the font size will change
-    this.CEA608_NUM_ROWS = 15 / Math.max(this.FONT_SIZE_FACTOR, 1);
-    this.CEA608_NUM_COLUMNS = 32 / this.FONT_SIZE_FACTOR;
+    this.CEA608_NUM_ROWS = SubtitleOverlay.DEFAULT_CEA608_NUM_ROWS / Math.max(this.FONT_SIZE_FACTOR, 1);
+    this.CEA608_NUM_COLUMNS = SubtitleOverlay.DEFAULT_CEA608_NUM_COLUMNS / this.FONT_SIZE_FACTOR;
     this.CEA608_COLUMN_OFFSET = 100 / this.CEA608_NUM_COLUMNS;
   }
 
