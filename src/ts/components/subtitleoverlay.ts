@@ -217,13 +217,22 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
     }
   }
 
+  resolveColumn(row: number) {
+    if (this.FONT_SIZE_FACTOR > 1 && row > this.CEA608_NUM_ROWS) {
+      const rowDelta = Math.floor(SubtitleOverlay.DEFAULT_CEA608_NUM_ROWS - this.CEA608_NUM_ROWS);
+      return row - rowDelta;
+    }
+
+    return row;
+  }
+
   generateLabel(event: SubtitleCueEvent): SubtitleLabel {
     // Sanitize cue data (must be done before the cue ID is generated in subtitleManager.cueEnter / update)
     let region = event.region;
 
     if (event.position) {
       // Sometimes the positions are undefined, we assume them to be zero
-      event.position.row = event.position.row || 0;
+      event.position.row = this.resolveColumn(event.position.row) || 0;
       event.position.column = event.position.column || 0;
 
       region = region || `cea608-row-${event.position.row}`;
