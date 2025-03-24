@@ -217,7 +217,9 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
     }
   }
 
-  resolveColumn(row: number) {
+  resolveRowNumber(row: number): number {
+    // In case there is a font size factor and the row from event would overflow
+    // we need to apply an offset so it gets rendered to visible area.
     if (this.FONT_SIZE_FACTOR > 1 && row > this.CEA608_NUM_ROWS) {
       const rowDelta = Math.floor(SubtitleOverlay.DEFAULT_CEA608_NUM_ROWS - this.CEA608_NUM_ROWS);
       return row - rowDelta;
@@ -232,7 +234,7 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
 
     if (event.position) {
       // Sometimes the positions are undefined, we assume them to be zero
-      event.position.row = this.resolveColumn(event.position.row) || 0;
+      event.position.row = this.resolveRowNumber(event.position.row) || 0;
       event.position.column = event.position.column || 0;
 
       region = region || `cea608-row-${event.position.row}`;
