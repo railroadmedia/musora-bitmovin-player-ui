@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [3.89.0] - 2025-03-24
 
 ### Added
 - Changing font size now also takes an effect in CEA-608 captions with cap from 50% to 200%. Larger than default font size also disables the grid view.
@@ -1096,6 +1096,7 @@ Version 2.0 of the UI framework is built for player 7.1. If absolutely necessary
 ## 1.0.0 (2017-02-03)
 - First release
 
+[3.89.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.88.0...v3.89.0
 [3.88.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.87.0...v3.88.0
 [3.87.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.86.0...v3.87.0
 [3.86.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.85.0...v3.86.0
