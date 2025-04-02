@@ -106,10 +106,12 @@ describe('SubtitleOverlay', () => {
       [2.0, 15 / 2.0, 32 / 2.0],  // Larger factor, smaller grid
       [0.5, 15 / 1.0, 32 / 0.5],  // Factor <1 → rows stay 15, columns grow
     ])('setFontSizeFactor(%f) recalculates grid: ROWS = %f, COLUMNS = %f', (factor, expectedRows, expectedColumns) => {
+      // We need to floor for whole rows as they are represented in precompiled sass styles
+      const expectedWholeRows = Math.floor(expectedRows)
       subtitleOverlay.setFontSizeFactor(factor);
       subtitleOverlay.recalculateCEAGrid();
 
-      expect(subtitleOverlay['CEA608_NUM_ROWS']).toBe(expectedRows);
+      expect(subtitleOverlay['CEA608_NUM_ROWS']).toBe(expectedWholeRows);
       expect(subtitleOverlay['CEA608_NUM_COLUMNS']).toBe(expectedColumns);
     });
   });

@@ -233,12 +233,12 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
     // Sanitize cue data (must be done before the cue ID is generated in subtitleManager.cueEnter / update)
     let region = event.region;
 
-    // We need to keep track of the original row position in case of recalculation,
-    const originalRowNumber = event.position.row;
+    // Sometimes the positions are undefined, we assume them to be zero.
+    // We need to keep track of the original row position in case of recalculation.
+    const originalRowNumber = event.position?.row || 0;
 
     if (event.position) {
-      // Sometimes the positions are undefined, we assume them to be zero
-      event.position.row = this.resolveRowNumber(originalRowNumber) || 0;
+      event.position.row = this.resolveRowNumber(event.position.row) || 0;
       event.position.column = event.position.column || 0;
 
       region = region || `cea608-row-${event.position.row}`;
