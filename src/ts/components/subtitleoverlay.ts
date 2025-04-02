@@ -274,8 +274,9 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
     const element = (r.getDomElement().get() as HTMLElement[])[0];
     const label = r.getComponents();
 
-    const origLabelCom = Object.values((label as any))
-    const originRow = (origLabelCom[0] as any)?.config.originalRowPosition
+    // TODO Get rid of any to access the label as the .getConfig() does not seem to work.
+    const origLabelCom = Object.values((label as any));
+    const originRow = (origLabelCom[0] as any)?.config.originalRowPosition;
 
     const classList = element?.classList;
 
