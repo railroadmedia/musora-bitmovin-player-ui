@@ -162,14 +162,15 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
   setFontSizeFactor(factor: number): void {
     // We only allow range from 50% to 200% as suggested by spec
     // https://www.ecfr.gov/current/title-47/part-79/section-79.103#p-79.103(c)(4)
-    this.FONT_SIZE_FACTOR = Math.max(0.5, Math.min(2.0, factor));;
+    this.FONT_SIZE_FACTOR = Math.max(0.5, Math.min(2.0, factor));
 
     this.recalculateCEAGrid();
   }
 
   recalculateCEAGrid() {
-    // Needs to get recalculated in case the font size will change
-    this.CEA608_NUM_ROWS = SubtitleOverlay.DEFAULT_CEA608_NUM_ROWS / Math.max(this.FONT_SIZE_FACTOR, 1);
+    // Needs to get recalculated in case the font size will change also we need to floor this
+    // to always align to the whole number represented in styles.
+    this.CEA608_NUM_ROWS = Math.floor(SubtitleOverlay.DEFAULT_CEA608_NUM_ROWS / Math.max(this.FONT_SIZE_FACTOR, 1));
     this.CEA608_NUM_COLUMNS = SubtitleOverlay.DEFAULT_CEA608_NUM_COLUMNS / this.FONT_SIZE_FACTOR;
     this.CEA608_COLUMN_OFFSET = 100 / this.CEA608_NUM_COLUMNS;
   }
@@ -221,7 +222,7 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
     // In case there is a font size factor and the row from event would overflow
     // we need to apply an offset so it gets rendered to visible area.
     if (this.FONT_SIZE_FACTOR > 1 && row > this.CEA608_NUM_ROWS) {
-      const rowDelta = Math.floor(SubtitleOverlay.DEFAULT_CEA608_NUM_ROWS - this.CEA608_NUM_ROWS);
+      const rowDelta = SubtitleOverlay.DEFAULT_CEA608_NUM_ROWS - this.CEA608_NUM_ROWS;
       return row - rowDelta;
     }
 
@@ -232,9 +233,12 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
     // Sanitize cue data (must be done before the cue ID is generated in subtitleManager.cueEnter / update)
     let region = event.region;
 
+    // We need to keep track of the original row position in case of recalculation,
+    const originalRowNumber = event.position.row;
+
     if (event.position) {
       // Sometimes the positions are undefined, we assume them to be zero
-      event.position.row = this.resolveRowNumber(event.position.row) || 0;
+      event.position.row = this.resolveRowNumber(originalRowNumber) || 0;
       event.position.column = event.position.column || 0;
 
       region = region || `cea608-row-${event.position.row}`;
@@ -247,13 +251,14 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
       vtt: event.vtt,
       region: region,
       regionStyle: event.regionStyle,
+      originalRowPosition: originalRowNumber,
     });
 
     return label;
   }
 
   filterFontSizeOptions: ListItemFilter = (listItem) => {
-    if (this.cea608Enabled) {
+    if (this.cea608Enabled && listItem.key !== null) {
       const percent = parseInt(listItem.key, 10);
       return !isNaN(percent) && percent <= 200;
     }
@@ -264,6 +269,30 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
   resolveFontSizeFactor(value: string): number {
     return parseInt(value) / 100;;
   }
+
+  updateRegionRowPosition(r: SubtitleRegionContainer): void {
+    const element = (r.getDomElement().get() as HTMLElement[])[0];
+    const label = r.getComponents();
+
+    const origLabelCom = Object.values((label as any))
+    const originRow = (origLabelCom[0] as any)?.config.originalRowPosition
+
+    const classList = element?.classList;
+
+    if (!classList) return;
+
+    const currentClass = Array.from(classList).find(cls => /subtitle-position-cea608-row-\d+/.test(cls));
+    if (!currentClass) return;
+
+    const match = currentClass.match(/subtitle-position-cea608-row-(\d+)/);
+    const rowNumber = match ? parseInt(match[1], 10) : null;
+
+    const newRowNum = this.resolveRowNumber(originRow ?? rowNumber);
+    const newClass = currentClass.replace(/subtitle-position-cea608-row-\d+/, `subtitle-position-cea608-row-${newRowNum}`);
+
+    classList.remove(currentClass);
+    classList.add(newClass);
+  };
 
   configureCea608Captions(player: PlayerAPI, uimanager: UIInstanceManager): void {
     // The calculated font size
@@ -348,6 +377,14 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
 
       // After computing overlay dimensions:
       const newRowHeight = fontSize;
+
+      // Update row position of regions
+      const regions = this.getComponents();
+      regions.forEach(r => {
+        if (r instanceof SubtitleRegionContainer) {
+          this.updateRegionRowPosition(r);
+        }
+      });
 
       // Update the CSS custom property on the overlay DOM element
       overlayElement.get().forEach((el) => {
@@ -472,6 +509,7 @@ interface SubtitleLabelConfig extends LabelConfig {
   vtt?: VTTProperties;
   region?: string;
   regionStyle?: string;
+  originalRowPosition?: number;
 }
 
 export class SubtitleLabel extends Label<SubtitleLabelConfig> {
@@ -496,8 +534,16 @@ export class SubtitleLabel extends Label<SubtitleLabelConfig> {
     return this.config.regionStyle;
   }
 
+  get originalRowPosition(): number {
+    return this.config.originalRowPosition;
+  }
+
   set regionStyle(style: string) {
     this.config.regionStyle = style;
+  }
+
+  set originalRowPosition(row: number) {
+    this.config.originalRowPosition = row;
   }
 }
 
