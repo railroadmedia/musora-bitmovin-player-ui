@@ -71,6 +71,6 @@
   "seekBar.value": "Waarde",
   "seekBar.timeshift": "Tijdverschuiving",
   "seekBar.durationText": "van",
-  "quickseek.forward": "Vooruitspoelen",
-  "quickseek.rewind": "Terugspoelen"
+  "quickseek.forward": "{seekSeconds} seconden vooruitspoelen",
+  "quickseek.rewind": "{seekSeconds} seconden terugspoelen"
 }
