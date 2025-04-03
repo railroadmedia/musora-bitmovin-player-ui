@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+- Setting larger font size while using CEA-608 captions can shift some cues outside of visible area.
+
 ## [3.89.0] - 2025-03-24
 
 ### Added
