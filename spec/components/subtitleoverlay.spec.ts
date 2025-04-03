@@ -1,6 +1,6 @@
 import { MockHelper, TestingPlayerAPI } from '../helper/MockHelper';
 import { UIInstanceManager } from '../../src/ts/uimanager';
-import { SubtitleOverlay, SubtitleRegionContainerManager } from '../../src/ts/components/subtitleoverlay';
+import { SubtitleOverlay, SubtitleRegionContainer, SubtitleRegionContainerManager } from '../../src/ts/components/subtitleoverlay';
 import { DOM } from '../../src/ts/dom';
 
 let playerMock: jest.Mocked<TestingPlayerAPI>;
@@ -114,5 +114,44 @@ describe('SubtitleOverlay', () => {
       expect(subtitleOverlay['CEA608_NUM_ROWS']).toBe(expectedWholeRows);
       expect(subtitleOverlay['CEA608_NUM_COLUMNS']).toBe(expectedColumns);
     });
+
+    test.each([
+      [1.0, 5, 5, 5],         // Factor 1.0: grid remains 15 rows; row 5 remains unchanged.
+      [1.0, 14, 14, 14],      // Factor 1.0: grid remains 15 rows; row 14 remains unchanged.
+      [2.0, 14, 14, 6],       // Factor 2.0: grid becomes floor(15/2)=7 rows; rowDelta = 15-7=8; 14-8=6.
+      [1.5, 12, 12, 7],       // Factor 1.5: grid becomes floor(15/1.5)=10 rows; 12 > 10 so rowDelta=15-10=5; 12-5=7.
+      [1.5, 8, 8, 8],         // Factor 1.5: grid becomes 10 rows; 8 <= 10 so no clamping.
+      [2.0, 14, undefined, 6] // If no originalRow provided, falls back to initial row (14) and is clamped to 6.
+    ])(
+      'with fontSizeFactor=%f, initialRow=%d, labelOriginalRow=%s, expected new row=%d',
+      (fontSizeFactor, initialRow, labelOriginalRow, expectedRow) => {
+        const element = document.createElement('div');
+        const initialClass = `subtitle-position-cea608-row-${initialRow}`;
+        element.classList.add(initialClass);
+
+        const label = {
+          getConfig: () =>
+            labelOriginalRow !== undefined
+              ? { originalRowPosition: labelOriginalRow }
+              : {}
+        };
+
+        const regionContainer = {
+          getDomElement: jest.fn(() => ({ get: () => [element] })),
+          getComponents: jest.fn(() => [label]),
+        } as unknown as SubtitleRegionContainer;
+
+        subtitleOverlay.setFontSizeFactor(fontSizeFactor);
+        subtitleOverlay.updateRegionRowPosition(regionContainer);
+
+        const expectedClass = `subtitle-position-cea608-row-${expectedRow}`;
+        expect(element.classList.contains(expectedClass)).toBe(true);
+
+        // If the new class differs from the original, ensure the original is removed.
+        if (expectedClass !== initialClass) {
+          expect(element.classList.contains(initialClass)).toBe(false);
+        }
+      }
+    );
   });
 });
