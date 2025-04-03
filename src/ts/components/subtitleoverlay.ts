@@ -271,29 +271,31 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
   }
 
   updateRegionRowPosition(r: SubtitleRegionContainer): void {
-    const element = (r.getDomElement().get() as HTMLElement[])[0];
-    const label = r.getComponents();
+    const element = r.getDomElement().get()[0];
+    const label = r.getComponents()[0];
 
-    // TODO Get rid of any to access the label as the .getConfig() does not seem to work.
-    const origLabelCom = Object.values((label as any));
-    const originRow = (origLabelCom[0] as any)?.config.originalRowPosition;
+    if (!element || !label) {
+      return;
+    }
 
-    const classList = element?.classList;
+    const rowClassList = element.classList;
+    const originalRow = (label.getConfig() as SubtitleLabelConfig)?.originalRowPosition;
+    const rowClassRegex = /subtitle-position-cea608-row-(\d+)/;
 
-    if (!classList) return;
+    const currentClass = Array.from(rowClassList).find(cls => rowClassRegex.test(cls));
 
-    const currentClass = Array.from(classList).find(cls => /subtitle-position-cea608-row-\d+/.test(cls));
-    if (!currentClass) return;
+    if (!currentClass) {
+      return;
+    }
 
-    const match = currentClass.match(/subtitle-position-cea608-row-(\d+)/);
+    const match = rowClassRegex.exec(currentClass);
     const rowNumber = match ? parseInt(match[1], 10) : null;
+    const newRowNum = this.resolveRowNumber(originalRow ?? rowNumber);
+    const newClass = currentClass.replace(rowClassRegex, `subtitle-position-cea608-row-${newRowNum}`);
 
-    const newRowNum = this.resolveRowNumber(originRow ?? rowNumber);
-    const newClass = currentClass.replace(/subtitle-position-cea608-row-\d+/, `subtitle-position-cea608-row-${newRowNum}`);
+    rowClassList.replace(currentClass, newClass);
+  }
 
-    classList.remove(currentClass);
-    classList.add(newClass);
-  };
 
   configureCea608Captions(player: PlayerAPI, uimanager: UIInstanceManager): void {
     // The calculated font size
