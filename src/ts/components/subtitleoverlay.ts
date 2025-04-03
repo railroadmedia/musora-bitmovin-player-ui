@@ -171,7 +171,7 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
     // Needs to get recalculated in case the font size will change also we need to floor this
     // to always align to the whole number represented in styles.
     this.CEA608_NUM_ROWS = Math.floor(SubtitleOverlay.DEFAULT_CEA608_NUM_ROWS / Math.max(this.FONT_SIZE_FACTOR, 1));
-    this.CEA608_NUM_COLUMNS = SubtitleOverlay.DEFAULT_CEA608_NUM_COLUMNS / this.FONT_SIZE_FACTOR;
+    this.CEA608_NUM_COLUMNS = Math.floor(SubtitleOverlay.DEFAULT_CEA608_NUM_COLUMNS / this.FONT_SIZE_FACTOR);
     this.CEA608_COLUMN_OFFSET = 100 / this.CEA608_NUM_COLUMNS;
   }
 
