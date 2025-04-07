@@ -60,6 +60,13 @@ export interface SeekBarConfig extends ComponentConfig {
    * Used to enable/disable seek preview
    */
   enableSeekPreview?: boolean;
+
+  /**
+   * Enables a fallback mode for handling ARIA details of the seekbar for platforms that don't support the 
+   * `aria-valuetext` attribute, such as Samsung Tizen. In this mode, the `aria-label` attribute is used in addition
+   * to provide the current time.
+   */
+  ariaFallbackMode?: boolean;
 }
 
 /**
@@ -189,12 +196,22 @@ export class SeekBar extends Component<SeekBarConfig> {
   private setAriaSliderValues() {
     if (this.seekBarType === SeekBarType.Live) {
       const timeshiftValue = Math.ceil(this.player.getTimeShift()).toString();
+      const timeShiftText = `${i18n.performLocalization(i18n.getLocalizer('seekBar.timeshift'))} ${i18n.performLocalization(i18n.getLocalizer('seekBar.value'))}: ${timeshiftValue}`;
+
       this.getDomElement().attr('aria-valuenow', timeshiftValue);
-      this.getDomElement().attr('aria-valuetext', `${i18n.performLocalization(i18n.getLocalizer('seekBar.timeshift'))} ${i18n.performLocalization(i18n.getLocalizer('seekBar.value'))}: ${timeshiftValue}`);
+      this.getDomElement().attr('aria-valuetext', timeShiftText);
+
+      if (this.config.ariaFallbackMode) {
+        this.getDomElement().attr('aria-label', `${i18n.performLocalization(this.config.ariaLabel)}: ${timeShiftText}`);
+      }
     } else if (this.seekBarType === SeekBarType.Vod) {
-      const ariaValueText = `${StringUtils.secondsToText(this.player.getCurrentTime())} ${i18n.performLocalization(i18n.getLocalizer('seekBar.durationText'))} ${StringUtils.secondsToText(this.player.getDuration())}`;
+      const ariaValueText = `${StringUtils.secondsToText(this.player.getCurrentTime(), false)} ${i18n.performLocalization(i18n.getLocalizer('seekBar.durationText'))} ${StringUtils.secondsToText(this.player.getDuration(), false)}`;
       this.getDomElement().attr('aria-valuenow', Math.floor(this.player.getCurrentTime()).toString());
       this.getDomElement().attr('aria-valuetext', ariaValueText);
+
+      if (this.config.ariaFallbackMode) {
+        this.getDomElement().attr('aria-label', `${i18n.performLocalization(this.config.ariaLabel)}: ${StringUtils.secondsToText(this.player.getCurrentTime(), false)}`);
+      }
     }
   }
 

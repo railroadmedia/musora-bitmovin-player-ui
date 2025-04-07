@@ -36,7 +36,7 @@ export namespace StringUtils {
         .replace('ss', leftPadWithZeros(seconds, 2));
   }
 
-  export function secondsToText(totalSeconds: number): string {
+  export function secondsToText(totalSeconds: number, shouldLeftPadNumbers = true): string {
     const isNegative = totalSeconds < 0;
 
     if (isNegative) {
@@ -50,10 +50,12 @@ export namespace StringUtils {
     const minutes = Math.floor(totalSeconds / 60) - hours * 60;
     const seconds = Math.floor(totalSeconds) % 60;
 
+    const padLength = shouldLeftPadNumbers ? 2 : 0;
+
     return (isNegative ? '-' : '') +
-    (hours !== 0 ? `${leftPadWithZeros(hours, 2)} ${i18n.performLocalization(i18n.getLocalizer('settings.time.hours'))} ` : '') +
-    (minutes !== 0 ? `${leftPadWithZeros(minutes, 2)} ${i18n.performLocalization(i18n.getLocalizer('settings.time.minutes'))} ` : '') +
-    `${leftPadWithZeros(seconds, 2)} ${i18n.performLocalization(i18n.getLocalizer('settings.time.seconds'))}`;
+    (hours !== 0 ? `${leftPadWithZeros(hours, padLength)} ${i18n.performLocalization(i18n.getLocalizer('settings.time.hours'))} ` : '') +
+    (minutes !== 0 ? `${leftPadWithZeros(minutes, padLength)} ${i18n.performLocalization(i18n.getLocalizer('settings.time.minutes'))} ` : '') +
+    `${leftPadWithZeros(seconds, padLength)} ${i18n.performLocalization(i18n.getLocalizer('settings.time.seconds'))}`;
   }
 
   /**
