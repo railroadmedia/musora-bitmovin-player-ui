@@ -137,23 +137,31 @@ export class ErrorMessageOverlay extends Container<ErrorMessageOverlayConfig> {
 
     player.on(player.exports.PlayerEvent.SourceLoaded, (event: PlayerEventBase) => {
       if (this.isShown()) {
-        this.tvNoiseBackground.stop();
-        this.hide();
+        this.clear();
       }
     });
   }
 
   display(errorMessage: string): void {
     this.errorLabel.setText(errorMessage);
+    this.getDomElement().attr('aria-label', errorMessage);
     this.tvNoiseBackground.start();
     this.show();
+  }
+
+  private clear(): void {
+    this.errorLabel.setText('');
+    this.getDomElement().removeAttr('aria-label');
+
+    // Canvas rendering must be explicitly stopped, else it just continues forever and hogs resources
+    this.tvNoiseBackground.stop();
+    this.hide();
   }
 
   release(): void {
     super.release();
 
-    // Canvas rendering must be explicitly stopped, else it just continues forever and hogs resources
-    this.tvNoiseBackground.stop();
+    this.clear();
   }
 }
 
