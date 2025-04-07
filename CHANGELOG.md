@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - The `aria-pressed` attribute is not set if both, `onAriaLabel` and `offAriaLabel`, configuration properties are set for a specific component
 - The `aria-label` for Quickseek buttons contain now also the number of seconds the button seeks
 
+## [3.90.0] - 2025-04-03
+
+### Fixed
+- Setting larger font size while using CEA-608 captions can shift some cues outside of visible area.
+
 ## [3.89.0] - 2025-03-24
 
 ### Added
@@ -1107,6 +1112,7 @@ Version 2.0 of the UI framework is built for player 7.1. If absolutely necessary
 ## 1.0.0 (2017-02-03)
 - First release
 
+[3.90.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.89.0...v3.90.0
 [3.89.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.88.0...v3.89.0
 [3.88.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.87.0...v3.88.0
 [3.87.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.86.0...v3.87.0
