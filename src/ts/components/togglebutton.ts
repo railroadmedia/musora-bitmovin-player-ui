@@ -94,6 +94,8 @@ export class ToggleButton<Config extends ToggleButtonConfig> extends Button<Conf
        * label instead. This option will be used if both, `onAriaLabel` and `offAriaLabel` are set.
        */
       this.setAriaAttr('pressed', 'false');
+    } else {
+      this.setAriaLabel(this.config.offAriaLabel);
     }
   }
 
