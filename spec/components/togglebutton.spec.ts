@@ -23,9 +23,11 @@ describe('ToggleButton', () => {
   describe('aria label', () => {
     it('should set on label when toggle state is on', () => {
       const onLocalizer = () => 'on';
+      const offLocalizer = () => 'off';
 
       const config: ToggleButtonConfig = {
         onAriaLabel: onLocalizer,
+        offAriaLabel: offLocalizer,
       };
 
       toggleButton = new ToggleButton(config);
@@ -36,9 +38,11 @@ describe('ToggleButton', () => {
 
     it('should set on label when toggle state is on (string label)', () => {
       const onLocalizer = 'on';
+      const offLocalizer = 'off';
 
       const config: ToggleButtonConfig = {
         onAriaLabel: onLocalizer,
+        offAriaLabel: offLocalizer,
       };
 
       toggleButton = new ToggleButton(config);
@@ -48,9 +52,11 @@ describe('ToggleButton', () => {
     });
 
     it('should set off label when toggle state is off', () => {
+      const onLocalizer = () => 'on';
       const offLocalizer = () => 'off';
 
       const config: ToggleButtonConfig = {
+        onAriaLabel: onLocalizer,
         offAriaLabel: offLocalizer,
       };
 
@@ -62,9 +68,11 @@ describe('ToggleButton', () => {
     });
 
     it('should set off label when toggle state is off (string label)', () => {
+      const onLocalizer = 'on';
       const offLocalizer = 'off';
 
       const config: ToggleButtonConfig = {
+        onAriaLabel: onLocalizer,
         offAriaLabel: offLocalizer,
       };
 
@@ -73,6 +81,62 @@ describe('ToggleButton', () => {
       toggleButton.off();
 
       expect(mockDomElement.attr).toHaveBeenCalledWith('aria-label', 'off');
+    });
+  });
+
+  describe('aria pressed', () => {
+    it('should set pressed to true when toggle state is on', () => {
+      const onLocalizer = () => 'on';
+
+      const config: ToggleButtonConfig = {
+        ariaLabel: onLocalizer,
+      };
+
+      toggleButton = new ToggleButton(config);
+      toggleButton.on();
+
+      expect(mockDomElement.attr).toHaveBeenCalledWith('aria-pressed', 'true');
+    });
+
+    it('should set pressed to true when toggle state is on (string label)', () => {
+      const onLocalizer = 'on';
+
+      const config: ToggleButtonConfig = {
+        ariaLabel: onLocalizer,
+      };
+
+      toggleButton = new ToggleButton(config);
+      toggleButton.on();
+
+      expect(mockDomElement.attr).toHaveBeenCalledWith('aria-pressed', 'true');
+    });
+
+    it('should set pressed to false when toggle state is off', () => {
+      const onLocalizer = () => 'on';
+
+      const config: ToggleButtonConfig = {
+        ariaLabel: onLocalizer,
+      };
+
+      toggleButton = new ToggleButton(config);
+      toggleButton.on();
+      toggleButton.off();
+
+      expect(mockDomElement.attr).toHaveBeenCalledWith('aria-pressed', 'false');
+    });
+
+    it('should set pressed to false when toggle state is off (string label)', () => {
+      const onLocalizer = 'on';
+
+      const config: ToggleButtonConfig = {
+        ariaLabel: onLocalizer,
+      };
+
+      toggleButton = new ToggleButton(config);
+      toggleButton.on();
+      toggleButton.off();
+
+      expect(mockDomElement.attr).toHaveBeenCalledWith('aria-pressed', 'false');
     });
   });
 });
