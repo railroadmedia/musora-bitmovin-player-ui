@@ -75,6 +75,8 @@ export class ToggleButton<Config extends ToggleButtonConfig> extends Button<Conf
     }
 
     this.config = this.mergeConfig(config, defaultConfig as Config, this.config);
+
+    this.useAriaPressedAttributeAsToggleIndicator = !this.config.onAriaLabel || !this.config.offAriaLabel;
   }
 
   configure(player: PlayerAPI, uimanager: UIInstanceManager): void {
