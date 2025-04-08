@@ -25,7 +25,19 @@
   ],
   "lint-staged": {
     "*.ts": [
-      "eslint --fix"
+      "prettier --write"
+    ],
+    "*.json": [
+      "prettier --write"
+    ],
+    "*.scss": [
+      "prettier --write"
+    ],
+    "*.html": [
+      "prettier --write"
+    ],
+    "*.md": [
+      "prettier --write"
     ]
   },
   "devDependencies": {
