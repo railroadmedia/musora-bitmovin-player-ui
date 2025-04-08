@@ -100,6 +100,7 @@ export class ErrorMessageOverlay extends Container<ErrorMessageOverlayConfig> {
       cssClass: 'ui-errormessage-overlay',
       components: [this.tvNoiseBackground, this.errorLabel],
       hidden: true,
+      role: 'status',
     }, this.config);
   }
 
@@ -144,14 +145,12 @@ export class ErrorMessageOverlay extends Container<ErrorMessageOverlayConfig> {
 
   display(errorMessage: string): void {
     this.errorLabel.setText(errorMessage);
-    this.getDomElement().attr('aria-label', errorMessage);
     this.tvNoiseBackground.start();
     this.show();
   }
 
   private clear(): void {
     this.errorLabel.setText('');
-    this.getDomElement().removeAttr('aria-label');
 
     // Canvas rendering must be explicitly stopped, else it just continues forever and hogs resources
     this.tvNoiseBackground.stop();
