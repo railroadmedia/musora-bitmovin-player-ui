@@ -87,7 +87,7 @@ export class NavigationGroup {
     }
   };
 
-  protected defaultActionHandler = (action: Action): void => {
+  protected defaultActionHandler(action: Action): void {
     switch (action) {
       case Action.SELECT:
         this.activeElement.click();
@@ -96,7 +96,7 @@ export class NavigationGroup {
         this.container.hide();
         break;
     }
-  };
+  }
 
   private handleInput = <T>(data: T, defaultHandler: (data: T) => void, userHandler?: Callback<T>): void => {
     let handleDefault = true;
@@ -114,7 +114,7 @@ export class NavigationGroup {
    *
    * @param direction The direction of the navigation event
    */
-  public handleNavigation = (direction: Direction): void => {
+  public handleNavigation(direction: Direction): void {
     if (!this.activeElement) {
       // If we do not have an active element, the active element has been disabled by a mouseleave
       // event. We should continue the navigation at the exact place where we left off.
@@ -127,16 +127,20 @@ export class NavigationGroup {
     }
 
     this.handleInput(direction, this.defaultNavigationHandler, this.onNavigation);
-  };
+  }
 
   /**
    * Handles an action event.
    *
    * @param action The action of the event
    */
-  public handleAction = (action: Action): void => {
-    this.handleInput(action, this.defaultActionHandler, this.onAction);
-  };
+  public handleAction(action: Action): void {
+    this.handleInput(
+      action,
+      data => this.defaultActionHandler(data),
+      (data, target, preventDefault) => this.onAction?.(data, target, preventDefault),
+    );
+  }
 
   /**
    * Disable navigation group

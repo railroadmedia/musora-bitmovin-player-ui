@@ -28,14 +28,14 @@ export class ListNavigationGroup extends NavigationGroup {
     }
   }
 
-  public handleAction(action: Action): void {
+  public handleAction = (action: Action): void => {
     super.handleAction(action);
 
     if (action === Action.SELECT) {
       // close the container when a list entry is selected
       this.handleAction(Action.BACK);
     }
-  }
+  };
 
   public handleNavigation(direction: Direction): void {
     super.handleNavigation(direction);
