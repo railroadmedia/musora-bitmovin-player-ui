@@ -23,7 +23,10 @@ export class NavigationGroup {
   private removeElementHoverEventListeners = () => {};
   private readonly eventSubscriber: NodeEventSubscriber;
 
-  constructor(public readonly container: Container<unknown>, ...components: Component<unknown>[]) {
+  constructor(
+    public readonly container: Container<unknown>,
+    ...components: Component<unknown>[]
+  ) {
     this.components = components;
     this.eventSubscriber = new NodeEventSubscriber();
   }
@@ -72,7 +75,7 @@ export class NavigationGroup {
     }
   }
 
-  protected defaultNavigationHandler(direction: Direction): void {
+  protected defaultNavigationHandler = (direction: Direction): void => {
     const targetElement = getElementInDirection(
       this.activeElement,
       getHtmlElementsFromComponents(this.components),
@@ -82,20 +85,20 @@ export class NavigationGroup {
     if (targetElement) {
       this.focusElement(targetElement);
     }
-  }
+  };
 
-  protected defaultActionHandler(action: Action): void {
+  protected defaultActionHandler = (action: Action): void => {
     switch (action) {
-      case(Action.SELECT):
+      case Action.SELECT:
         this.activeElement.click();
         break;
-      case(Action.BACK):
+      case Action.BACK:
         this.container.hide();
         break;
     }
-  }
+  };
 
-  private handleInput<T>(data: T, defaultHandler: (data: T) => void, userHandler?: Callback<T>): void {
+  private handleInput = <T>(data: T, defaultHandler: (data: T) => void, userHandler?: Callback<T>): void => {
     let handleDefault = true;
     const preventDefault = () => (handleDefault = false);
 
@@ -104,14 +107,14 @@ export class NavigationGroup {
     if (handleDefault) {
       defaultHandler.call(this, data);
     }
-  }
+  };
 
   /**
    * Handles a navigation event.
    *
    * @param direction The direction of the navigation event
    */
-  public handleNavigation(direction: Direction): void {
+  public handleNavigation = (direction: Direction): void => {
     if (!this.activeElement) {
       // If we do not have an active element, the active element has been disabled by a mouseleave
       // event. We should continue the navigation at the exact place where we left off.
@@ -123,19 +126,17 @@ export class NavigationGroup {
       return;
     }
 
-    // eslint-disable-next-line @typescript-eslint/unbound-method
     this.handleInput(direction, this.defaultNavigationHandler, this.onNavigation);
-  }
+  };
 
   /**
    * Handles an action event.
    *
    * @param action The action of the event
    */
-  public handleAction(action: Action): void {
-    // eslint-disable-next-line @typescript-eslint/unbound-method
+  public handleAction = (action: Action): void => {
     this.handleInput(action, this.defaultActionHandler, this.onAction);
-  }
+  };
 
   /**
    * Disable navigation group

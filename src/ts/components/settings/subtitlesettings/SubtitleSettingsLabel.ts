@@ -1,6 +1,6 @@
 import { Label, LabelConfig } from '../../labels/Label';
-import {Container, ContainerConfig} from '../../Container';
-import {SettingsPanelPageOpenButton} from '../SettingsPanelPageOpenButton';
+import { Container, ContainerConfig } from '../../Container';
+import { SettingsPanelPageOpenButton } from '../SettingsPanelPageOpenButton';
 import { LocalizableText } from '../../../localization/i18n';
 
 /**
@@ -14,7 +14,6 @@ export interface SubtitleSettingsLabelConfig extends LabelConfig {
  * @category Components
  */
 export class SubtitleSettingsLabel extends Container<ContainerConfig> {
-
   readonly opener: SettingsPanelPageOpenButton;
 
   readonly text: LocalizableText;
@@ -28,12 +27,13 @@ export class SubtitleSettingsLabel extends Container<ContainerConfig> {
     this.text = config.text;
     this.for = config.for;
 
-    this.config = this.mergeConfig(<ContainerConfig>config, {
-      components: [
-        new Label({ text: this.text, for: this.for } as LabelConfig),
-        this.opener,
-      ],
-      cssClass: 'ui-subtitle-settings-label',
-    }, this.config);
+    this.config = this.mergeConfig(
+      <ContainerConfig>config,
+      {
+        components: [new Label({ text: this.text, for: this.for } as LabelConfig), this.opener],
+        cssClass: 'ui-subtitle-settings-label',
+      },
+      this.config,
+    );
   }
 }

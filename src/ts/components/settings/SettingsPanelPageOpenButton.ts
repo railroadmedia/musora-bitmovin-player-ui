@@ -1,5 +1,5 @@
-import {UIInstanceManager} from '../../UIManager';
-import {SettingsPanelPageNavigatorButton, SettingsPanelPageNavigatorConfig} from './SettingsPanelPageNavigatorButton';
+import { UIInstanceManager } from '../../UIManager';
+import { SettingsPanelPageNavigatorButton, SettingsPanelPageNavigatorConfig } from './SettingsPanelPageNavigatorButton';
 import { PlayerAPI } from 'bitmovin-player';
 import { i18n } from '../../localization/i18n';
 
@@ -10,11 +10,15 @@ export class SettingsPanelPageOpenButton extends SettingsPanelPageNavigatorButto
   constructor(config: SettingsPanelPageNavigatorConfig) {
     super(config);
 
-    this.config = this.mergeConfig(config, {
-      cssClass: 'ui-settingspanelpageopenbutton',
-      text: i18n.getLocalizer('open'),
-      role: 'menuitem',
-    } as SettingsPanelPageNavigatorConfig, this.config);
+    this.config = this.mergeConfig(
+      config,
+      {
+        cssClass: 'ui-settingspanelpageopenbutton',
+        text: i18n.getLocalizer('open'),
+        role: 'menuitem',
+      } as SettingsPanelPageNavigatorConfig,
+      this.config,
+    );
   }
 
   configure(player: PlayerAPI, uimanager: UIInstanceManager): void {

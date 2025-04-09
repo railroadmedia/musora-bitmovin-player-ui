@@ -1,7 +1,7 @@
 import { RootNavigationGroup } from './RootNavigationGroup';
 import { NodeEventSubscriber } from './NodeEventSubscriber';
 import { Action, Direction } from './types';
-import {getBoundingRectFromElement} from './NavigationAlgorithm';
+import { getBoundingRectFromElement } from './NavigationAlgorithm';
 
 const DefaultScrubSpeedPercentage = 0.005;
 const ScrubSpeedClearInterval = 100;
@@ -12,7 +12,7 @@ const ScrubSpeedMultiplier = 1.1;
  * scrubbing tooltip is shown as if the user scrubbed using the mouse/touchscreen.
  */
 export class SeekBarHandler {
-  private readonly cursorPosition = { x: 0, y: 0};
+  private readonly cursorPosition = { x: 0, y: 0 };
   private readonly eventSubscriber: NodeEventSubscriber;
   private isScrubbing = false;
   private scrubSpeedResetTimeout: number;
@@ -28,7 +28,8 @@ export class SeekBarHandler {
     clearTimeout(this.scrubSpeedResetTimeout);
     this.scrubSpeedPercentage *= ScrubSpeedMultiplier;
     this.scrubSpeedResetTimeout = window.setTimeout(
-      () => this.scrubSpeedPercentage = DefaultScrubSpeedPercentage, ScrubSpeedClearInterval,
+      () => (this.scrubSpeedPercentage = DefaultScrubSpeedPercentage),
+      ScrubSpeedClearInterval,
     );
   }
 
@@ -54,8 +55,7 @@ export class SeekBarHandler {
     const playbackPositionMarker = getPlaybackPositionMarker(seekBarWrapper);
     const rect = getBoundingRectFromElement(playbackPositionMarker);
 
-
-    const startX = rect.x + (rect.width / 2);
+    const startX = rect.x + rect.width / 2;
     const startY = rect.y;
 
     this.cursorPosition.x = startX;

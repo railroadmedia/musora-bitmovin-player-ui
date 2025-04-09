@@ -57,15 +57,17 @@ export class DynamicSettingsPanelItem extends InteractiveSettingsPanelItem<Dynam
       cssClasses: ['ui-label-setting-selected-option'],
     });
 
-    this.config = this.mergeConfig(config, {
-      components: [
-        this.selectedOptionLabel,
-      ],
-      cssClass: 'ui-settings-panel-item',
-      role: 'menuitem',
-      addSettingAsComponent: false,
-      tabIndex: 0,
-    }, this.config);
+    this.config = this.mergeConfig(
+      config,
+      {
+        components: [this.selectedOptionLabel],
+        cssClass: 'ui-settings-panel-item',
+        role: 'menuitem',
+        addSettingAsComponent: false,
+        tabIndex: 0,
+      },
+      this.config,
+    );
   }
 
   configure(player: PlayerAPI, uimanager: UIInstanceManager): void {
@@ -93,7 +95,8 @@ export class DynamicSettingsPanelItem extends InteractiveSettingsPanelItem<Dynam
       let selectedOptionLabelText = selectedItem.label;
       if (this.settingComponent instanceof SubtitleSelectBox) {
         let availableSettings = this.settingComponent.getItems().length;
-        selectedOptionLabelText = i18n.performLocalization(selectedOptionLabelText) + ' (' + (availableSettings - 1) + ')';
+        selectedOptionLabelText =
+          i18n.performLocalization(selectedOptionLabelText) + ' (' + (availableSettings - 1) + ')';
       }
       this.selectedOptionLabel.setText(selectedOptionLabelText);
     };
@@ -124,7 +127,7 @@ export class DynamicSettingsPanelItem extends InteractiveSettingsPanelItem<Dynam
     page.addComponent(backSettingsPanelItem);
 
     menuOptions
-      .map((option) => {
+      .map(option => {
         return new SettingsPanelSelectOption({
           label: option.label,
           settingComponent: this.settingComponent,
@@ -132,7 +135,7 @@ export class DynamicSettingsPanelItem extends InteractiveSettingsPanelItem<Dynam
           addSettingAsComponent: false,
         });
       })
-      .forEach((selectOption) => {
+      .forEach(selectOption => {
         selectOption.configure(this.player, this.uimanager);
         page.addComponent(selectOption);
       });

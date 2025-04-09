@@ -33,10 +33,7 @@ describe('getHtmlElementsFromComponents', () => {
       document.createElement('div'),
       document.createElement('div'),
     ];
-    const componentElements = [
-      document.createElement('button'),
-      document.createElement('button'),
-    ];
+    const componentElements = [document.createElement('button'), document.createElement('button')];
     const expectedHtmlElements = [componentElements[0], ...listBoxEntries];
 
     const container = createContainerMock(

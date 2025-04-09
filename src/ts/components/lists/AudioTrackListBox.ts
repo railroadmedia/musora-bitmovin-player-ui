@@ -1,6 +1,6 @@
-import {ListBox} from './ListBox';
-import {UIInstanceManager} from '../../UIManager';
-import {AudioTrackSwitchHandler} from '../../utils/AudioTrackUtils';
+import { ListBox } from './ListBox';
+import { UIInstanceManager } from '../../UIManager';
+import { AudioTrackSwitchHandler } from '../../utils/AudioTrackUtils';
 import { PlayerAPI } from 'bitmovin-player';
 
 /**
@@ -9,7 +9,6 @@ import { PlayerAPI } from 'bitmovin-player';
  * @category Components
  */
 export class AudioTrackListBox extends ListBox {
-
   configure(player: PlayerAPI, uimanager: UIInstanceManager): void {
     super.configure(player, uimanager);
     new AudioTrackSwitchHandler(player, this, uimanager);

@@ -1,6 +1,6 @@
-import {Label, LabelConfig} from '../labels/Label';
-import {UIInstanceManager} from '../../UIManager';
-import {StringUtils} from '../../utils/StringUtils';
+import { Label, LabelConfig } from '../labels/Label';
+import { UIInstanceManager } from '../../UIManager';
+import { StringUtils } from '../../utils/StringUtils';
 import { AdEvent, LinearAd, PlayerAPI } from 'bitmovin-player';
 import { i18n } from '../../localization/i18n';
 
@@ -10,14 +10,17 @@ import { i18n } from '../../localization/i18n';
  * @category Components
  */
 export class AdMessageLabel extends Label<LabelConfig> {
-
   constructor(config: LabelConfig = {}) {
     super(config);
 
-    this.config = this.mergeConfig(config, {
-      cssClass: 'ui-label-ad-message',
-      text: i18n.getLocalizer('ads.remainingTime') ,
-    }, this.config);
+    this.config = this.mergeConfig(
+      config,
+      {
+        cssClass: 'ui-label-ad-message',
+        text: i18n.getLocalizer('ads.remainingTime'),
+      },
+      this.config,
+    );
   }
 
   configure(player: PlayerAPI, uimanager: UIInstanceManager): void {
@@ -32,7 +35,7 @@ export class AdMessageLabel extends Label<LabelConfig> {
 
     let adStartHandler = (event: AdEvent) => {
       let uiConfig = (event.ad as LinearAd).uiConfig;
-      text = uiConfig && uiConfig.message || config.text;
+      text = (uiConfig && uiConfig.message) || config.text;
 
       updateMessageHandler();
 

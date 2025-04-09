@@ -1,6 +1,6 @@
-import {Container, ContainerConfig} from './Container';
-import {UIInstanceManager} from '../UIManager';
-import {MetadataLabel, MetadataLabelContent} from './labels/MetadataLabel';
+import { Container, ContainerConfig } from './Container';
+import { UIInstanceManager } from '../UIManager';
+import { MetadataLabel, MetadataLabelContent } from './labels/MetadataLabel';
 import { PlayerAPI } from 'bitmovin-player';
 
 /**
@@ -23,19 +23,22 @@ export interface TitleBarConfig extends ContainerConfig {
  * @category Components
  */
 export class TitleBar extends Container<TitleBarConfig> {
-
   constructor(config: TitleBarConfig = {}) {
     super(config);
 
-    this.config = this.mergeConfig(config, {
-      cssClass: 'ui-titlebar',
-      hidden: true,
-      components: [
-        new MetadataLabel({ content: MetadataLabelContent.Title }),
-        new MetadataLabel({ content: MetadataLabelContent.Description }),
-      ],
-      keepHiddenWithoutMetadata: false,
-    }, <TitleBarConfig>this.config);
+    this.config = this.mergeConfig(
+      config,
+      {
+        cssClass: 'ui-titlebar',
+        hidden: true,
+        components: [
+          new MetadataLabel({ content: MetadataLabelContent.Title }),
+          new MetadataLabel({ content: MetadataLabelContent.Description }),
+        ],
+        keepHiddenWithoutMetadata: false,
+      },
+      <TitleBarConfig>this.config,
+    );
   }
 
   configure(player: PlayerAPI, uimanager: UIInstanceManager): void {

@@ -78,7 +78,7 @@ describe('getElementInDirection', () => {
   });
 
   it('should return undefined if there is no element element in the given direction', () => {
-    const otherElements = [ mockHtmlElement(190, 200, 100, 100) ];
+    const otherElements = [mockHtmlElement(190, 200, 100, 100)];
 
     const elementInDirection = getElementInDirection(currentHtmlElement, otherElements, Direction.RIGHT);
 

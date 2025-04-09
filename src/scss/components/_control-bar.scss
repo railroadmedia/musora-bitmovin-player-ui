@@ -10,23 +10,23 @@
   background: linear-gradient(to bottom, $color-transparent, $color-background-bars);
   box-sizing: border-box;
   line-height: 1em;
-  padding: 1em 1em .5em;
+  padding: 1em 1em 0.5em;
 
   .#{$prefix}-controlbar-top,
   .#{$prefix}-controlbar-bottom {
     > .#{$prefix}-container-wrapper {
       display: flex;
-      margin: .5em 0;
+      margin: 0.5em 0;
     }
   }
 
   .#{$prefix}-controlbar-top {
     .#{$prefix}-ui-label {
-      font-size: .9em;
+      font-size: 0.9em;
     }
 
     > .#{$prefix}-container-wrapper > * {
-      margin: 0 .5em;
+      margin: 0 0.5em;
     }
   }
 
@@ -34,9 +34,8 @@
     white-space: nowrap; // Required for iOS 8.2 to avoid wrapped controlbar due to wrong size calculation
 
     > .#{$prefix}-container-wrapper {
-
       .#{$prefix}-ui-volumeslider {
-        margin: auto .5em;
+        margin: auto 0.5em;
         width: 5em;
       }
     }

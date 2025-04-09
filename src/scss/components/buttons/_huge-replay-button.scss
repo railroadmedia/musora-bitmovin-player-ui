@@ -27,7 +27,7 @@
     }
 
     &:hover {
-      animation: #{$prefix}-spin .5s ease-in;
+      animation: #{$prefix}-spin 0.5s ease-in;
     }
   }
 }

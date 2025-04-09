@@ -4,7 +4,7 @@
   @include focusable(true);
 
   line-height: 1.5em;
-  padding: .5em .7em;
+  padding: 0.5em 0.7em;
   white-space: nowrap;
 
   cursor: pointer;
@@ -14,12 +14,12 @@
 
   @media (hover: hover) {
     &:hover {
-      background-color: transparentize($color-item-hover, .15);
+      background-color: transparentize($color-item-hover, 0.15);
     }
   }
 
   &:active {
-    background-color: transparentize($color-item-hover, .15);
+    background-color: transparentize($color-item-hover, 0.15);
   }
 
   &.#{$prefix}-hidden {
@@ -39,7 +39,7 @@
 
   .#{$prefix}-ui-label {
     display: inline-block;
-    font-size: .8em;
+    font-size: 0.8em;
     font-weight: 500;
     margin: 0;
     text-align: justify;
@@ -58,7 +58,7 @@
       content: ' ';
       display: inline-block;
       height: 1.5em;
-      vertical-align: -.4em;
+      vertical-align: -0.4em;
       width: 1.5em;
     }
   }
@@ -73,7 +73,7 @@
           content: ' ';
           display: inline-block;
           height: 1.5em;
-          vertical-align: -.4em;
+          vertical-align: -0.4em;
           width: 1.5em;
         }
       }
@@ -81,7 +81,7 @@
   }
 
   &.#{$prefix}-title-item {
-    border-bottom: 1px solid transparentize($color-item-hover, .15);
+    border-bottom: 1px solid transparentize($color-item-hover, 0.15);
   }
 }
 

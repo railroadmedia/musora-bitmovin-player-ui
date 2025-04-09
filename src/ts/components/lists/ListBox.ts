@@ -1,6 +1,6 @@
 import { ToggleButton, ToggleButtonConfig } from '../buttons/ToggleButton';
 import { ListItem, ListSelector, ListSelectorConfig } from './ListSelector';
-import {DOM} from '../../DOM';
+import { DOM } from '../../DOM';
 import { PlayerAPI } from 'bitmovin-player';
 import { UIInstanceManager } from '../../UIManager';
 import { ArrayUtils } from '../../utils/ArrayUtils';
@@ -28,9 +28,13 @@ export class ListBox extends ListSelector<ListSelectorConfig> {
   constructor(config: ListSelectorConfig = {}) {
     super(config);
 
-    this.config = this.mergeConfig(config, {
-      cssClass: 'ui-listbox',
-    } as ListSelectorConfig, this.config);
+    this.config = this.mergeConfig(
+      config,
+      {
+        cssClass: 'ui-listbox',
+      } as ListSelectorConfig,
+      this.config,
+    );
   }
 
   public configure(player: PlayerAPI, uimanager: UIInstanceManager): void {
@@ -43,10 +47,14 @@ export class ListBox extends ListSelector<ListSelectorConfig> {
   }
 
   protected toDomElement(): DOM {
-    let listBoxElement = new DOM('div', {
-      'id': this.config.id,
-      'class': this.getCssClasses(),
-    }, this);
+    let listBoxElement = new DOM(
+      'div',
+      {
+        id: this.config.id,
+        class: this.getCssClasses(),
+      },
+      this,
+    );
 
     this.listBoxElement = listBoxElement;
     this.createListBoxDomItems();
@@ -116,7 +124,7 @@ export class ListBox extends ListSelector<ListSelectorConfig> {
   }
 
   private getComponentForKey(key: string): ListBoxItemButton {
-    return this.components.find((c) => key === c.key);
+    return this.components.find(c => key === c.key);
   }
 
   private handleSelectionChange = (sender: ListBoxItemButton) => {
@@ -132,15 +140,18 @@ interface ListBoxItemButtonConfig extends ToggleButtonConfig {
 }
 
 class ListBoxItemButton extends ToggleButton<ListBoxItemButtonConfig> {
-
   constructor(config: ListBoxItemButtonConfig) {
     super(config);
 
-    this.config = this.mergeConfig(config, {
-      cssClass: 'ui-listbox-button',
-      onClass: 'selected',
-      offClass: '',
-    } as ListBoxItemButtonConfig, this.config);
+    this.config = this.mergeConfig(
+      config,
+      {
+        cssClass: 'ui-listbox-button',
+        onClass: 'selected',
+        offClass: '',
+      } as ListBoxItemButtonConfig,
+      this.config,
+    );
   }
 
   get key(): string {

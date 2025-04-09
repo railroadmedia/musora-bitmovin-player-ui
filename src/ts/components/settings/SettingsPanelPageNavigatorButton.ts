@@ -1,6 +1,6 @@
-import {Button, ButtonConfig} from '../buttons/Button';
-import {SettingsPanel} from './SettingsPanel';
-import {SettingsPanelPage} from './SettingsPanelPage';
+import { Button, ButtonConfig } from '../buttons/Button';
+import { SettingsPanel } from './SettingsPanel';
+import { SettingsPanelPage } from './SettingsPanelPage';
 import { PlayerAPI } from 'bitmovin-player';
 import { UIInstanceManager } from '../../UIManager';
 

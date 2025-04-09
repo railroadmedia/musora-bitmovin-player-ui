@@ -80,7 +80,7 @@ export namespace UIFactory {
       [
         {
           ui: emptyStateUILayout(),
-          condition: (context) => {
+          condition: context => {
             return !context.isSourceLoaded;
           },
         },
@@ -107,13 +107,13 @@ export namespace UIFactory {
           ...tvUILayout(),
           condition: (context: UIConditionContext) => {
             return context.isTv && !context.isAd;
-          }
+          },
         },
         {
           ...tvUILayout(),
           condition: (context: UIConditionContext) => {
             return context.isTv && context.isAd && context.adRequiresUi;
-          }
+          },
         },
         {
           ui: adsUILayout(),
@@ -309,9 +309,7 @@ function uiLayout(config: UIConfig) {
     ],
   });
 
-  const conditionalComponents = [
-    config.includeWatermark ? new Watermark() : null,
-  ].filter((e) => e);
+  const conditionalComponents = [config.includeWatermark ? new Watermark() : null].filter(e => e);
 
   return new UIContainer({
     components: [
@@ -351,12 +349,7 @@ function adsUILayout() {
         cssClasses: ['controlbar-top'],
       }),
       new Container({
-        components: [
-          new PlaybackToggleButton(),
-          new VolumeToggleButton(),
-          new Spacer(),
-          new FullscreenToggleButton(),
-        ],
+        components: [new PlaybackToggleButton(), new VolumeToggleButton(), new Spacer(), new FullscreenToggleButton()],
         cssClasses: ['controlbar-bottom'],
       }),
     ],
@@ -405,7 +398,7 @@ function smallScreenUILayout() {
       }),
       new DynamicSettingsPanelItem({
         label: i18n.getLocalizer('settings.audio.track'),
-        settingComponent: new AudioTrackSelectBox() ,
+        settingComponent: new AudioTrackSelectBox(),
         container: settingsPanel,
       }),
       new DynamicSettingsPanelItem({
@@ -519,12 +512,7 @@ function smallScreenAdsUILayout() {
         cssClasses: ['controlbar-top'],
       }),
       new Container({
-        components: [
-          new PlaybackToggleButton(),
-          new VolumeToggleButton(),
-          new Spacer(),
-          new FullscreenToggleButton(),
-        ],
+        components: [new PlaybackToggleButton(), new VolumeToggleButton(), new Spacer(), new FullscreenToggleButton()],
         cssClasses: ['controlbar-bottom'],
       }),
     ],
@@ -569,9 +557,7 @@ function castReceiverUILayout(config: UIConfig) {
     ],
   });
 
-  const conditionalComponents = [
-    config.includeWatermark ? new Watermark() : null,
-  ].filter((e) => e);
+  const conditionalComponents = [config.includeWatermark ? new Watermark() : null].filter(e => e);
 
   return new CastUIContainer({
     components: [
@@ -706,11 +692,7 @@ function tvAdsUILayout() {
  */
 function emptyStateUILayout() {
   return new UIContainer({
-    components: [
-      new BufferingOverlay(),
-      new PlaybackToggleOverlay(),
-      new ErrorMessageOverlay(),
-    ],
+    components: [new BufferingOverlay(), new PlaybackToggleOverlay(), new ErrorMessageOverlay()],
     cssClasses: ['ui', 'ui-empty-state'],
   });
 }

@@ -1,6 +1,6 @@
-import {ComponentConfig, Component} from '../Component';
-import {DOM} from '../../DOM';
-import {EventDispatcher, Event, NoArgs} from '../../EventDispatcher';
+import { ComponentConfig, Component } from '../Component';
+import { DOM } from '../../DOM';
+import { EventDispatcher, Event, NoArgs } from '../../EventDispatcher';
 import { LocalizableText, i18n } from '../../localization/i18n';
 
 /**
@@ -31,7 +31,6 @@ export interface LabelConfig extends ComponentConfig {
  * @category Components
  */
 export class Label<Config extends LabelConfig> extends Component<Config> {
-
   private text: LocalizableText;
 
   private labelEvents = {
@@ -42,20 +41,28 @@ export class Label<Config extends LabelConfig> extends Component<Config> {
   constructor(config: Config = {} as Config) {
     super(config);
 
-    this.config = this.mergeConfig(config, {
-      cssClass: 'ui-label',
-    } as Config, this.config);
+    this.config = this.mergeConfig(
+      config,
+      {
+        cssClass: 'ui-label',
+      } as Config,
+      this.config,
+    );
     this.text = this.config.text;
   }
 
   protected toDomElement(): DOM {
     const tagName = this.config.for != null ? 'label' : 'span';
 
-    let labelElement = new DOM(tagName, {
-      'id': this.config.id,
-      'for': this.config.for,
-      'class': this.getCssClasses(),
-    }, this).html(i18n.performLocalization(this.text));
+    let labelElement = new DOM(
+      tagName,
+      {
+        id: this.config.id,
+        for: this.config.for,
+        class: this.getCssClasses(),
+      },
+      this,
+    ).html(i18n.performLocalization(this.text));
 
     labelElement.on('click', () => {
       this.onClickEvent();

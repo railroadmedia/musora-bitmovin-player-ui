@@ -75,8 +75,8 @@ function getElementVector(element: HTMLElement): Vector {
  */
 function calculateAngle(a: Vector, b: Vector, direction: Direction): number {
   const directionVector = {
-    x: (direction === Direction.LEFT ? -1 : direction === Direction.RIGHT ? 1 : 0),
-    y: (direction === Direction.UP ? -1 : direction === Direction.DOWN ? 1 : 0),
+    x: direction === Direction.LEFT ? -1 : direction === Direction.RIGHT ? 1 : 0,
+    y: direction === Direction.UP ? -1 : direction === Direction.DOWN ? 1 : 0,
   };
 
   const elementVector = normalize({
@@ -86,7 +86,7 @@ function calculateAngle(a: Vector, b: Vector, direction: Direction): number {
 
   const angleCos = dotProduct(directionVector, elementVector) / (length(directionVector) * length(elementVector));
 
-  return Math.acos(angleCos) * 180 / Math.PI;
+  return (Math.acos(angleCos) * 180) / Math.PI;
 }
 
 /**
@@ -107,23 +107,25 @@ export function getElementInDirection(
   const cutoffAngle = 45;
   const activeElemVector = getElementVector(activeElement);
 
-  return elements
-    // don't take the current element into account
-    .filter(elem => elem !== activeElement)
-    // get the angle between, and distance to any other element from the current element
-    .map(element => {
-      const elementVector = getElementVector(element);
-      const dist = distance(activeElemVector, elementVector);
-      const angle = calculateAngle(activeElemVector, elementVector, direction);
+  return (
+    elements
+      // don't take the current element into account
+      .filter(elem => elem !== activeElement)
+      // get the angle between, and distance to any other element from the current element
+      .map(element => {
+        const elementVector = getElementVector(element);
+        const dist = distance(activeElemVector, elementVector);
+        const angle = calculateAngle(activeElemVector, elementVector, direction);
 
-      return { angle, dist, element };
-    })
-    // filter out any elements that don't align with the direction we're trying to move in
-    .filter(({ angle }) => angle <= cutoffAngle)
-    // sort the resulting elements based on their distance to the current element in ascending order
-    .sort(({ angle: angleA, dist: distA }, { angle: angleB, dist: distB }) => (angleA - angleB) + (distA - distB))
-    // return the element closest to the current element
-    .shift()?.element;
+        return { angle, dist, element };
+      })
+      // filter out any elements that don't align with the direction we're trying to move in
+      .filter(({ angle }) => angle <= cutoffAngle)
+      // sort the resulting elements based on their distance to the current element in ascending order
+      .sort(({ angle: angleA, dist: distA }, { angle: angleB, dist: distB }) => angleA - angleB + (distA - distB))
+      // return the element closest to the current element
+      .shift()?.element
+  );
 }
 
 /**
@@ -143,4 +145,3 @@ export function getBoundingRectFromElement(element: HTMLElement) {
 
   return boundingRect;
 }
-

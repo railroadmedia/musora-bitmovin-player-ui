@@ -10,7 +10,6 @@ import { Action, Direction } from '../../src/ts/spatialnavigation/types';
 jest.mock('../../src/ts/spatialnavigation/NavigationAlgorithm.ts');
 jest.mock('../../src/ts/spatialnavigation/NodeEventSubscriber.ts');
 
-
 describe('NavigationGroup', () => {
   let rootNavigationGroup: NavigationGroup;
   let rootContainerMock: jest.Mocked<UIContainer>;
@@ -21,9 +20,8 @@ describe('NavigationGroup', () => {
     rootContainerMock = mockComponent(UIContainer);
     playbackToggleButtonMock = mockComponent(PlaybackToggleButton);
     subtitleToggleButtonMock = mockComponent(SettingsToggleButton);
-    
-    rootNavigationGroup = new NavigationGroup(rootContainerMock, playbackToggleButtonMock, subtitleToggleButtonMock);
 
+    rootNavigationGroup = new NavigationGroup(rootContainerMock, playbackToggleButtonMock, subtitleToggleButtonMock);
   });
 
   describe('getActiveElement', () => {
@@ -45,7 +43,7 @@ describe('NavigationGroup', () => {
 
     it('should focus last activeElementBeforeDisable if not settings panel', () => {
       const playbackButtonHtml = getFirstDomElement(playbackToggleButtonMock);
-      rootNavigationGroup['activeElementBeforeDisable'] = playbackButtonHtml
+      rootNavigationGroup['activeElementBeforeDisable'] = playbackButtonHtml;
 
       rootNavigationGroup.enable();
       expect(playbackButtonHtml.focus).toHaveBeenCalled();
@@ -62,7 +60,6 @@ describe('NavigationGroup', () => {
       expect(rootNavigationGroup['activeElementBeforeDisable']).toEqual(playbackButtonHtml);
     });
   });
-
 
   describe('handleNavigation', () => {
     let subtitleToggleButtonHTML: HTMLElement;
@@ -84,7 +81,7 @@ describe('NavigationGroup', () => {
       rootNavigationGroup['activeElement'] = undefined;
 
       rootNavigationGroup.handleNavigation(Direction.LEFT);
-      
+
       expect(subtitleToggleButtonHTML.focus).toHaveBeenCalled();
     });
 
@@ -125,7 +122,6 @@ describe('NavigationGroup', () => {
         rootNavigationGroup.handleAction(Action.SELECT);
 
         expect(playButtonHTML.click).not.toHaveBeenCalled();
-
       });
     });
   });

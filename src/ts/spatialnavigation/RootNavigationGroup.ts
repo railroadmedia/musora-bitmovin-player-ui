@@ -9,7 +9,10 @@ import { Action, Direction } from './types';
  * @category Components
  */
 export class RootNavigationGroup extends NavigationGroup {
-  constructor(public readonly container: UIContainer, ...elements: Component<unknown>[]) {
+  constructor(
+    public readonly container: UIContainer,
+    ...elements: Component<unknown>[]
+  ) {
     super(container, ...elements);
   }
 

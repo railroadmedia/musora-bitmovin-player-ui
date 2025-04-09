@@ -53,13 +53,13 @@
     width: 100%;
 
     &:hover {
-      animation:  #{$prefix}-breathe 3s ease-in-out infinite;
+      animation: #{$prefix}-breathe 3s ease-in-out infinite;
     }
   }
 
   &.#{$prefix}-on {
     .#{$prefix}-image {
-      animation: #{$prefix}-fade-out $animation-duration cubic-bezier(.55, .055, .675, .19); // http://easings.net/de#easeInCubic
+      animation: #{$prefix}-fade-out $animation-duration cubic-bezier(0.55, 0.055, 0.675, 0.19); // http://easings.net/de#easeInCubic
       transition: visibility 0s $animation-duration;
       visibility: hidden;
     }
@@ -67,7 +67,7 @@
 
   &.#{$prefix}-off {
     .#{$prefix}-image {
-      animation:  #{$prefix}-fade-in $animation-duration cubic-bezier(.55, .055, .675, .19); // http://easings.net/de#easeInCubic
+      animation: #{$prefix}-fade-in $animation-duration cubic-bezier(0.55, 0.055, 0.675, 0.19); // http://easings.net/de#easeInCubic
       visibility: visible;
     }
   }

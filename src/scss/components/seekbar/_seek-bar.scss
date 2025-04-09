@@ -1,7 +1,7 @@
 @import '../../variables';
 @import '../../mixins';
 
-$seekbar-height: .3125em;
+$seekbar-height: 0.3125em;
 
 // sass-lint:disable no-vendor-prefixes
 %bar {
@@ -37,7 +37,7 @@ $seekbar-height: .3125em;
     @include seekbar-position-marker($seekbar-height * 3);
     background-color: $color-highlight;
     border-radius: 50%;
-    box-shadow: 0 0 3px 0 transparentize($color: #000, $amount: .75);
+    box-shadow: 0 0 3px 0 transparentize($color: #000, $amount: 0.75);
   }
 
   .#{$prefix}-seekbar {
@@ -61,7 +61,7 @@ $seekbar-height: .3125em;
 
     .#{$prefix}-seekbar-backdrop {
       @extend %bar;
-      background-color: transparentize($color-primary, .8);
+      background-color: transparentize($color-primary, 0.8);
       margin: $bar-inset 0;
       width: 100%;
     }
@@ -70,13 +70,15 @@ $seekbar-height: .3125em;
       @extend %bar;
       background-color: $color-primary;
       margin: $bar-inset 0;
-      transition: .3s linear, .3s linear;
+      transition:
+        0.3s linear,
+        0.3s linear;
       transition-property: transform;
     }
 
     .#{$prefix}-seekbar-seekposition {
       @extend %bar;
-      background-color: transparentize($color-primary, .8);
+      background-color: transparentize($color-primary, 0.8);
       margin: $bar-inset 0;
     }
 
@@ -84,7 +86,9 @@ $seekbar-height: .3125em;
       @extend %bar;
       background-color: $color-highlight;
       margin: $bar-inset 0;
-      transition: .1s linear, .1s linear;
+      transition:
+        0.1s linear,
+        0.1s linear;
       transition-property: transform;
     }
 
@@ -100,7 +104,7 @@ $seekbar-height: .3125em;
         background-color: $color-primary;
         height: 100%;
         text-align: center;
-        transition-duration: .1s;
+        transition-duration: 0.1s;
         transition-property: transform;
         transition-timing-function: linear;
         width: $marker-width;
@@ -108,7 +112,7 @@ $seekbar-height: .3125em;
         > .#{$prefix}-seekbar-marker-image {
           height: $seekbar-height * 4;
           position: absolute;
-          transform: translate(-50%, calc(-100% - .2em));
+          transform: translate(-50%, calc(-100% - 0.2em));
         }
       }
     }

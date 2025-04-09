@@ -67,7 +67,7 @@ describe('SeekBarHandler', () => {
     });
 
     it('should increase scrubSpeedPercentage', () => {
-      for(let i = 0; i < 20; i++) {
+      for (let i = 0; i < 20; i++) {
         rootNavigationGroupMock.onNavigation!(Direction.RIGHT, seekBarWrapperMock, preventDefaultSpy);
       }
       const mousePositions = scrubbingPositionsFromMouseEventMock(seekBarMock.dispatchEvent);
@@ -80,7 +80,7 @@ describe('SeekBarHandler', () => {
       ${Direction.RIGHT}
       ${Direction.LEFT}
     `('should reset scrubSpeedPercentage when stop scrubbing with direction=$direction', ({ direction }) => {
-      for(let i = 0; i < 20; i++) {
+      for (let i = 0; i < 20; i++) {
         rootNavigationGroupMock.onNavigation!(direction, seekBarWrapperMock, preventDefaultSpy);
       }
 
@@ -99,7 +99,7 @@ describe('SeekBarHandler', () => {
       const afterResetMinDelta = afterResetScrubbingSpeeds[0];
 
       expect(initialMinDelta).toEqual(afterResetMinDelta);
-    })
+    });
   });
 
   describe('onAction', () => {
@@ -118,7 +118,7 @@ describe('SeekBarHandler', () => {
     });
 
     it('should ignore SELECT actions when not actively scrubbing', () => {
-      rootNavigationGroupMock.onAction!(Action.SELECT, seekBarWrapperMock, preventDefaultSpy)
+      rootNavigationGroupMock.onAction!(Action.SELECT, seekBarWrapperMock, preventDefaultSpy);
 
       expect(preventDefaultSpy).not.toHaveBeenCalled();
     });

@@ -1,6 +1,6 @@
-import {PlaybackToggleButton, PlaybackToggleButtonConfig} from './PlaybackToggleButton';
-import {DOM} from '../../DOM';
-import {UIInstanceManager} from '../../UIManager';
+import { PlaybackToggleButton, PlaybackToggleButtonConfig } from './PlaybackToggleButton';
+import { DOM } from '../../DOM';
+import { UIInstanceManager } from '../../UIManager';
 import { PlayerAPI, PlayerEventBase, WarningEvent } from 'bitmovin-player';
 import { i18n } from '../../localization/i18n';
 
@@ -10,15 +10,18 @@ import { i18n } from '../../localization/i18n';
  * @category Buttons
  */
 export class HugePlaybackToggleButton extends PlaybackToggleButton {
-
   constructor(config: PlaybackToggleButtonConfig = {}) {
     super(config);
 
-    this.config = this.mergeConfig(config, {
-      cssClass: 'ui-hugeplaybacktogglebutton',
-      text: i18n.getLocalizer('playPause'),
-      role: 'button',
-    }, this.config);
+    this.config = this.mergeConfig(
+      config,
+      {
+        cssClass: 'ui-hugeplaybacktogglebutton',
+        text: i18n.getLocalizer('playPause'),
+        role: 'button',
+      },
+      this.config,
+    );
   }
 
   configure(player: PlayerAPI, uimanager: UIInstanceManager): void {
@@ -164,9 +167,11 @@ export class HugePlaybackToggleButton extends PlaybackToggleButton {
     // Setting the image directly on the button does not work together with scaling animations, because the button
     // can cover the whole video player are and scaling would extend it beyond. By adding an inner element, confined
     // to the size if the image, it can scale inside the player without overshooting.
-    buttonElement.append(new DOM('div', {
-      'class': this.prefixCss('image'),
-    }));
+    buttonElement.append(
+      new DOM('div', {
+        class: this.prefixCss('image'),
+      }),
+    );
 
     return buttonElement;
   }

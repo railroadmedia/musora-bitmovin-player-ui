@@ -1,10 +1,17 @@
 import { mockClass, mockObject } from './mockClass';
 import { MockHelper } from './MockHelper';
 
-type ConstructorType<T> = new (...args : any[]) => T;
+type ConstructorType<T> = new (...args: any[]) => T;
 
 export function mockHtmlElement() {
-  return mockObject(['focus', 'blur', 'addEventListener', 'removeEventListener', 'children', 'click']) as jest.Mocked<HTMLElement>;
+  return mockObject([
+    'focus',
+    'blur',
+    'addEventListener',
+    'removeEventListener',
+    'children',
+    'click',
+  ]) as jest.Mocked<HTMLElement>;
 }
 
 export function mockComponent<T extends ConstructorType<any>>(component: T) {

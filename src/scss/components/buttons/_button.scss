@@ -14,8 +14,8 @@
   font-size: 1em;
   height: 1.5em;
   min-width: 1.5em;
-  padding: .25em;
-  transition: transform .15s ease;
+  padding: 0.25em;
+  transition: transform 0.15s ease;
   -webkit-tap-highlight-color: transparent;
 
   .#{$prefix}-label {
@@ -39,7 +39,7 @@
   }
 
   &:active {
-    transform: scale(.9);
+    transform: scale(0.9);
   }
 
   @include hidden;
