@@ -54,10 +54,6 @@ export class Button<Config extends ButtonConfig> extends Component<Config> {
       'aria-label': i18n.performLocalization(this.config.ariaLabel || this.config.text),
       'class': this.getCssClasses(),
       'type' : 'button',
-      /**
-      * WCAG20 standard to display if a button is pressed or not
-      */
-      'aria-pressed': 'false',
       'tabindex': this.config.tabIndex.toString(),
     };
 

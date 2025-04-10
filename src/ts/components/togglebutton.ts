@@ -1,5 +1,5 @@
-import {Button, ButtonConfig} from './button';
-import {NoArgs, EventDispatcher, Event} from '../eventdispatcher';
+import { Button, ButtonConfig } from './button';
+import { NoArgs, EventDispatcher, Event } from '../eventdispatcher';
 import { UIInstanceManager } from '../uimanager';
 import { PlayerAPI } from 'bitmovin-player';
 import { LocalizableText } from '../localization/i18n';
@@ -22,7 +22,11 @@ export interface ToggleButtonConfig extends ButtonConfig {
    * WCAG20 standard for defining info about the component (usually the name)
    *
    * It is recommended to use `onAriaLabel` and `offAriaLabel` for toggle buttons
-   * as the component can then update them as the button is used.
+   * as the component can then update them as the button is used. If this is the case,
+   * the `aria-pressed` attribute is not set as the specification defines either the name
+   * or the pressed-state should be changed, but not both.
+   * Some platforms, like many versions of Samsung Tizen TVs, don't support the `aria-pressed`
+   * attribute, so it is recommended to use `onAriaLabel` and `offAriaLabel` instead.
    *
    * If both `ariaLabel` and `onAriaLabel` are set, `onAriaLabel` is used.
    */
@@ -49,6 +53,7 @@ export interface ToggleButtonConfig extends ButtonConfig {
 export class ToggleButton<Config extends ToggleButtonConfig> extends Button<Config> {
 
   private onState: boolean;
+  private useAriaPressedAttributeAsToggleIndicator: boolean;
 
   private toggleButtonEvents = {
     onToggle: new EventDispatcher<ToggleButton<Config>, NoArgs>(),
@@ -70,12 +75,30 @@ export class ToggleButton<Config extends ToggleButtonConfig> extends Button<Conf
     }
 
     this.config = this.mergeConfig(config, defaultConfig as Config, this.config);
+
+    this.useAriaPressedAttributeAsToggleIndicator = !this.config.onAriaLabel || !this.config.offAriaLabel;
   }
 
   configure(player: PlayerAPI, uimanager: UIInstanceManager): void {
     super.configure(player, uimanager);
     const config = this.getConfig();
     this.getDomElement().addClass(this.prefixCss(config.offClass));
+
+    this.useAriaPressedAttributeAsToggleIndicator = !this.config.onAriaLabel || !this.config.offAriaLabel;
+
+    if (this.useAriaPressedAttributeAsToggleIndicator) {
+      /**
+       * WCAG20 standard to display if a button is pressed or not. In screenreaders, this converts the button to a
+       * toggle button and the button label should not change. Unfortunately, not all devices and screenreaders support
+       * this attribute (e.g. Samsung Tizen TVs).
+       * 
+       * The alternative is to not use this attribute and toggle the button
+       * label instead. This option will be used if both, `onAriaLabel` and `offAriaLabel` are set.
+       */
+      this.setAriaAttr('pressed', 'false');
+    } else {
+      this.setAriaLabel(this.config.offAriaLabel);
+    }
   }
 
   /**
@@ -92,9 +115,9 @@ export class ToggleButton<Config extends ToggleButtonConfig> extends Button<Conf
       this.onToggleEvent();
       this.onToggleOnEvent();
 
-      this.setAriaAttr('pressed', 'true');
-
-      if (this.config.onAriaLabel) {
+      if (this.useAriaPressedAttributeAsToggleIndicator) {
+        this.setAriaAttr('pressed', 'true');
+      } else {
         this.setAriaLabel(this.config.onAriaLabel);
       }
     }
@@ -114,9 +137,9 @@ export class ToggleButton<Config extends ToggleButtonConfig> extends Button<Conf
       this.onToggleEvent();
       this.onToggleOffEvent();
 
-      this.setAriaAttr('pressed', 'false');
-
-      if (this.config.offAriaLabel) {
+      if (this.useAriaPressedAttributeAsToggleIndicator) {
+        this.setAriaAttr('pressed', 'false');
+      } else {
         this.setAriaLabel(this.config.offAriaLabel);
       }
     }

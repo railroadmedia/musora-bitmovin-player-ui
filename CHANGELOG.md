@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+
+### Added
+- `aria-label` to `ErrorMessageOverlay`
+- New `ariaFallbackMode` configuration option to `SeekBarConfig`, which updates the current playback position also in the `aria-label`. This can be used for devices which don't support the `aria-valuetext` attribute for `slider`s.
+
+### Changed
+- The `aria-pressed` attribute is only set on `ToggleButton`s instead of all buttons
+- The `aria-pressed` attribute is not set if both, `onAriaLabel` and `offAriaLabel`, configuration properties are set for a specific component
+- The `aria-label` for Quickseek buttons contain now also the number of seconds the button seeks
+
+### Fixed
+- Error message in `ErrorMessageOverlay` not read by Text-To-Speech engine on Tizen
+
 ## [3.90.0] - 2025-04-03
 
 ### Fixed
