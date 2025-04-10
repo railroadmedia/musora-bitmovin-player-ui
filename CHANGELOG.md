@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [3.91.0] - 2025-04-10
 
 ### Added
 - `aria-label` to `ErrorMessageOverlay`
@@ -1115,6 +1115,7 @@ Version 2.0 of the UI framework is built for player 7.1. If absolutely necessary
 ## 1.0.0 (2017-02-03)
 - First release
 
+[3.91.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.90.0...v3.91.0
 [3.90.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.89.0...v3.90.0
 [3.89.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.88.0...v3.89.0
 [3.88.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.87.0...v3.88.0
