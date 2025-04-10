@@ -204,12 +204,12 @@ export class SeekBar extends Component<SeekBarConfig> {
         this.getDomElement().attr('aria-label', `${i18n.performLocalization(this.config.ariaLabel)}: ${timeShiftText}`);
       }
     } else if (this.seekBarType === SeekBarType.Vod) {
-      const ariaValueText = `${StringUtils.secondsToText(this.player.getCurrentTime(), false)} ${i18n.performLocalization(i18n.getLocalizer('seekBar.durationText'))} ${StringUtils.secondsToText(this.player.getDuration(), false)}`;
+      const ariaValueText = `${StringUtils.secondsToText(this.player.getCurrentTime())} ${i18n.performLocalization(i18n.getLocalizer('seekBar.durationText'))} ${StringUtils.secondsToText(this.player.getDuration())}`;
       this.getDomElement().attr('aria-valuenow', Math.floor(this.player.getCurrentTime()).toString());
       this.getDomElement().attr('aria-valuetext', ariaValueText);
 
       if (this.config.addCurrentTimeToAriaLabel) {
-        this.getDomElement().attr('aria-label', `${i18n.performLocalization(this.config.ariaLabel)}: ${StringUtils.secondsToText(this.player.getCurrentTime(), false)}`);
+        this.getDomElement().attr('aria-label', `${i18n.performLocalization(this.config.ariaLabel)}: ${StringUtils.secondsToText(this.player.getCurrentTime())}`);
       }
     }
   }
