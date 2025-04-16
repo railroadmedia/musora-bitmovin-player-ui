@@ -13,8 +13,9 @@ $color-background-highlight: transparentize(mix($color-black, $color-highlight, 
 $color-background-bars: transparentize($color-black, .3) !default;
 $color-focus: #1b7fcc;
 
-$color-item-hover: #54565a !default;
-$color-background-menu: #212226 !default;
+$color-item-hover: #3B3B3B !default;
+$color-background-menu-title: #000000 !default;
+$color-background-menu: #141414 !default;
 $color-background-seek-circle: rgba(124, 124, 124, .35) !default;
 $color-shadow-seek-label: 0 0 30px 0 rgba(0, 0, 0, .75) !default;
 $color-ads: #ffc737 !default;

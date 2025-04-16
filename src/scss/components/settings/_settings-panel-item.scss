@@ -81,7 +81,7 @@
   }
 
   &.#{$prefix}-title-item {
-    border-bottom: 1px solid transparentize($color-item-hover, .15);
+    background-color: transparentize($color-background-menu-title, .15);
   }
 }
 

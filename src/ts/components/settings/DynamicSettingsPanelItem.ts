@@ -12,6 +12,7 @@ import { SettingsPanel } from './SettingsPanel';
 import { SettingsPanelPageBackButton } from './SettingsPanelPageBackButton';
 import { SubtitleSettingSelectBox } from './subtitlesettings/SubtitleSettingSelectBox';
 import { InteractiveSettingsPanelItem } from './InteractiveSettingsPanelItem';
+import { Component, ComponentConfig } from '../Component';
 
 /**
  * Configuration interface for a {@link DynamicSettingsPanelItem}.
@@ -28,6 +29,10 @@ export interface DynamicSettingsPanelItemConfig extends SettingsPanelItemConfig 
    */
   settingComponent: ListSelector<ListSelectorConfig>;
   /**
+   * TODO: 
+   */
+  additionalComponent?: Component<ComponentConfig>;
+  /**
    * The enclosing {@link SettingsPanel} where the sub page will be added.
    */
   container: SettingsPanel;
@@ -42,6 +47,7 @@ export interface DynamicSettingsPanelItemConfig extends SettingsPanelItemConfig 
 export class DynamicSettingsPanelItem extends InteractiveSettingsPanelItem<DynamicSettingsPanelItemConfig> {
   private selectedOptionLabel: Label<LabelConfig>;
   protected settingComponent: ListSelector<ListSelectorConfig>;
+  protected additionalComponent: Component<ComponentConfig>;
 
   private player: PlayerAPI;
   private uimanager: UIInstanceManager;
@@ -50,6 +56,7 @@ export class DynamicSettingsPanelItem extends InteractiveSettingsPanelItem<Dynam
     super(config);
 
     this.settingComponent = config.settingComponent;
+    this.additionalComponent = config.additionalComponent;
 
     this.selectedOptionLabel = new Label({
       text: '-',
@@ -80,6 +87,9 @@ export class DynamicSettingsPanelItem extends InteractiveSettingsPanelItem<Dynam
 
     if (this.settingComponent != null) {
       this.settingComponent.configure(this.player, this.uimanager);
+    }
+    if (this.additionalComponent != null) {
+      this.additionalComponent.configure(this.player, this.uimanager);
     }
 
     const handleSelectedItemChanged = () => {
@@ -119,8 +129,11 @@ export class DynamicSettingsPanelItem extends InteractiveSettingsPanelItem<Dynam
     backButton.configure(this.player, this.uimanager);
     const backSettingsPanelItem = new SettingsPanelItem({
       label: backButton,
+      settingComponent: this.additionalComponent,
       cssClasses: ['title-item'],
     });
+    backSettingsPanelItem.configure(this.player, this.uimanager);
+
     page.addComponent(backSettingsPanelItem);
 
     menuOptions

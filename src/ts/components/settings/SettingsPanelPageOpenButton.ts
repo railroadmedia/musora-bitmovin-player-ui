@@ -11,8 +11,8 @@ export class SettingsPanelPageOpenButton extends SettingsPanelPageNavigatorButto
     super(config);
 
     this.config = this.mergeConfig(config, {
-      cssClass: 'ui-settingspanelpageopenbutton',
-      text: i18n.getLocalizer('open'),
+      cssClass: 'ui-textbutton',
+      text: i18n.getLocalizer('settings.subtitles.options'),
       role: 'menuitem',
     } as SettingsPanelPageNavigatorConfig, this.config);
   }

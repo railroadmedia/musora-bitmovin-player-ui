@@ -1,12 +1,13 @@
 @import '../../../variables';
 
-.#{$prefix}-ui-subtitlesettingsresetbutton {
+.#{$prefix}-ui-textbutton {
   @extend %ui-button;
 
   font-size: .8em;
   font-weight: 500;
+  text-decoration: underline;
 
-  .#{$prefix}-label {
+  .#{$prefix}-label { 
     display: inline-block;
   }
 }
