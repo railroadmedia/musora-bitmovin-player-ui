@@ -5,9 +5,9 @@
 
   font-size: .8em;
   font-weight: 500;
-  text-decoration: underline;
 
   .#{$prefix}-label { 
     display: inline-block;
+    text-decoration: underline;
   }
 }
