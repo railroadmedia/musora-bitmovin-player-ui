@@ -265,8 +265,8 @@ function uiLayout(config: UIConfig) {
   const subtitleSelectBox = new SubtitleSelectBox();
   let subtitleSelectItem = new DynamicSettingsPanelItem({
     label: i18n.getLocalizer('settings.subtitles'),
+    labelComponent: subtitleSettingsOpenButton,
     settingComponent: subtitleSelectBox,
-    additionalComponent: subtitleSettingsOpenButton,
     container: settingsPanel,
   });
   mainSettingsPanelPage.addComponent(subtitleSelectItem);
@@ -431,8 +431,8 @@ function smallScreenUILayout() {
   const subtitleSelectBox = new SubtitleSelectBox();
   let subtitleSelectItem = new DynamicSettingsPanelItem({
     label: i18n.getLocalizer('settings.subtitles'),
+    labelComponent: subtitleSettingsOpenButton,
     settingComponent: subtitleSelectBox,
-    additionalComponent: subtitleSettingsOpenButton,
     role: 'menubar',
     container: settingsPanel,
   });

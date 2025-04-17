@@ -7,7 +7,6 @@ import { SubtitleSelectBox } from './SubtitleSelectBox';
 import { SettingsPanelItem, SettingsPanelItemConfig } from './SettingsPanelItem';
 import { SettingsPanelSelectOption } from './SettingsPanelSelectOption';
 import { SettingsPanelPage } from './SettingsPanelPage';
-import { SubtitleSettingsLabel } from './subtitlesettings/SubtitleSettingsLabel';
 import { SettingsPanel } from './SettingsPanel';
 import { SettingsPanelPageBackButton } from './SettingsPanelPageBackButton';
 import { SubtitleSettingSelectBox } from './subtitlesettings/SubtitleSettingSelectBox';
@@ -23,15 +22,15 @@ export interface DynamicSettingsPanelItemConfig extends SettingsPanelItemConfig 
   /**
    * The label component or the text for the label.
    */
-  label: LocalizableText | SubtitleSettingsLabel;
+  label: LocalizableText;
+  /**
+   * Optional component to be displayed next to the label. 
+   */
+  labelComponent?: Component<ComponentConfig>;
   /**
    * The list selector component which will be used to build the sub page.
    */
   settingComponent: ListSelector<ListSelectorConfig>;
-  /**
-   * TODO: 
-   */
-  additionalComponent?: Component<ComponentConfig>;
   /**
    * The enclosing {@link SettingsPanel} where the sub page will be added.
    */
@@ -46,8 +45,8 @@ export interface DynamicSettingsPanelItemConfig extends SettingsPanelItemConfig 
  */
 export class DynamicSettingsPanelItem extends InteractiveSettingsPanelItem<DynamicSettingsPanelItemConfig> {
   private selectedOptionLabel: Label<LabelConfig>;
+  protected labelComponent: Component<ComponentConfig>;
   protected settingComponent: ListSelector<ListSelectorConfig>;
-  protected additionalComponent: Component<ComponentConfig>;
 
   private player: PlayerAPI;
   private uimanager: UIInstanceManager;
@@ -55,8 +54,8 @@ export class DynamicSettingsPanelItem extends InteractiveSettingsPanelItem<Dynam
   constructor(config: DynamicSettingsPanelItemConfig) {
     super(config);
 
+    this.labelComponent = config.labelComponent;
     this.settingComponent = config.settingComponent;
-    this.additionalComponent = config.additionalComponent;
 
     this.selectedOptionLabel = new Label({
       text: '-',
@@ -81,15 +80,12 @@ export class DynamicSettingsPanelItem extends InteractiveSettingsPanelItem<Dynam
     this.player = player;
     this.uimanager = uimanager;
 
-    if (this.config.label instanceof SubtitleSettingsLabel) {
-      this.config.label.opener.configure(player, uimanager);
+    if (this.labelComponent != null) {
+      this.labelComponent.configure(this.player, this.uimanager);
     }
 
     if (this.settingComponent != null) {
       this.settingComponent.configure(this.player, this.uimanager);
-    }
-    if (this.additionalComponent != null) {
-      this.additionalComponent.configure(this.player, this.uimanager);
     }
 
     const handleSelectedItemChanged = () => {
@@ -120,7 +116,7 @@ export class DynamicSettingsPanelItem extends InteractiveSettingsPanelItem<Dynam
     const menuOptions = this.settingComponent.getItems();
     const page = new SettingsPanelPage({ removeOnPop: true });
 
-    const text = this.config.label instanceof SubtitleSettingsLabel ? this.config.label.text : this.config.label;
+    const text = this.config.label;
 
     const backButton = new SettingsPanelPageBackButton({
       text: text,
@@ -129,7 +125,7 @@ export class DynamicSettingsPanelItem extends InteractiveSettingsPanelItem<Dynam
     backButton.configure(this.player, this.uimanager);
     const backSettingsPanelItem = new SettingsPanelItem({
       label: backButton,
-      settingComponent: this.additionalComponent,
+      settingComponent: this.labelComponent,
       cssClasses: ['title-item'],
     });
     backSettingsPanelItem.configure(this.player, this.uimanager);
