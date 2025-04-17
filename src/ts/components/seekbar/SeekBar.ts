@@ -60,6 +60,12 @@ export interface SeekBarConfig extends ComponentConfig {
    * Used to enable/disable seek preview
    */
   enableSeekPreview?: boolean;
+
+  /**
+   * Used to add the current playback time into the `aria-label` attribute. This allows screen readers to read the current
+   * current time even on platforms that do not support the `aria-valuetext` attribute, such as Samsung Tizen.
+   */
+  addCurrentTimeToAriaLabel?: boolean;
 }
 
 /**
@@ -189,12 +195,22 @@ export class SeekBar extends Component<SeekBarConfig> {
   private setAriaSliderValues() {
     if (this.seekBarType === SeekBarType.Live) {
       const timeshiftValue = Math.ceil(this.player.getTimeShift()).toString();
+      const timeShiftText = `${i18n.performLocalization(i18n.getLocalizer('seekBar.timeshift'))} ${i18n.performLocalization(i18n.getLocalizer('seekBar.value'))}: ${timeshiftValue}`;
+
       this.getDomElement().attr('aria-valuenow', timeshiftValue);
-      this.getDomElement().attr('aria-valuetext', `${i18n.performLocalization(i18n.getLocalizer('seekBar.timeshift'))} ${i18n.performLocalization(i18n.getLocalizer('seekBar.value'))}: ${timeshiftValue}`);
+      this.getDomElement().attr('aria-valuetext', timeShiftText);
+
+      if (this.config.addCurrentTimeToAriaLabel) {
+        this.getDomElement().attr('aria-label', `${i18n.performLocalization(this.config.ariaLabel)}: ${timeShiftText}`);
+      }
     } else if (this.seekBarType === SeekBarType.Vod) {
       const ariaValueText = `${StringUtils.secondsToText(this.player.getCurrentTime())} ${i18n.performLocalization(i18n.getLocalizer('seekBar.durationText'))} ${StringUtils.secondsToText(this.player.getDuration())}`;
       this.getDomElement().attr('aria-valuenow', Math.floor(this.player.getCurrentTime()).toString());
       this.getDomElement().attr('aria-valuetext', ariaValueText);
+
+      if (this.config.addCurrentTimeToAriaLabel) {
+        this.getDomElement().attr('aria-label', `${i18n.performLocalization(this.config.ariaLabel)}: ${StringUtils.secondsToText(this.player.getCurrentTime())}`);
+      }
     }
   }
 
