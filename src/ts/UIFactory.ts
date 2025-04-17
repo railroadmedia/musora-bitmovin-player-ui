@@ -437,7 +437,6 @@ function smallScreenUILayout() {
     container: settingsPanel,
   });
   mainSettingsPanelPage.addComponent(subtitleSelectItem);
-  settingsPanel.addComponent(subtitleSelectItem);
   settingsPanel.addComponent(subtitleSettingsPanelPage);
 
   let controlBar = new ControlBar({
