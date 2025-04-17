@@ -4,14 +4,6 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
-
-### Changed
-- Subtitle options are now accessible in the subtitle selection menu
-
-### Removed
-- `SubtitleSettingsLabel`
-
 ## [3.84.0] - 2025-01-15
 
 ### Added
