@@ -466,7 +466,16 @@ export namespace UIFactory {
       player,
       [
         {
+          ...modernTvAdsUI(),
+          condition: (context: UIConditionContext) => {
+            return context.isAd && context.adRequiresUi;
+          },
+        },
+        {
           ...modernTvUI(),
+          condition: (context: UIConditionContext) => {
+            return !context.isAd && !context.adRequiresUi;
+          }
         },
       ],
       config,
@@ -574,5 +583,51 @@ export namespace UIFactory {
       ui: uiContainer,
       spatialNavigation: spatialNavigation,
     };
+  }
+
+  export function modernTvAdsUI() {
+    const skipAdButton = new AdSkipButton();
+    const playbackToggleButton = new PlaybackToggleButton();
+    const volumeToggleButton = new VolumeToggleButton();
+
+    const uiContainer = new UIContainer({
+      components: [
+        new BufferingOverlay(),
+        new AdClickOverlay(),
+        new PlaybackToggleOverlay(),
+
+        new Container({
+          components: [new AdMessageLabel({ text: i18n.getLocalizer('ads.remainingTime') }), skipAdButton],
+          cssClass: 'ui-ads-status',
+        }),
+        new ControlBar({
+          components: [
+            new Container({
+              components: [
+                playbackToggleButton,
+                volumeToggleButton,
+              ],
+              cssClasses: ['controlbar-bottom'],
+            }),
+          ],
+        }),
+      ],
+      cssClasses: ['ui-skin-tv', 'ui-skin-ads'],
+      hideDelay: 2000,
+      hidePlayerStateExceptions: [
+        PlayerUtils.PlayerState.Prepared,
+        PlayerUtils.PlayerState.Paused,
+        PlayerUtils.PlayerState.Finished,
+      ],
+    });
+
+    const spatialNavigation = new SpatialNavigation(
+      new RootNavigationGroup(uiContainer, playbackToggleButton, volumeToggleButton, skipAdButton),
+    );
+
+    return {
+      ui: uiContainer,
+      spatialNavigation: spatialNavigation,
+    }
   }
 }
