@@ -90,6 +90,10 @@
     font-size: 2.5vh;
   }
 
+  .#{$prefix}-ui-ads-status {
+    font-size: $medium-size;
+  }
+
   :focus {
     border: 0;
     box-shadow: $focus-element-box-shadow;
