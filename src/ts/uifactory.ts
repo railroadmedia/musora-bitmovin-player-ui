@@ -588,7 +588,6 @@ export namespace UIFactory {
   export function modernTvAdsUI() {
     const skipAdButton = new AdSkipButton();
     const playbackToggleButton = new PlaybackToggleButton();
-    const volumeToggleButton = new VolumeToggleButton();
 
     const uiContainer = new UIContainer({
       components: [
@@ -605,7 +604,6 @@ export namespace UIFactory {
             new Container({
               components: [
                 playbackToggleButton,
-                volumeToggleButton,
               ],
               cssClasses: ['controlbar-bottom'],
             }),
@@ -622,7 +620,7 @@ export namespace UIFactory {
     });
 
     const spatialNavigation = new SpatialNavigation(
-      new RootNavigationGroup(uiContainer, playbackToggleButton, volumeToggleButton, skipAdButton),
+      new RootNavigationGroup(uiContainer, playbackToggleButton, skipAdButton),
     );
 
     return {
