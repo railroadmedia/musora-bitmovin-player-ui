@@ -16,16 +16,16 @@ jobs:
     steps:
         # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up node.js
-        uses: actions/setup-node@v3.3.0
+        uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
 
       - name: Cache node modules
         id: cache-nodemodules
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         env:
           cache-name: cache-node-modules
         with:
@@ -46,7 +46,7 @@ jobs:
         run: tar -czvf artifact.tar.gz dist
         shell: bash
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           path: |
             ${{ github.workspace }}/artifact.tar.gz

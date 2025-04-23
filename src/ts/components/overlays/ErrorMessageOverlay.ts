@@ -100,6 +100,7 @@ export class ErrorMessageOverlay extends Container<ErrorMessageOverlayConfig> {
       cssClass: 'ui-errormessage-overlay',
       components: [this.tvNoiseBackground, this.errorLabel],
       hidden: true,
+      role: 'status',
     }, this.config);
   }
 
@@ -137,8 +138,7 @@ export class ErrorMessageOverlay extends Container<ErrorMessageOverlayConfig> {
 
     player.on(player.exports.PlayerEvent.SourceLoaded, (event: PlayerEventBase) => {
       if (this.isShown()) {
-        this.tvNoiseBackground.stop();
-        this.hide();
+        this.clear();
       }
     });
   }
@@ -149,11 +149,18 @@ export class ErrorMessageOverlay extends Container<ErrorMessageOverlayConfig> {
     this.show();
   }
 
-  release(): void {
-    super.release();
+  private clear(): void {
+    this.errorLabel.setText('');
 
     // Canvas rendering must be explicitly stopped, else it just continues forever and hogs resources
     this.tvNoiseBackground.stop();
+    this.hide();
+  }
+
+  release(): void {
+    super.release();
+
+    this.clear();
   }
 }
 

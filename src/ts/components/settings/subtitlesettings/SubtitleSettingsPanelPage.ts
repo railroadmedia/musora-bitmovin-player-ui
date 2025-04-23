@@ -50,6 +50,7 @@ export class SubtitleSettingsPanelPage extends SettingsPanelPage {
         i18n.getLocalizer('settings.subtitles.font.size'),
         new FontSizeSelectBox({
           overlay: this.overlay,
+          filter: (item) => this.overlay.filterFontSizeOptions(item),
         }),
         config.useDynamicSettingsPanelItem,
       ),
@@ -149,6 +150,17 @@ export class SubtitleSettingsPanelPage extends SettingsPanelPage {
 
     this.onActive.subscribe(() => {
       this.overlay.enablePreviewSubtitleLabel();
+
+      // Dynamically reapply font size filter
+      const fontSizeComponent = this.getComponents().find((component: any) =>
+        component instanceof SettingsPanelItem &&
+        component.getComponents().some((c) => c instanceof FontSizeSelectBox)
+      ) as SettingsPanelItem<SettingsPanelItemConfig>;
+
+      if (fontSizeComponent) {
+        const fontSizeSelectBox = fontSizeComponent.getComponents().find(c => c instanceof FontSizeSelectBox) as FontSizeSelectBox;
+        fontSizeSelectBox?.reapplyFilterAndReload();
+      }
     });
 
     this.onInactive.subscribe(() => {
