@@ -8,8 +8,32 @@ on:
       - develop
 
 jobs:
-  trigger-ui-release:
+  verify-changelog:
     if: github.event.pull_request.merged == true
+    outputs:
+      HAS_CHANGELOG: ${{ steps.ensure-changelog.outputs.HAS_CHANGELOG }}
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Ensure Changelog
+      id: ensure-changelog
+      shell: bash
+      run: |
+        changes=$(gh pr view ${{github.event.pull_request.number}} --json files -q '.files[].path')
+        if echo $changes | grep -q CHANGELOG.md; then
+          echo "CHANGELOG.md has been updated"
+          echo "HAS_CHANGELOG=true" >> $GITHUB_OUTPUT
+        else
+          echo "CHANGELOG.md has not been updated, skipping release"
+        fi
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  trigger-ui-release:
+    needs: verify-changelog
+    if: ${{ needs.verify-changelog.outputs.HAS_CHANGELOG }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

@@ -76,6 +76,6 @@
   "seekBar.value": "posición",
   "seekBar.timeshift": "cambio de posición",
   "seekBar.durationText": "de",
-  "quickseek.forward": "Adelantar",
-  "quickseek.rewind": "Rebobinar"
+  "quickseek.forward": "Adelantar {seekSeconds} segundos",
+  "quickseek.rewind": "Rebobinar {seekSeconds} segundos"
 }

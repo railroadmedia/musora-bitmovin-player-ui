@@ -39,7 +39,11 @@ export class QuickSeekButton extends Button<QuickSeekButtonConfig> {
     const seekDirection = this.config.seekSeconds < 0 ? 'rewind' : 'forward';
 
     this.config.text = this.config.text || i18n.getLocalizer(`quickseek.${seekDirection}`);
-    this.config.ariaLabel = this.config.ariaLabel || i18n.getLocalizer(`quickseek.${seekDirection}`);
+    this.config.ariaLabel =
+      this.config.ariaLabel ||
+      i18n.getLocalizer(`quickseek.${seekDirection}`, {
+        seekSeconds: Math.abs(this.config.seekSeconds),
+      });
 
     this.getDomElement().data(this.prefixCss('seek-direction'), seekDirection);
   }

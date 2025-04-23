@@ -4,6 +4,53 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.91.0] - 2025-04-10
+
+### Added
+- `aria-label` to `ErrorMessageOverlay`
+- New `ariaFallbackMode` configuration option to `SeekBarConfig`, which updates the current playback position also in the `aria-label`. This can be used for devices which don't support the `aria-valuetext` attribute for `slider`s.
+
+### Changed
+- The `aria-pressed` attribute is only set on `ToggleButton`s instead of all buttons
+- The `aria-pressed` attribute is not set if both, `onAriaLabel` and `offAriaLabel`, configuration properties are set for a specific component
+- The `aria-label` for Quickseek buttons contain now also the number of seconds the button seeks
+
+### Fixed
+- Error message in `ErrorMessageOverlay` not read by Text-To-Speech engine on Tizen
+
+## [3.90.0] - 2025-04-03
+
+### Fixed
+- Setting larger font size while using CEA-608 captions can shift some cues outside of visible area.
+
+## [3.89.0] - 2025-03-24
+
+### Added
+- Changing font size now also takes an effect in CEA-608 captions with cap from 50% to 200%. Larger than default font size also disables the grid view.
+
+## [3.88.0] - 2025-02-25
+
+### Changed
+- Chore: Skip releasing a new version when no changelog entry was added
+- Chore: Fix release workflow
+- Chore: Fix release workflow again
+- Chore: Fix release condition
+
+## [3.87.0] - 2025-02-20
+
+### Fixed
+- Setting font color in subtitle customization settings not working on Comcast X1 Set-Top Boxes and other older WebKit-based platforms
+
+## [3.86.0] - 2025-02-20
+
+### Changed
+- Chore: Update github actions to v4
+
+## [3.85.0] - 2025-01-16
+
+### Changed
+- Chore: Update assets to use Bitmovin CDN
+
 ## [3.84.0] - 2025-01-15
 
 ### Added
@@ -1068,6 +1115,12 @@ Version 2.0 of the UI framework is built for player 7.1. If absolutely necessary
 ## 1.0.0 (2017-02-03)
 - First release
 
+[3.91.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.90.0...v3.91.0
+[3.90.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.89.0...v3.90.0
+[3.89.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.88.0...v3.89.0
+[3.88.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.87.0...v3.88.0
+[3.87.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.86.0...v3.87.0
+[3.86.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.85.0...v3.86.0
 [3.85.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.84.0...v3.85.0
 [3.84.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.83.0...v3.84.0
 [3.83.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.82.0...v3.83.0
