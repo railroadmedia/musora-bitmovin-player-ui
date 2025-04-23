@@ -11,7 +11,7 @@
     )
   );
 
-  $background-color: transparentize($color-background-menu, .15);
+  $background-color: transparentize($color-background-menu, .20);
 
   backdrop-filter: blur(10px);
   background-color: $background-color;

@@ -14,12 +14,12 @@
 
   @media (hover: hover) {
     &:hover {
-      background-color: transparentize($color-item-hover, .15);
+      background-color: transparentize($color-item-hover, .20);
     }
   }
 
   &:active {
-    background-color: transparentize($color-item-hover, .15);
+    background-color: transparentize($color-item-hover, .20);
   }
 
   &.#{$prefix}-hidden {
@@ -81,7 +81,7 @@
   }
 
   &.#{$prefix}-title-item {
-    background-color: transparentize($color-background-menu-title, .15);
+    background-color: transparentize($color-background-menu-title, .20);
   }
 }
 
