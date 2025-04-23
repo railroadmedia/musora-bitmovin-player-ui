@@ -1,6 +1,6 @@
-@import '../../../variables';
+@import '../../variables';
 
-.#{$prefix}-ui-textbutton {
+.#{$prefix}-ui-settings-panel-navigation-text-button {
   @extend %ui-button;
 
   font-size: .8em;
