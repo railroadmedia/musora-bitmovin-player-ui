@@ -13,6 +13,6 @@ export class SubtitleListBox extends ListBox {
   configure(player: PlayerAPI, uimanager: UIInstanceManager): void {
     super.configure(player, uimanager);
 
-    new SubtitleSwitchHandler(player, this, uimanager);
+    new SubtitleSwitchHandler(player, this.config.listSelector, uimanager);
   }
 }
