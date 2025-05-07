@@ -42,6 +42,7 @@ export class ListBox extends SettingsPanel<ListBoxConfig> {
         new SettingsPanelItem({
           label: label,
           cssClasses: ['title-item'],
+          isSetting: false,
         })
       );
     }
