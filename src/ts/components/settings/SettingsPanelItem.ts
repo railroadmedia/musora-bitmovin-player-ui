@@ -29,6 +29,11 @@ export interface SettingsPanelItemConfig extends ContainerConfig {
    * If the setting should be added as a component to this item.
    */
   addSettingAsComponent?: boolean;
+  /**
+   * Indicates if the SettingsPanelItem is representing an actual setting or if it just a label. E.g. when used
+   * as a title.
+   */
+  isSetting?: boolean;
 }
 
 /**
@@ -57,6 +62,7 @@ export class SettingsPanelItem<Config extends SettingsPanelItemConfig> extends C
       cssClass: 'ui-settings-panel-item',
       role: 'menuitem',
       addSettingAsComponent: true,
+      isSetting: true,
     } as Config, this.config);
 
     const label = config.label;
