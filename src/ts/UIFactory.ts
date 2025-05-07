@@ -595,35 +595,18 @@ function castReceiverUILayout(config: UIConfig) {
 
 function tvUILayout() {
   const subtitleListBox = new SubtitleListBox();
-  const subtitleListPanel = new SettingsPanel({
-    components: [
-      new SettingsPanelPage({
-        components: [new SettingsPanelItem({ settingComponent: subtitleListBox })],
-      }),
-    ],
-    hidden: true,
-  });
-
   const audioTrackListBox = new AudioTrackListBox();
-  const audioTrackListPanel = new SettingsPanel({
-    components: [
-      new SettingsPanelPage({
-        components: [new SettingsPanelItem({ settingComponent: audioTrackListBox })],
-      }),
-    ],
-    hidden: true,
-  });
 
   const seekBar = new SeekBar({ label: new SeekBarLabel() });
   const playbackToggleOverlay = new PlaybackToggleOverlay();
   const subtitleToggleButton = new SettingsToggleButton({
-    settingsPanel: subtitleListPanel,
+    settingsPanel: subtitleListBox,
     autoHideWhenNoActiveSettings: true,
     cssClass: 'ui-subtitlesettingstogglebutton',
     text: i18n.getLocalizer('settings.subtitles'),
   });
   const audioToggleButton = new SettingsToggleButton({
-    settingsPanel: audioTrackListPanel,
+    settingsPanel: audioTrackListBox,
     autoHideWhenNoActiveSettings: true,
     cssClass: 'ui-audiotracksettingstogglebutton',
     ariaLabel: i18n.getLocalizer('settings.audio.track'),
@@ -665,8 +648,8 @@ function tvUILayout() {
           new Container({
             components: [
               new MetadataLabel({ content: MetadataLabelContent.Description }),
-              subtitleListPanel,
-              audioTrackListPanel,
+              subtitleListBox,
+              audioTrackListBox,
             ],
             cssClasses: ['ui-titlebar-bottom'],
           }),
@@ -686,8 +669,8 @@ function tvUILayout() {
 
   const spatialNavigation = new SpatialNavigation(
     new RootNavigationGroup(uiContainer, playbackToggleOverlay, seekBar, audioToggleButton, subtitleToggleButton),
-    new ListNavigationGroup(ListOrientation.Vertical, subtitleListPanel, subtitleListBox),
-    new ListNavigationGroup(ListOrientation.Vertical, audioTrackListPanel, audioTrackListBox),
+    new ListNavigationGroup(ListOrientation.Vertical, subtitleListBox),
+    new ListNavigationGroup(ListOrientation.Vertical, audioTrackListBox),
   );
 
   return {
