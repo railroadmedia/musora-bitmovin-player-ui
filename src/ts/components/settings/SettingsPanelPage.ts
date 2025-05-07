@@ -114,4 +114,20 @@ export class SettingsPanelPage extends Container<SettingsPanelPageConfig> {
   get onInactive(): Event<SettingsPanelPage, NoArgs> {
     return this.settingsPanelPageEvents.onInactive.getEvent();
   }
+
+  /**
+   * Dynamically add a settings panel item to the page.
+   */
+  addSettingsPanelItem(settingsPanelItem: SettingsPanelItem<SettingsPanelItemConfig>) {
+    this.addComponent(settingsPanelItem);
+    this.updateComponents();
+  }
+
+  /**
+   * Dynamically remove a settings panel item from the page.
+   */
+  removeSettingsPanelItem(settingsPanelItem: SettingsPanelItem<SettingsPanelItemConfig>) {
+    this.removeComponent(settingsPanelItem);
+    this.updateComponents();
+  }
 }
