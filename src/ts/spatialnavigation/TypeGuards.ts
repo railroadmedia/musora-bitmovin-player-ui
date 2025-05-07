@@ -1,10 +1,10 @@
 import { Component } from '../components/Component';
-import { SettingsPanel } from '../components/settings/SettingsPanel';
+import { SettingsPanel, SettingsPanelConfig } from '../components/settings/SettingsPanel';
 import { Container } from '../components/Container';
 import { ListBox } from '../components/lists/ListBox';
 import { Action, Direction } from './types';
 
-export function isSettingsPanel(component: Component<unknown>): component is SettingsPanel {
+export function isSettingsPanel(component: Component<unknown>): component is SettingsPanel<SettingsPanelConfig> {
   return component instanceof SettingsPanel;
 }
 

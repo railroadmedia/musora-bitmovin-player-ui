@@ -8,7 +8,7 @@ import { SettingsPanelItem, SettingsPanelItemConfig } from './SettingsPanelItem'
 import { SettingsPanelSelectOption } from './SettingsPanelSelectOption';
 import { SettingsPanelPage } from './SettingsPanelPage';
 import { SubtitleSettingsLabel } from './subtitlesettings/SubtitleSettingsLabel';
-import { SettingsPanel } from './SettingsPanel';
+import { SettingsPanel, SettingsPanelConfig } from './SettingsPanel';
 import { SettingsPanelPageBackButton } from './SettingsPanelPageBackButton';
 import { SubtitleSettingSelectBox } from './subtitlesettings/SubtitleSettingSelectBox';
 import { InteractiveSettingsPanelItem } from './InteractiveSettingsPanelItem';
@@ -30,7 +30,7 @@ export interface DynamicSettingsPanelItemConfig extends SettingsPanelItemConfig 
   /**
    * The enclosing {@link SettingsPanel} where the sub page will be added.
    */
-  container: SettingsPanel;
+  container: SettingsPanel<SettingsPanelConfig>;
 }
 
 /**
