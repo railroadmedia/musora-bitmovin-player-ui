@@ -69,7 +69,7 @@ export class SettingsPanelPage extends Container<SettingsPanelPageConfig> {
 
   hasActiveSettings(): boolean {
     for (let component of this.getItems()) {
-      if (component.isActive()) {
+      if (component.getConfig().isSetting && component.isActive()) {
         return true;
       }
     }
