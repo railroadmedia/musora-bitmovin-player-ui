@@ -31,13 +31,13 @@ export class ListBox extends SettingsPanel<ListBoxConfig> {
 
     this.config = this.mergeConfig(config, {
       hidden: true,
-      cssClass: 'ui-listbox',
+      cssClasses: ['ui-listbox'],
     }, this.config);
 
     this.addComponent(this.settingsPanelPage);
 
     if (config.title) {
-      const label = new Label({ text: config.title, cssClass: 'title-label' })
+      const label = new Label({ text: config.title, cssClasses: ['title-label'] })
       this.settingsPanelPage.addComponent(
         new SettingsPanelItem({
           label: label,

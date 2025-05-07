@@ -82,6 +82,10 @@
 
   &.#{$prefix}-title-item {
     border-bottom: 1px solid transparentize($color-item-hover, .15);
+
+    .#{$prefix}-label {
+      font-size: .8em;
+    }
   }
 }
 
