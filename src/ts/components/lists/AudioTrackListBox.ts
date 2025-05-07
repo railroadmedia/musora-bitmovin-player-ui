@@ -17,7 +17,6 @@ export class AudioTrackListBox extends ListBox {
     super(config);
   }
 
-
   configure(player: PlayerAPI, uimanager: UIInstanceManager): void {
     super.configure(player, uimanager);
     new AudioTrackSwitchHandler(player, this.config.listSelector, uimanager);
