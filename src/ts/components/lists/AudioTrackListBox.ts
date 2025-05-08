@@ -3,6 +3,7 @@ import {UIInstanceManager} from '../../UIManager';
 import {AudioTrackSwitchHandler} from '../../utils/AudioTrackUtils';
 import { PlayerAPI } from 'bitmovin-player';
 import { AudioTrackSelectBox } from '../settings/AudioTrackSelectBox';
+import { LocalizableText } from '../../localization/i18n';
 
 /**
  * A element that is similar to a select box where the user can select a subtitle
@@ -11,10 +12,11 @@ import { AudioTrackSelectBox } from '../settings/AudioTrackSelectBox';
  */
 export class AudioTrackListBox extends ListBox {
 
-  constructor(config: ListBoxConfig = {
-    listSelector: new AudioTrackSelectBox()
-  }) {
-    super(config);
+  constructor(title?: LocalizableText) {
+    super({
+      listSelector: new AudioTrackSelectBox(),
+      title: title,
+    });
   }
 
   configure(player: PlayerAPI, uimanager: UIInstanceManager): void {
