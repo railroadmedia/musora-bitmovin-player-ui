@@ -4,12 +4,12 @@ import {Event, EventDispatcher, NoArgs} from '../../EventDispatcher';
 import { Label, LabelConfig } from '../labels/Label';
 import {UIInstanceManager} from '../../UIManager';
 import {SelectBox} from './SelectBox';
-import {ListBox} from '../lists/ListBox';
 import {VideoQualitySelectBox} from './VideoQualitySelectBox';
 import {AudioQualitySelectBox} from './AudioQualitySelectBox';
 import {PlaybackSpeedSelectBox} from './PlaybackSpeedSelectBox';
 import { PlayerAPI } from 'bitmovin-player';
 import { LocalizableText } from '../../localization/i18n';
+import { ListSelector } from '../lists/ListSelector';
 
 /**
  * Configuration interface for a {@link SettingsPanelItem}
@@ -29,6 +29,11 @@ export interface SettingsPanelItemConfig extends ContainerConfig {
    * If the setting should be added as a component to this item.
    */
   addSettingAsComponent?: boolean;
+  /**
+   * Indicates if the SettingsPanelItem is representing an actual setting or if it just a label. E.g. when used
+   * as a title.
+   */
+  isSetting?: boolean;
 }
 
 /**
@@ -57,6 +62,7 @@ export class SettingsPanelItem<Config extends SettingsPanelItemConfig> extends C
       cssClass: 'ui-settings-panel-item',
       role: 'menuitem',
       addSettingAsComponent: true,
+      isSetting: true,
     } as Config, this.config);
 
     const label = config.label;
@@ -79,9 +85,9 @@ export class SettingsPanelItem<Config extends SettingsPanelItemConfig> extends C
       this.updateComponents();
     }
 
-    if (this.settingComponent instanceof SelectBox || this.settingComponent instanceof ListBox) {
+    if (this.settingComponent instanceof ListSelector) {
       let handleConfigItemChanged = () => {
-        if (!(this.settingComponent instanceof SelectBox) && !(this.settingComponent instanceof ListBox)) {
+        if (!(this.settingComponent instanceof ListSelector)) {
           return;
         }
         // The minimum number of items that must be available for the setting to be displayed

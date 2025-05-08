@@ -120,6 +120,7 @@ export class DynamicSettingsPanelItem extends InteractiveSettingsPanelItem<Dynam
     const backSettingsPanelItem = new SettingsPanelItem({
       label: backButton,
       cssClasses: ['title-item'],
+      isSetting: false,
     });
     page.addComponent(backSettingsPanelItem);
 

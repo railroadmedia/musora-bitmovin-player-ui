@@ -1,11 +1,6 @@
 import { Container } from '../../src/ts/components/Container';
 import { Component } from '../../src/ts/components/Component';
-import { ListBox } from '../../src/ts/components/lists/ListBox';
 import { getHtmlElementsFromComponents } from '../../src/ts/spatialnavigation/getHtmlElementsFromComponents';
-
-class DummyListBox extends ListBox {
-  public className = 'ListBox';
-}
 
 class DummyContainer extends Container<{}> {
   public className = 'Container';
@@ -20,7 +15,6 @@ describe('getHtmlElementsFromComponents', () => {
     component
     ${createContainerMock()}
     ${createComponentMock()}
-    ${createListBoxMock()}
   `('should return an empty array for an empty $component.className', ({ component }) => {
     const htmlElements = getHtmlElementsFromComponents([component]);
 
@@ -28,21 +22,15 @@ describe('getHtmlElementsFromComponents', () => {
   });
 
   it('should resolve components recursively', () => {
-    const listBoxEntries = [
-      document.createElement('div'),
-      document.createElement('div'),
-      document.createElement('div'),
-    ];
     const componentElements = [
       document.createElement('button'),
       document.createElement('button'),
     ];
-    const expectedHtmlElements = [componentElements[0], ...listBoxEntries];
+    const expectedHtmlElements = [componentElements[0]];
 
     const container = createContainerMock(
       createContainerMock(createComponentMock()),
       createContainerMock(createContainerMock(createComponentMock(...componentElements))),
-      createListBoxMock(...listBoxEntries),
     );
 
     const htmlElements = getHtmlElementsFromComponents([container as Container<any>]);
@@ -64,14 +52,6 @@ describe('getHtmlElementsFromComponents', () => {
     expect(htmlElements).toEqual(expectedHtmlElements);
   });
 });
-
-function createListBoxMock(...elements: HTMLElement[]): jest.Mocked<DummyListBox> {
-  const listBox = new DummyListBox();
-
-  listBox.getDomElement = jest.fn().mockReturnValue({ get: () => [{ children: elements }] });
-
-  return listBox as jest.Mocked<DummyListBox>;
-}
 
 function createContainerMock(...components: DummyComponent[]): jest.Mocked<DummyContainer> {
   const container = new DummyContainer({});

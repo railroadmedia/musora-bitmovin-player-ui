@@ -1,6 +1,6 @@
 import { Component } from '../components/Component';
 import { Container } from '../components/Container';
-import { isComponent, isContainer, isListBox } from './TypeGuards';
+import { isComponent, isContainer } from './TypeGuards';
 
 /**
  * Recursively resolves a container and the components contained within them, building a flat list of components.
@@ -27,11 +27,7 @@ function resolveAllComponents(container: Container<unknown>): Component<unknown>
  * @param component The component to get the HTML elements from
  */
 function toHtmlElement(component: Component<unknown>): HTMLElement[] {
-  if (isListBox(component)) {
-    return [].slice.call(component.getDomElement().get()[0].children);
-  } else {
     return component.getDomElement().get().slice(0, 1);
-  }
 }
 
 /**
