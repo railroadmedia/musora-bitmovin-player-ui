@@ -309,7 +309,7 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
 
 
     const settingsManager = uimanager.getSubtitleSettingsManager();
-    const fontSizeFactorSettings = this.resolveFontSizeFactor(settingsManager.fontSize.value);
+    const fontSizeFactorSettings = this.resolveFontSizeFactor(settingsManager.fontSize.value ?? '100');
     this.setFontSizeFactor(fontSizeFactorSettings);
 
     settingsManager.fontSize.onChanged.subscribe((_sender, property) => {
