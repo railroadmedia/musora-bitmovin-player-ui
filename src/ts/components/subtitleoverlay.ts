@@ -263,11 +263,11 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
       return !isNaN(percent) && percent <= 200;
     }
 
-    return true
+    return true;
   };
 
   resolveFontSizeFactor(value: string): number {
-    return parseInt(value) / 100;;
+    return parseInt(value) / 100;
   }
 
   updateRegionRowPosition(r: SubtitleRegionContainer): void {
