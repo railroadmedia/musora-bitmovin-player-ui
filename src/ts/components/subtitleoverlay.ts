@@ -263,11 +263,11 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
       return !isNaN(percent) && percent <= 200;
     }
 
-    return true
+    return true;
   };
 
   resolveFontSizeFactor(value: string): number {
-    return parseInt(value) / 100;;
+    return parseInt(value) / 100;
   }
 
   updateRegionRowPosition(r: SubtitleRegionContainer): void {
@@ -309,8 +309,10 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
 
 
     const settingsManager = uimanager.getSubtitleSettingsManager();
-    const fontSizeFactorSettings = this.resolveFontSizeFactor(settingsManager.fontSize.value);
-    this.setFontSizeFactor(fontSizeFactorSettings);
+    if (settingsManager.fontSize.value != null) {
+      const fontSizeFactorSettings = this.resolveFontSizeFactor(settingsManager.fontSize.value);
+      this.setFontSizeFactor(fontSizeFactorSettings);
+    }
 
     settingsManager.fontSize.onChanged.subscribe((_sender, property) => {
       if (property.isSet()) {

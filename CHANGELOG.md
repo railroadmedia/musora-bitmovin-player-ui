@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+- CEA caption rendering broken if no user preference is present for subtitle font size
+
 ## [3.92.0] - 2025-04-23
 
 ### Added

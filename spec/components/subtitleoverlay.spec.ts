@@ -87,6 +87,10 @@ describe('SubtitleOverlay', () => {
       subtitleOverlay.configure(playerMock, uiInstanceManagerMock);
     });
 
+    it('should preserve default FONT_SIZE_FACTOR of 1 if no font size value on settings present', () => {
+      expect(subtitleOverlay['FONT_SIZE_FACTOR']).toBe(1);
+    });
+
     // Font size factor clamping
     test.each([
       [0.2, 0.5],  // Clamped to minimum
