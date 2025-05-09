@@ -24,9 +24,9 @@ export interface DynamicSettingsPanelItemConfig extends SettingsPanelItemConfig 
    */
   label: LocalizableText;
   /**
-   * Optional component to be displayed next to the label. 
+   * Optional back navigation component to be displayed on the right side of the label. 
    */
-  labelComponent?: Component<ComponentConfig>;
+  backNavigationRightComponent?: Component<ComponentConfig>;
   /**
    * The list selector component which will be used to build the sub page.
    */
@@ -45,7 +45,7 @@ export interface DynamicSettingsPanelItemConfig extends SettingsPanelItemConfig 
  */
 export class DynamicSettingsPanelItem extends InteractiveSettingsPanelItem<DynamicSettingsPanelItemConfig> {
   private selectedOptionLabel: Label<LabelConfig>;
-  protected labelComponent: Component<ComponentConfig>;
+  protected backNavigationRightComponent: Component<ComponentConfig>;
   protected settingComponent: ListSelector<ListSelectorConfig>;
 
   private player: PlayerAPI;
@@ -54,7 +54,7 @@ export class DynamicSettingsPanelItem extends InteractiveSettingsPanelItem<Dynam
   constructor(config: DynamicSettingsPanelItemConfig) {
     super(config);
 
-    this.labelComponent = config.labelComponent;
+    this.backNavigationRightComponent = config.backNavigationRightComponent;
     this.settingComponent = config.settingComponent;
 
     this.selectedOptionLabel = new Label({
@@ -80,8 +80,8 @@ export class DynamicSettingsPanelItem extends InteractiveSettingsPanelItem<Dynam
     this.player = player;
     this.uimanager = uimanager;
 
-    if (this.labelComponent != null) {
-      this.labelComponent.configure(this.player, this.uimanager);
+    if (this.backNavigationRightComponent != null) {
+      this.backNavigationRightComponent.configure(this.player, this.uimanager);
     }
 
     if (this.settingComponent != null) {
@@ -125,7 +125,7 @@ export class DynamicSettingsPanelItem extends InteractiveSettingsPanelItem<Dynam
     backButton.configure(this.player, this.uimanager);
     const backSettingsPanelItem = new SettingsPanelItem({
       label: backButton,
-      settingComponent: this.labelComponent,
+      settingComponent: this.backNavigationRightComponent,
       cssClasses: ['title-item'],
     });
     backSettingsPanelItem.configure(this.player, this.uimanager);
