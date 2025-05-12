@@ -304,9 +304,11 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
     let fontLetterSpacing = 0;
     // Flag telling if a font size calculation is required of if the current values are valid
     let fontSizeCalculationRequired = true;
+    // The ratio of the caption window/row height that is used as padding to make the window enclose the caption
+    const windowPaddingRatio = 0.2;
+    let windowPadding: number;
     // Flag telling if the CEA-608 mode is enabled
     this.cea608Enabled = false;
-
 
     const settingsManager = uimanager.getSubtitleSettingsManager();
     if (settingsManager.fontSize.value != null) {
@@ -382,6 +384,8 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
 
       // After computing overlay dimensions:
       const newRowHeight = fontSize;
+      fontSize = newRowHeight * (1 - windowPaddingRatio);
+      windowPadding = newRowHeight * windowPaddingRatio;
 
       // Update row position of regions
       const regions = this.getComponents();
@@ -407,7 +411,7 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
           'left': isLargerFontSize && '0%',
         });
 
-        label.regionStyle = `line-height: ${fontSize}px;`;
+        label.regionStyle = `line-height: ${fontSize}px; padding: ${windowPadding / 2}px; height: ${fontSize}px`;
       }
 
       for (let label of this.getComponents()) {
@@ -462,7 +466,7 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
         'white-space': `${isLargerFontSize ? 'nowrap' : 'normal'}`,
       });
 
-      label.regionStyle = `line-height: ${fontSize}px;`;
+      label.regionStyle = `line-height: ${fontSize}px; padding: ${windowPadding / 2}px; height: ${fontSize}px`;
     });
 
     const reset = () => {
