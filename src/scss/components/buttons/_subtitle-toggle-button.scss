@@ -9,12 +9,12 @@
   }
 
   &.#{$prefix}-subtitles-on {
-    background-image: url('../../assets/images/subtitles-on.svg');
+    background-image: url('../../assets/images/subtitles.svg');
     background-size: 1.5em;
   }
 
   &.#{$prefix}-subtitles-off {
-    background-image: url('../../assets/images/subtitles-off.svg');
+    background-image: url('../../assets/images/subtitlesX.svg');
     background-size: 1.5em;
   }
 }

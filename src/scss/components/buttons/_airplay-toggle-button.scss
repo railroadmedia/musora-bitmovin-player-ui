@@ -11,6 +11,7 @@
   }
 
   &.#{$prefix}-on {
-    background-image: url('../../assets/images/airplayX.svg');
+    // TODO: replace with filled cast icon once available
+    background-image: url('../../assets/images/airplay.svg');
   }
 }
