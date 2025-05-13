@@ -364,12 +364,14 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
         (dummyLabelCharHeight * this.CEA608_NUM_ROWS);
       // The size ratio of the available space for the grid
       const subtitleOverlaySizeRatio = subtitleOverlayWidth / subtitleOverlayHeight;
+      let newRowHeight = 0;
 
       if (subtitleOverlaySizeRatio > fontGridSizeRatio) {
         // When the available space is wider than the text grid, the font size is simply
         // determined by the height of the available space.
-        fontSize = subtitleOverlayHeight / this.CEA608_NUM_ROWS;
-
+        newRowHeight = subtitleOverlayHeight / this.CEA608_NUM_ROWS;
+        fontSize = newRowHeight * (1 - windowPaddingRatio);
+        
         // Calculate the additional letter spacing required to evenly spread the text across the grid's width
         const gridSlotWidth = subtitleOverlayWidth / this.CEA608_NUM_COLUMNS;
         const fontCharWidth = fontSize * fontSizeRatio;
@@ -378,13 +380,11 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
         // When the available space is not wide enough, texts would vertically overlap if we take
         // the height as a base for the font size, so we need to limit the height. We do that
         // by determining the font size by the width of the available space.
-        fontSize = subtitleOverlayWidth / this.CEA608_NUM_COLUMNS / fontSizeRatio;
+        newRowHeight = subtitleOverlayWidth / this.CEA608_NUM_COLUMNS / fontSizeRatio;
+        fontSize = newRowHeight * (1 - windowPaddingRatio);
         fontLetterSpacing = 0;
       }
-
-      // After computing overlay dimensions:
-      const newRowHeight = fontSize;
-      fontSize = newRowHeight * (1 - windowPaddingRatio);
+      
       windowPadding = newRowHeight * windowPaddingRatio;
 
       // Update row position of regions
