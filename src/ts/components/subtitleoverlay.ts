@@ -753,6 +753,7 @@ export class SubtitleRegionContainerManager {
 
       if (label.regionStyle) {
         regionContainer.getDomElement().attr('style', label.regionStyle);
+        regionContainer.getDomElement().css('position', 'static');
       } else if (label.vtt && !label.vtt.region) {
         /**
          * If there is no region present to wrap the Cue Box, the Cue box becomes the
