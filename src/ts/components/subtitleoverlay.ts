@@ -414,21 +414,21 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
         label.regionStyle = `line-height: ${fontSize}px; padding: ${windowPadding / 2}px; height: ${fontSize}px`;
       }
 
-      for (let label of this.getComponents()) {
-        if (label instanceof SubtitleRegionContainer) {
-          label.getDomElement().css({
+      for (const childComponent of this.getComponents()) {
+        if (childComponent instanceof SubtitleRegionContainer) {
+          childComponent.getDomElement().css({
             'line-height': `${fontSize}px`,
             padding: `${windowPadding / 2}px`,
             height: `${fontSize}px`
           });
 
-          label.getComponents().forEach((l: SubtitleLabel) => {
+          childComponent.getComponents().forEach((l: SubtitleLabel) => {
             updateLabel(l);
           })
         }
 
-        if (label instanceof SubtitleLabel) {
-          updateLabel(label);
+        if (childComponent instanceof SubtitleLabel) {
+          updateLabel(childComponent);
         }
       }
     };
