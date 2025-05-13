@@ -134,6 +134,7 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
       removedActiveCues.forEach(toRemove => {
         this.subtitleContainerManager.removeLabel(toRemove.label);
       });
+      this.updateComponents();
     };
 
     player.on(player.exports.PlayerEvent.AudioChanged, subtitleClearHandler);
