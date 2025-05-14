@@ -1,5 +1,5 @@
 import {ToggleButton, ToggleButtonConfig} from '../buttons/ToggleButton';
-import {SettingsPanel} from './SettingsPanel';
+import { SettingsPanel, SettingsPanelConfig } from './SettingsPanel';
 import {UIInstanceManager} from '../../UIManager';
 import {Component, ComponentConfig} from '../Component';
 import {ArrayUtils} from '../../utils/ArrayUtils';
@@ -15,7 +15,7 @@ export interface SettingsToggleButtonConfig extends ToggleButtonConfig {
   /**
    * The settings panel whose visibility the button should toggle.
    */
-  settingsPanel: SettingsPanel;
+  settingsPanel: SettingsPanel<SettingsPanelConfig>;
 
   /**
    * Decides if the button should be automatically hidden when the settings panel does not contain any active settings.
@@ -31,7 +31,7 @@ export interface SettingsToggleButtonConfig extends ToggleButtonConfig {
  */
 export class SettingsToggleButton extends ToggleButton<SettingsToggleButtonConfig> {
 
-  private visibleSettingsPanels: SettingsPanel[] = [];
+  private visibleSettingsPanels: SettingsPanel<SettingsPanelConfig>[] = [];
 
   constructor(config: SettingsToggleButtonConfig) {
     super(config);

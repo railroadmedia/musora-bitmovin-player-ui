@@ -60,7 +60,7 @@ export enum NavigationDirection {
  *
  * @category Components
  */
-export class SettingsPanel extends Container<SettingsPanelConfig> {
+export class SettingsPanel<Config extends SettingsPanelConfig> extends Container<Config> {
 
   private static readonly CLASS_ACTIVE_PAGE = 'active';
 
@@ -69,19 +69,19 @@ export class SettingsPanel extends Container<SettingsPanelConfig> {
   private navigationStack: SettingsPanelPage[] = [];
 
   private settingsPanelEvents = {
-    onSettingsStateChanged: new EventDispatcher<SettingsPanel, NoArgs>(),
+    onSettingsStateChanged: new EventDispatcher<SettingsPanel<SettingsPanelConfig>, NoArgs>(),
   };
 
   private hideTimeout: Timeout;
 
-  constructor(config: SettingsPanelConfig) {
+  constructor(config: Config) {
     super(config);
 
     this.config = this.mergeConfig(config, {
       cssClass: 'ui-settings-panel',
       hideDelay: 3000,
       pageTransitionAnimation: true,
-    } as SettingsPanelConfig, this.config);
+    } as Config, this.config);
 
     this.activePage = this.getRootPage();
   }
@@ -261,7 +261,7 @@ export class SettingsPanel extends Container<SettingsPanelConfig> {
     return <SettingsPanelPage[]>this.config.components.filter(component => component instanceof SettingsPanelPage);
   }
 
-  get onSettingsStateChanged(): Event<SettingsPanel, NoArgs> {
+  get onSettingsStateChanged(): Event<SettingsPanel<SettingsPanelConfig>, NoArgs> {
     return this.settingsPanelEvents.onSettingsStateChanged.getEvent();
   }
 

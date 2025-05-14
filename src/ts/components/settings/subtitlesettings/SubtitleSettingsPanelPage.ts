@@ -1,5 +1,5 @@
 import { SettingsPanelPage, SettingsPanelPageConfig } from '../SettingsPanelPage';
-import {SettingsPanel} from '../SettingsPanel';
+import { SettingsPanel, SettingsPanelConfig } from '../SettingsPanel';
 import {SubtitleOverlay} from '../../overlays/SubtitleOverlay';
 import {Component, ComponentConfig} from '../../Component';
 import {FontSizeSelectBox} from './FontSizeSelectBox';
@@ -26,7 +26,7 @@ import { CharacterEdgeColorSelectBox } from './CharacterEdgeColorSelectBox';
  * @category Configs
  */
 export interface SubtitleSettingsPanelPageConfig extends SettingsPanelPageConfig {
-  settingsPanel: SettingsPanel;
+  settingsPanel: SettingsPanel<SettingsPanelConfig>;
   overlay: SubtitleOverlay;
   useDynamicSettingsPanelItem?: boolean;
 }
@@ -37,7 +37,7 @@ export interface SubtitleSettingsPanelPageConfig extends SettingsPanelPageConfig
 export class SubtitleSettingsPanelPage extends SettingsPanelPage {
 
   private readonly overlay: SubtitleOverlay;
-  private readonly settingsPanel: SettingsPanel;
+  private readonly settingsPanel: SettingsPanel<SettingsPanelConfig>;
 
   constructor(config: SubtitleSettingsPanelPageConfig) {
     super(config);

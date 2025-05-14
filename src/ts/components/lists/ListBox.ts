@@ -1,149 +1,89 @@
-import { ToggleButton, ToggleButtonConfig } from '../buttons/ToggleButton';
-import { ListItem, ListSelector, ListSelectorConfig } from './ListSelector';
-import {DOM} from '../../DOM';
+import { ListSelector, ListSelectorConfig } from './ListSelector';
 import { PlayerAPI } from 'bitmovin-player';
 import { UIInstanceManager } from '../../UIManager';
-import { ArrayUtils } from '../../utils/ArrayUtils';
+import { SettingsPanel, SettingsPanelConfig } from '../settings/SettingsPanel';
+import { SettingsPanelPage } from '../settings/SettingsPanelPage';
+import { SettingsPanelSelectOption } from '../settings/SettingsPanelSelectOption';
+import { SettingsPanelItem } from '../settings/SettingsPanelItem';
+import { LocalizableText } from '../../localization/i18n';
+import { Label } from '../labels/Label';
 
-/**
- * A element to select a single item out of a list of available items.
- *
- * DOM example:
- * <code>
- *   <div class='ui-listbox'>
- *     <button class='ui-listbox-button'>label</button>
- *     ...
- *   </div
- * </code>
- *
- * @category Components
- */
-// TODO: change ListSelector to extends container in v4 to improve usage of ListBox.
-//       Currently we are creating the dom element of the list box with child elements manually here.
-//       But this functionality is already covered within the Container component.
-export class ListBox extends ListSelector<ListSelectorConfig> {
-  private listBoxElement: DOM;
-  private components: ListBoxItemButton[] = [];
+export interface ListBoxConfig extends SettingsPanelConfig, ListSelectorConfig {
+  /**
+   * The list selector component which will be used to build the settings page.
+   */
+  listSelector: ListSelector<ListSelectorConfig>;
+  /**
+   * An optional title which will be added to the list.
+   */
+  title?: LocalizableText;
+}
 
-  constructor(config: ListSelectorConfig = {}) {
+export class ListBox extends SettingsPanel<ListBoxConfig> {
+  private readonly settingsPanelPage: SettingsPanelPage;
+  private readonly listSelector: ListSelector<ListSelectorConfig>;
+
+  constructor(config: ListBoxConfig) {
     super(config);
 
+    this.settingsPanelPage = new SettingsPanelPage({});
+    this.listSelector = config.listSelector;
+
     this.config = this.mergeConfig(config, {
-      cssClass: 'ui-listbox',
-    } as ListSelectorConfig, this.config);
+      hidden: true,
+      cssClasses: ['ui-listbox'],
+    }, this.config);
+
+    this.addComponent(this.settingsPanelPage);
+
+    if (config.title) {
+      const label = new Label({ text: config.title, cssClasses: ['title-label'] })
+      this.settingsPanelPage.addComponent(
+        new SettingsPanelItem({
+          label: label,
+          cssClasses: ['title-item'],
+          isSetting: false,
+        })
+      );
+    }
   }
 
   public configure(player: PlayerAPI, uimanager: UIInstanceManager): void {
-    // Subscribe before super call to receive initial events
-    this.onItemAdded.subscribe(this.addListBoxDomItem);
-    this.onItemRemoved.subscribe(this.removeListBoxDomItem);
-    this.onItemSelected.subscribe(this.refreshSelectedItem);
-
     super.configure(player, uimanager);
-  }
 
-  protected toDomElement(): DOM {
-    let listBoxElement = new DOM('div', {
-      'id': this.config.id,
-      'class': this.getCssClasses(),
-    }, this);
-
-    this.listBoxElement = listBoxElement;
-    this.createListBoxDomItems();
-    this.refreshSelectedItem();
-
-    return listBoxElement;
-  }
-
-  private createListBoxDomItems() {
-    // Delete all children
-    this.listBoxElement.empty();
-    this.components = [];
-
-    // Add updated children
-    for (let item of this.items) {
-      this.addListBoxDomItem(this, item.key);
-    }
-  }
-
-  private removeListBoxDomItem = (_: ListBox, key: string) => {
-    const component = this.getComponentForKey(key);
-    if (component) {
-      component.getDomElement().remove();
-      ArrayUtils.remove(this.components, component);
-    }
-  };
-
-  private addListBoxDomItem = (_: ListBox, key: string) => {
-    const component = this.getComponentForKey(key);
-    const newItem = this.getItemForKey(key);
-    if (component) {
-      // Update existing component
-      component.setText(newItem.label);
-    } else {
-      const listBoxItemButton = this.buildListBoxItemButton(newItem);
-
-      listBoxItemButton.onClick.subscribe(() => {
-        this.handleSelectionChange(listBoxItemButton);
+    const onItemAdded = (_: any, itemKey: string) => {
+      const item = this.listSelector.getItemForKey(itemKey);
+      const selectOption = new SettingsPanelSelectOption({
+        label: item.label,
+        settingComponent: this.listSelector,
+        settingsValue: item.key,
+        addSettingAsComponent: false,
       });
 
-      this.components.push(listBoxItemButton);
-      this.listBoxElement.append(listBoxItemButton.getDomElement());
-    }
-  };
+      selectOption.configure(player, uimanager);
+      this.settingsPanelPage.addSettingsPanelItem(selectOption);
+    };
 
-  private refreshSelectedItem = () => {
-    // This gets called twice because the first time is triggered when the user clicks on the ListBoxItemButton. And the
-    // second call comes from the player event when the actual item is selected (Subtitle / AudioTrack in this case).
-    // As this is a generic component we can't prohibit this behaviour. We need to treat this component as it acts
-    // independent from PlayerEvents and on the other hand we need to react to PlayerEvents as it could be triggered
-    // from outside.
+    const onItemRemoved = (_: any, itemKey: string) => {
+      const settingsPanelItem = this.settingsPanelPage.getComponents().find(item => {
+        if (!(item instanceof SettingsPanelSelectOption)) {
+          return false;
+        }
 
-    for (let item of this.items) {
-      const component = this.getComponentForKey(item.key);
-      if (component) {
-        String(component.key) === String(this.selectedItem) ? component.on() : component.off();
+        return item.getConfig().settingsValue === itemKey;
+      });
+
+      if (!settingsPanelItem || !(settingsPanelItem instanceof SettingsPanelItem)) {
+        return;
       }
-    }
-  };
 
-  private buildListBoxItemButton(listItem: ListItem): ListBoxItemButton {
-    return new ListBoxItemButton({
-      key: listItem.key,
-      text: listItem.label,
-      ariaLabel: listItem.ariaLabel,
-    });
-  }
+      this.settingsPanelPage.removeSettingsPanelItem(settingsPanelItem);
+    };
 
-  private getComponentForKey(key: string): ListBoxItemButton {
-    return this.components.find((c) => key === c.key);
-  }
+    this.listSelector.onItemAdded.subscribe(onItemAdded);
+    this.listSelector.onItemRemoved.subscribe(onItemRemoved);
 
-  private handleSelectionChange = (sender: ListBoxItemButton) => {
-    this.onItemSelectedEvent(sender.key);
-  };
-}
-
-interface ListBoxItemButtonConfig extends ToggleButtonConfig {
-  /**
-   * key to identify selected item. Similar to the value attribute of an select option.
-   */
-  key: string;
-}
-
-class ListBoxItemButton extends ToggleButton<ListBoxItemButtonConfig> {
-
-  constructor(config: ListBoxItemButtonConfig) {
-    super(config);
-
-    this.config = this.mergeConfig(config, {
-      cssClass: 'ui-listbox-button',
-      onClass: 'selected',
-      offClass: '',
-    } as ListBoxItemButtonConfig, this.config);
-  }
-
-  get key(): string {
-    return (this.config as ListBoxItemButtonConfig).key;
+    this.settingsPanelPage.configure(player, uimanager);
+    this.listSelector.configure(player, uimanager);
   }
 }
