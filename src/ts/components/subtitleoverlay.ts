@@ -36,6 +36,7 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
   private static readonly CLASS_CEA_608 = 'cea608';
   private static readonly DEFAULT_CEA608_NUM_ROWS = 15;
   private static readonly DEFAULT_CEA608_NUM_COLUMNS = 32;
+  private static readonly DEFAULT_CAPTION_LEFT_OFFSET = '0.5%';
 
   private FONT_SIZE_FACTOR: number = 1;
   // The number of rows in a cea608 grid
@@ -408,7 +409,7 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
           'line-height': `${fontSize}px`,
           'letter-spacing': `${isLargerFontSize ? 0 : fontLetterSpacing}px`,
           'white-space': `${isLargerFontSize ? 'nowrap' : 'normal'}`,
-          'left': isLargerFontSize && '0%',
+          'left': isLargerFontSize && SubtitleOverlay.DEFAULT_CAPTION_LEFT_OFFSET,
         });
 
         label.regionStyle = `line-height: ${fontSize}px; padding: ${windowPadding / 2}px; height: ${fontSize}px`;
@@ -465,8 +466,14 @@ export class SubtitleOverlay extends Container<ContainerConfig> {
       // We disable the grid and wrapping in case enlarged font size is used to prevent
       // line and characters overflows
       const isLargerFontSize = this.FONT_SIZE_FACTOR > 1
+      let leftOffset = event.position.column * this.CEA608_COLUMN_OFFSET + '%';
+      if (leftOffset === '0%' || isLargerFontSize) {
+        // ensure that a little of the window still shows for better readability
+        leftOffset = SubtitleOverlay.DEFAULT_CAPTION_LEFT_OFFSET;
+      }
+
       label.getDomElement().css({
-        'left': `${isLargerFontSize ? 0 : event.position.column * this.CEA608_COLUMN_OFFSET}%`,
+        'left': leftOffset,
         'font-size': `${fontSize}px`,
         'letter-spacing': `${isLargerFontSize ? 0 : fontLetterSpacing}px`,
         'white-space': `${isLargerFontSize ? 'nowrap' : 'normal'}`,
