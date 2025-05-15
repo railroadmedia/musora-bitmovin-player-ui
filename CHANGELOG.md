@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+
+### Changed
+- Background of CEA captions now does not cover the subtitle window fully
+
 ## [3.93.0] - 2025-05-09
 
 ### Fixed
