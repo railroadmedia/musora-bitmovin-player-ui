@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [3.95.0] - 2025-05-16
 
 ### Fixed
 - Seeking with active CEA captions left an empty window behind
@@ -1135,6 +1135,7 @@ Version 2.0 of the UI framework is built for player 7.1. If absolutely necessary
 ## 1.0.0 (2017-02-03)
 - First release
 
+[3.95.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.94.0...v3.95.0
 [3.94.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.93.0...v3.94.0
 [3.93.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.92.0...v3.93.0
 [3.92.0]: https://github.com/bitmovin/bitmovin-player-ui/compare/v3.91.0...v3.92.0
