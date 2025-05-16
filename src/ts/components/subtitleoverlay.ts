@@ -754,16 +754,14 @@ export class SubtitleRegionContainerManager {
 
       if (label.regionStyle) {
         regionContainer.getDomElement().attr('style', label.regionStyle);
-      } else if (label.vtt && !label.vtt.region) {
-        /**
-         * If there is no region present to wrap the Cue Box, the Cue box becomes the
-         * region itself. Therefore the positioning values have to come from the box.
-         */
+      } 
+
+      if (label.vtt) {
         regionContainer.getDomElement().css('position', 'static');
-      } else {
-        // getDomElement needs to be called at least once to ensure the component exists
-        regionContainer.getDomElement();
       }
+
+      // getDomElement needs to be called at least once to ensure the component exists
+      regionContainer.getDomElement();
 
       for (const regionContainerId in this.subtitleRegionContainers) {
         this.subtitleOverlay.addComponent(this.subtitleRegionContainers[regionContainerId]);
