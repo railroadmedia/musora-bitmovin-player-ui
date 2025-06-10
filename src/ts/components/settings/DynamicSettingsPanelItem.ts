@@ -7,7 +7,7 @@ import { SubtitleSelectBox } from './SubtitleSelectBox';
 import { SettingsPanelItem, SettingsPanelItemConfig } from './SettingsPanelItem';
 import { SettingsPanelSelectOption } from './SettingsPanelSelectOption';
 import { SettingsPanelPage } from './SettingsPanelPage';
-import { SettingsPanel } from './SettingsPanel';
+import { SettingsPanel, SettingsPanelConfig } from './SettingsPanel';
 import { SettingsPanelPageBackButton } from './SettingsPanelPageBackButton';
 import { SubtitleSettingSelectBox } from './subtitlesettings/SubtitleSettingSelectBox';
 import { InteractiveSettingsPanelItem } from './InteractiveSettingsPanelItem';
@@ -24,7 +24,7 @@ export interface DynamicSettingsPanelItemConfig extends SettingsPanelItemConfig 
    */
   label: LocalizableText;
   /**
-   * Optional back navigation component to be displayed on the right side of the label. 
+   * Optional back navigation component to be displayed on the right side of the label.
    */
   backNavigationRightComponent?: Component<ComponentConfig>;
   /**
@@ -34,7 +34,7 @@ export interface DynamicSettingsPanelItemConfig extends SettingsPanelItemConfig 
   /**
    * The enclosing {@link SettingsPanel} where the sub page will be added.
    */
-  container: SettingsPanel;
+  container: SettingsPanel<SettingsPanelConfig>;
 }
 
 /**
@@ -127,6 +127,7 @@ export class DynamicSettingsPanelItem extends InteractiveSettingsPanelItem<Dynam
       label: backButton,
       settingComponent: this.backNavigationRightComponent,
       cssClasses: ['title-item'],
+      isSetting: false,
     });
     backSettingsPanelItem.configure(this.player, this.uimanager);
 

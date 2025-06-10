@@ -1,10 +1,9 @@
 import { Component } from '../components/Component';
-import { SettingsPanel } from '../components/settings/SettingsPanel';
+import { SettingsPanel, SettingsPanelConfig } from '../components/settings/SettingsPanel';
 import { Container } from '../components/Container';
-import { ListBox } from '../components/lists/ListBox';
 import { Action, Direction } from './types';
 
-export function isSettingsPanel(component: Component<unknown>): component is SettingsPanel {
+export function isSettingsPanel(component: Component<unknown>): component is SettingsPanel<SettingsPanelConfig> {
   return component instanceof SettingsPanel;
 }
 
@@ -14,10 +13,6 @@ export function isComponent(obj: unknown): obj is Component<unknown> {
 
 export function isContainer(obj: unknown): obj is Container<unknown> {
   return obj !== null && obj !== undefined && obj instanceof Container;
-}
-
-export function isListBox(obj: unknown): obj is ListBox {
-  return obj instanceof ListBox;
 }
 
 export function isDirection(direction: unknown): direction is Direction {

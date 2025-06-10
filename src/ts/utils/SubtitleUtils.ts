@@ -87,6 +87,8 @@ export class SubtitleSwitchHandler {
     if (this.listElement.hasItem(subtitle.id)) {
       this.listElement.removeItem(subtitle.id);
     }
+
+    this.selectCurrentSubtitle();
   };
 
   private selectCurrentSubtitle = () => {

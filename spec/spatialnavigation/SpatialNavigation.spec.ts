@@ -2,7 +2,7 @@ import { SpatialNavigation } from '../../src/ts/spatialnavigation/SpatialNavigat
 import { RootNavigationGroup } from '../../src/ts/spatialnavigation/RootNavigationGroup';
 import { UIContainer } from '../../src/ts/components/UIContainer';
 import { NavigationGroup } from '../../src/ts/spatialnavigation/NavigationGroup';
-import { SettingsPanel } from '../../src/ts/components/settings/SettingsPanel';
+import { SettingsPanel, SettingsPanelConfig } from '../../src/ts/components/settings/SettingsPanel';
 import { NodeEventSubscriber } from '../../src/ts/spatialnavigation/NodeEventSubscriber';
 import { SeekBarHandler } from '../../src/ts/spatialnavigation/SeekBarHandler';
 import { Action, Direction } from '../../src/ts/spatialnavigation/types';
@@ -17,7 +17,7 @@ describe('SpatialNavigation', () => {
   let rootNavigationContainer: UIContainer;
 
   let otherNavigationGroup: NavigationGroup;
-  let otherNavigationContainer: SettingsPanel;
+  let otherNavigationContainer: SettingsPanel<SettingsPanelConfig>;
   
   beforeEach(() => {
     rootNavigationContainer = new UIContainer({});

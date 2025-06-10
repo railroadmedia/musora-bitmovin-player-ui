@@ -2,7 +2,7 @@ import type { PlayerAPI } from 'bitmovin-player';
 
 import type { Component, ComponentConfig, ViewModeChangedEventArgs } from '../../../src/ts/components/Component';
 import { ViewMode } from '../../../src/ts/components/Component';
-import { SettingsPanel } from '../../../src/ts/components/settings/SettingsPanel';
+import { SettingsPanel, SettingsPanelConfig } from '../../../src/ts/components/settings/SettingsPanel';
 import { SettingsPanelPage } from '../../../src/ts/components/settings/SettingsPanelPage';
 import { EventDispatcher } from '../../../src/ts/EventDispatcher';
 import type { UIInstanceManager } from '../../../src/ts/UIManager';
@@ -14,7 +14,7 @@ import { SelectBox } from '../../../src/ts/components/settings/SelectBox';
 import { SettingsPanelItem } from '../../../src/ts/components/settings/SettingsPanelItem';
 import { VolumeSlider } from '../../../src/ts/components/seekbar/VolumeSlider';
 
-let settingsPanel: SettingsPanel;
+let settingsPanel: SettingsPanel<SettingsPanelConfig>;
 
 describe('SettingsPanel', () => {
   describe('page navigation', () => {

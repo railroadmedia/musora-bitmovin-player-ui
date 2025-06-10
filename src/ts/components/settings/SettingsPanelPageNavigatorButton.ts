@@ -1,5 +1,5 @@
 import {Button, ButtonConfig} from '../buttons/Button';
-import {SettingsPanel} from './SettingsPanel';
+import { SettingsPanel, SettingsPanelConfig } from './SettingsPanel';
 import {SettingsPanelPage} from './SettingsPanelPage';
 import { PlayerAPI } from 'bitmovin-player';
 import { UIInstanceManager } from '../../UIManager';
@@ -13,7 +13,7 @@ export interface SettingsPanelPageNavigatorConfig extends ButtonConfig {
   /**
    * Container `SettingsPanel` where the navigation takes place
    */
-  container: SettingsPanel;
+  container: SettingsPanel<SettingsPanelConfig>;
   /**
    * Page where the button should navigate to
    * If empty it will navigate to the root page (not intended to use as navigate back behavior)
@@ -42,7 +42,7 @@ export interface SettingsPanelPageNavigatorConfig extends ButtonConfig {
  * @category Buttons
  */
 export class SettingsPanelPageNavigatorButton extends Button<SettingsPanelPageNavigatorConfig> {
-  private readonly container: SettingsPanel;
+  private readonly container: SettingsPanel<SettingsPanelConfig>;
   private readonly targetPage?: SettingsPanelPage;
 
   constructor(config: SettingsPanelPageNavigatorConfig) {
