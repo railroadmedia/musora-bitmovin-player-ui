@@ -132,20 +132,21 @@ export class PlaybackTimeLabel extends Label<PlaybackTimeLabelConfig> {
       }
     };
 
-    let liveStreamDetector = new PlayerUtils.LiveStreamDetector(player, uimanager);
-    liveStreamDetector.onLiveChanged.subscribe((sender, args: LiveStreamDetectorEventArgs) => {
-      live = args.live;
-      playbackTimeHandler();
-      updateLiveState();
-    });
-    liveStreamDetector.detect(); // Initial detection
-
     let updateTimeFormatBasedOnDuration = () => {
       // Set time format depending on source duration
       this.timeFormat = Math.abs(player.isLive() ? player.getMaxTimeShift() : player.getDuration()) >= 3600 ?
       StringUtils.FORMAT_HHMMSS : StringUtils.FORMAT_MMSS;
       playbackTimeHandler();
     };
+
+    let liveStreamDetector = new PlayerUtils.LiveStreamDetector(player, uimanager);
+    liveStreamDetector.onLiveChanged.subscribe((sender, args: LiveStreamDetectorEventArgs) => {
+      live = args.live;
+      playbackTimeHandler();
+      updateTimeFormatBasedOnDuration();
+      updateLiveState();
+    });
+    liveStreamDetector.detect(); // Initial detection
 
     player.on(player.exports.PlayerEvent.TimeChanged, playbackTimeHandler);
     player.on(player.exports.PlayerEvent.Ready, updateTimeFormatBasedOnDuration);
