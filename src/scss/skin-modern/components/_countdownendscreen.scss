@@ -1,0 +1,205 @@
+@import '../variables';
+@import '../mixins';
+
+.#{$prefix}-ui-countdown-endscreen {
+  @extend %ui-container;
+
+  @include layout-cover;
+  @include layout-center-children-in-container;
+  @include hidden-animated($animation-duration * 2);
+
+  background-color: $color-background-highlight;
+  cursor: pointer;
+  text-align: center;
+
+  > .#{$prefix}-container-wrapper {
+    padding: 3em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100%;
+  }
+
+  .#{$prefix}-ui-countdown-label {
+    color: $color-primary;
+    font-size: 1.2em;
+    font-weight: 500;
+    margin-bottom: 2em;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+
+    .#{$prefix}-countdown-text {
+      margin-right: 0.5em;
+    }
+
+    .#{$prefix}-countdown-timer {
+      color: $color-highlight;
+      font-size: 1.5em;
+      font-weight: bold;
+      background-color: rgba(0, 0, 0, 0.7);
+      border-radius: 50%;
+      display: inline-block;
+      width: 2em;
+      height: 2em;
+      line-height: 2em;
+      text-align: center;
+      animation: countdown-pulse 1s infinite ease-in-out;
+    }
+  }
+
+  .#{$prefix}-ui-next-video-item {
+    background-color: rgba(0, 0, 0, 0.8);
+    border-radius: 8px;
+    display: flex;
+    max-width: 500px;
+    overflow: hidden;
+    transition: transform $animation-duration-short ease-out, box-shadow $animation-duration-short ease-out;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+
+    &:hover {
+      transform: scale(1.02);
+      box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+      transition: transform $animation-duration-short ease-in, box-shadow $animation-duration-short ease-in;
+    }
+
+    .#{$prefix}-thumbnail {
+      background-position: center;
+      background-size: cover;
+      background-color: $color-background;
+      flex-shrink: 0;
+      height: 120px;
+      width: 160px;
+      position: relative;
+
+      &:after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 0;
+        height: 0;
+        border-style: solid;
+        border-width: 12px 0 12px 20px;
+        border-color: transparent transparent transparent rgba(255, 255, 255, 0.9);
+        background-color: transparent;
+      }
+    }
+
+    .#{$prefix}-content {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.5em;
+      flex-grow: 1;
+      text-align: left;
+    }
+
+    .#{$prefix}-title {
+      color: $color-primary;
+      font-size: 1.1em;
+      font-weight: 600;
+      line-height: 1.3;
+      margin-bottom: 0.5em;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+
+    .#{$prefix}-duration {
+      color: $color-secondary;
+      font-size: 0.9em;
+      opacity: 0.8;
+    }
+  }
+
+  // Animation for mobile devices
+  @media (max-width: 768px) {
+    > .#{$prefix}-container-wrapper {
+      padding: 2em 1em;
+    }
+
+    .#{$prefix}-ui-next-video-item {
+      max-width: 100%;
+      flex-direction: column;
+
+      .#{$prefix}-thumbnail {
+        width: 100%;
+        height: 180px;
+      }
+
+      .#{$prefix}-content {
+        padding: 1em;
+      }
+    }
+
+    .#{$prefix}-ui-countdown-label {
+      font-size: 1em;
+      margin-bottom: 1.5em;
+
+      .#{$prefix}-countdown-timer {
+        font-size: 1.3em;
+      }
+    }
+  }
+
+  // Animation states
+  &.#{$prefix}-hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  &.#{$prefix}-shown {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+// Keyframe animation for countdown pulse
+@keyframes countdown-pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba($color-highlight, 0.7);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 5px rgba($color-highlight, 0.3);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba($color-highlight, 0);
+  }
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .#{$prefix}-ui-countdown-endscreen {
+    .#{$prefix}-ui-countdown-label .#{$prefix}-countdown-timer {
+      background-color: $color-background;
+      border: 2px solid $color-highlight;
+    }
+
+    .#{$prefix}-ui-next-video-item {
+      border: 2px solid $color-primary;
+    }
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .#{$prefix}-ui-countdown-endscreen {
+    .#{$prefix}-ui-countdown-label .#{$prefix}-countdown-timer {
+      animation: none;
+    }
+
+    .#{$prefix}-ui-next-video-item {
+      transition: none;
+
+      &:hover {
+        transform: none;
+      }
+    }
+  }
+}

@@ -31,6 +31,7 @@ import { PlaybackToggleOverlay } from './components/playbacktoggleoverlay';
 import { CastStatusOverlay } from './components/caststatusoverlay';
 import { TitleBar } from './components/titlebar';
 import { RecommendationOverlay } from './components/recommendationoverlay';
+import { CountdownEndscreen } from './components/countdownendscreen';
 import { Watermark } from './components/watermark';
 import { ErrorMessageOverlay } from './components/errormessageoverlay';
 import { AdClickOverlay } from './components/adclickoverlay';
@@ -520,5 +521,287 @@ export namespace UIFactory {
       ui: uiContainer,
       spatialNavigation: spatialNavigation,
     };
+  }
+
+  export function buildCountdownEndscreenUI(player: PlayerAPI, config: UIConfig = {}): UIManager {
+    // Create the countdown endscreen with next video configuration
+    let countdownEndscreen = new CountdownEndscreen({
+      nextVideo: {
+        title: 'Big Buck Bunny',
+        url: 'https://bitmovin.com',
+        thumbnail: 'https://cdn.bitmovin.com/content/assets/blender/poster.jpg',
+        duration: 596,
+      },
+      countdownDuration: 5,
+      autoPlay: true,
+    });
+
+    // Use modern UI as base but replace RecommendationOverlay with CountdownEndscreen
+    return new UIManager(player, [{
+      ui: modernSmallScreenAdsUI(),
+      condition: (context: UIConditionContext) => {
+        return context.isMobile && context.documentWidth < 600 && context.isAd
+          && context.adRequiresUi;
+      },
+    }, {
+      ui: modernAdsUI(),
+      condition: (context: UIConditionContext) => {
+        return context.isAd && context.adRequiresUi;
+      },
+    }, {
+      ui: modernSmallScreenUIWithCountdown(),
+      condition: (context: UIConditionContext) => {
+        return !context.isAd && !context.adRequiresUi && context.isMobile
+          && context.documentWidth < 600;
+      },
+    }, {
+      ui: modernUIWithCountdown(),
+      condition: (context: UIConditionContext) => {
+        return !context.isAd && !context.adRequiresUi;
+      },
+    }], config);
+  }
+
+  function modernUIWithCountdown() {
+    let subtitleOverlay = new SubtitleOverlay();
+
+    let mainSettingsPanelPage = new SettingsPanelPage({
+      components: [
+        new SettingsPanelItem(i18n.getLocalizer('settings.video.quality'), new VideoQualitySelectBox()),
+        new SettingsPanelItem(i18n.getLocalizer('speed'), new PlaybackSpeedSelectBox()),
+        new SettingsPanelItem(i18n.getLocalizer('settings.audio.track'), new AudioTrackSelectBox()),
+        new SettingsPanelItem(i18n.getLocalizer('settings.audio.quality'), new AudioQualitySelectBox()),
+      ],
+    });
+
+    let settingsPanel = new SettingsPanel({
+      components: [
+        mainSettingsPanelPage,
+      ],
+      hidden: true,
+    });
+
+    let subtitleSettingsPanelPage = new SubtitleSettingsPanelPage({
+      settingsPanel: settingsPanel,
+      overlay: subtitleOverlay,
+    });
+
+    const subtitleSelectBox = new SubtitleSelectBox();
+
+    let subtitleSettingsOpenButton = new SettingsPanelPageOpenButton({
+      targetPage: subtitleSettingsPanelPage,
+      container: settingsPanel,
+      ariaLabel: i18n.getLocalizer('settings.subtitles'),
+      text: i18n.getLocalizer('open'),
+    });
+
+    mainSettingsPanelPage.addComponent(
+      new SettingsPanelItem(
+        new SubtitleSettingsLabel({
+          text: i18n.getLocalizer('settings.subtitles'),
+          opener: subtitleSettingsOpenButton,
+        }),
+        subtitleSelectBox,
+        {
+          role: 'menubar',
+        },
+      ));
+
+    settingsPanel.addComponent(subtitleSettingsPanelPage);
+
+    let controlBar = new ControlBar({
+      components: [
+        new Container({
+          components: [
+            new PlaybackTimeLabel({ timeLabelMode: PlaybackTimeLabelMode.CurrentTime, hideInLivePlayback: true }),
+            new SeekBar({ label: new SeekBarLabel() }),
+            new PlaybackTimeLabel({ timeLabelMode: PlaybackTimeLabelMode.TotalTime, cssClasses: ['text-right'] }),
+          ],
+          cssClasses: ['controlbar-top'],
+        }),
+        new Container({
+          components: [
+            new PlaybackToggleButton(),
+            new VolumeSlider(),
+            new Spacer(),
+            new PictureInPictureToggleButton(),
+            new AirPlayToggleButton(),
+            new CastToggleButton(),
+            new VRToggleButton(),
+            new SettingsToggleButton({ settingsPanel: settingsPanel }),
+            new FullscreenToggleButton(),
+          ],
+          cssClasses: ['controlbar-bottom'],
+        }),
+      ],
+    });
+
+    // Create countdown endscreen with sample next video data
+    let countdownEndscreen = new CountdownEndscreen({
+      nextVideo: {
+        title: 'Big Buck Bunny',
+        url: 'https://bitmovin.com',
+        thumbnail: 'https://cdn.bitmovin.com/content/assets/blender/poster.jpg',
+        duration: 596,
+      },
+      countdownDuration: 5,
+      autoPlay: true,
+    });
+
+    // Handle auto-play event
+    countdownEndscreen.onAutoPlay.subscribe((sender, args) => {
+      console.log('Auto-play triggered for:', args.nextVideo.title);
+      alert('Would navigate to: ' + args.nextVideo.url);
+    });
+
+    return new UIContainer({
+      components: [
+        subtitleOverlay,
+        new BufferingOverlay(),
+        new CastStatusOverlay(),
+        new PlaybackToggleOverlay(),
+        countdownEndscreen,  // Use CountdownEndscreen instead of RecommendationOverlay
+        controlBar,
+        new TitleBar({
+          components: [
+            new MetadataLabel({ content: MetadataLabelContent.Title }),
+            new CastToggleButton(),
+            new VRToggleButton(),
+            new PictureInPictureToggleButton(),
+            new AirPlayToggleButton(),
+            new VolumeToggleButton(),
+            new SettingsToggleButton({ settingsPanel: settingsPanel }),
+            new FullscreenToggleButton(),
+          ],
+        }),
+        settingsPanel,
+        new Watermark(),
+        new ErrorMessageOverlay(),
+      ],
+      cssClasses: ['ui-skin-modern'],
+      hideDelay: 2000,
+      hidePlayerStateExceptions: [
+        PlayerUtils.PlayerState.Prepared,
+        PlayerUtils.PlayerState.Paused,
+        PlayerUtils.PlayerState.Finished,
+      ],
+    });
+  }
+
+  function modernSmallScreenUIWithCountdown() {
+    let subtitleOverlay = new SubtitleOverlay();
+
+    let mainSettingsPanelPage = new SettingsPanelPage({
+      components: [
+        new SettingsPanelItem(i18n.getLocalizer('settings.video.quality'), new VideoQualitySelectBox()),
+        new SettingsPanelItem(i18n.getLocalizer('speed'), new PlaybackSpeedSelectBox()),
+        new SettingsPanelItem(i18n.getLocalizer('settings.audio.track'), new AudioTrackSelectBox()),
+        new SettingsPanelItem(i18n.getLocalizer('settings.audio.quality'), new AudioQualitySelectBox()),
+      ],
+    });
+
+    let settingsPanel = new SettingsPanel({
+      components: [
+        mainSettingsPanelPage,
+      ],
+      hidden: true,
+      pageTransitionAnimation: false,
+      hideDelay: -1,
+    });
+
+    let subtitleSettingsPanelPage = new SubtitleSettingsPanelPage({
+      settingsPanel: settingsPanel,
+      overlay: subtitleOverlay,
+    });
+
+    let subtitleSettingsOpenButton = new SettingsPanelPageOpenButton({
+      targetPage: subtitleSettingsPanelPage,
+      container: settingsPanel,
+      ariaLabel: i18n.getLocalizer('settings.subtitles'),
+      text: i18n.getLocalizer('open'),
+    });
+
+    const subtitleSelectBox = new SubtitleSelectBox();
+
+    mainSettingsPanelPage.addComponent(
+      new SettingsPanelItem(
+        new SubtitleSettingsLabel({
+          text: i18n.getLocalizer('settings.subtitles'),
+          opener: subtitleSettingsOpenButton,
+        }),
+        subtitleSelectBox,
+        {
+          role: 'menubar',
+        },
+      ));
+
+    settingsPanel.addComponent(subtitleSettingsPanelPage);
+
+    settingsPanel.addComponent(new CloseButton({ target: settingsPanel }));
+    subtitleSettingsPanelPage.addComponent(new CloseButton({ target: settingsPanel }));
+
+    let controlBar = new ControlBar({
+      components: [
+        new Container({
+          components: [
+            new PlaybackTimeLabel({ timeLabelMode: PlaybackTimeLabelMode.CurrentTime, hideInLivePlayback: true }),
+            new SeekBar({ label: new SeekBarLabel() }),
+            new PlaybackTimeLabel({ timeLabelMode: PlaybackTimeLabelMode.TotalTime, cssClasses: ['text-right'] }),
+          ],
+          cssClasses: ['controlbar-top'],
+        }),
+      ],
+    });
+
+    // Create countdown endscreen for small screen
+    let countdownEndscreen = new CountdownEndscreen({
+      nextVideo: {
+        title: 'Big Buck Bunny',
+        url: 'https://bitmovin.com',
+        thumbnail: 'https://cdn.bitmovin.com/content/assets/blender/poster.jpg',
+        duration: 596,
+      },
+      countdownDuration: 5,
+      autoPlay: true,
+    });
+
+    // Handle auto-play event
+    countdownEndscreen.onAutoPlay.subscribe((sender, args) => {
+      console.log('Auto-play triggered for:', args.nextVideo.title);
+      alert('Would navigate to: ' + args.nextVideo.url);
+    });
+
+    return new UIContainer({
+      components: [
+        subtitleOverlay,
+        new BufferingOverlay(),
+        new CastStatusOverlay(),
+        new PlaybackToggleOverlay(),
+        countdownEndscreen,  // Use CountdownEndscreen instead of RecommendationOverlay
+        controlBar,
+        new TitleBar({
+          components: [
+            new MetadataLabel({ content: MetadataLabelContent.Title }),
+            new CastToggleButton(),
+            new VRToggleButton(),
+            new PictureInPictureToggleButton(),
+            new AirPlayToggleButton(),
+            new VolumeToggleButton(),
+            new SettingsToggleButton({ settingsPanel: settingsPanel }),
+            new FullscreenToggleButton(),
+          ],
+        }),
+        settingsPanel,
+        new Watermark(),
+        new ErrorMessageOverlay(),
+      ],
+      cssClasses: ['ui-skin-smallscreen'],
+      hideDelay: 2000,
+      hidePlayerStateExceptions: [
+        PlayerUtils.PlayerState.Prepared,
+        PlayerUtils.PlayerState.Paused,
+        PlayerUtils.PlayerState.Finished,
+      ],
+    });
   }
 }

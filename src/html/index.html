@@ -39,7 +39,13 @@
                 <div class="col-sm-4">
                     <select class="form-control" id="config-ui"></select>
                 </div>
-                <span class="col-sm-4 form-text">The UI skin or skin type to display.</span>
+                <span class="col-sm-4 form-text">The UI skin or skin type to display. Try "buildCountdownEndscreenUI" to test the new countdown endscreen component!</span>
+            </div>
+            
+            <div class="alert alert-info" role="alert">
+                <strong>New Feature:</strong> Select "buildCountdownEndscreenUI" to test the countdown endscreen component. 
+                After video ends, it shows a countdown timer with the next video preview. 
+                Use the "Test countdown endscreen" action button to trigger it manually.
             </div>
         </div>
 
@@ -578,6 +584,11 @@
       .animate({ height: minHeight }, 1000)
       .animate({ height: maxHeight }, 1000)
       .animate({ height: initialHeight }, 1000);
+    },
+    'Test countdown endscreen': function() {
+      // Manually trigger PlaybackFinished event to demo the countdown endscreen
+      player.fireEvent(player.exports.PlayerEvent.PlaybackFinished);
+      return 'Countdown endscreen triggered (if using buildCountdownEndscreenUI)';
     },
   };
   $.each(actions, function(title, handler) {
