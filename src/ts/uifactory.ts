@@ -29,540 +29,36 @@ import { UIContainer } from './components/uicontainer';
 import { BufferingOverlay } from './components/bufferingoverlay';
 import { PlaybackToggleOverlay } from './components/playbacktoggleoverlay';
 import { CastStatusOverlay } from './components/caststatusoverlay';
-import { TitleBar } from './components/titlebar';
-import { RecommendationOverlay } from './components/recommendationoverlay';
-import { CountdownEndscreen } from './components/countdownendscreen';
-import { Watermark } from './components/watermark';
+import { MusoraEndscreen } from './components/musoraendscreen';
 import { ErrorMessageOverlay } from './components/errormessageoverlay';
-import { AdClickOverlay } from './components/adclickoverlay';
-import { AdMessageLabel } from './components/admessagelabel';
-import { AdSkipButton } from './components/adskipbutton';
-import { CloseButton } from './components/closebutton';
-import { MetadataLabel, MetadataLabelContent } from './components/metadatalabel';
-import { PlayerUtils } from './playerutils';
-import { Label } from './components/label';
-import { CastUIContainer } from './components/castuicontainer';
 import { UIConditionContext, UIManager } from './uimanager';
 import { UIConfig } from './uiconfig';
 import { PlayerAPI } from 'bitmovin-player';
 import { i18n } from './localization/i18n';
-import { SubtitleListBox } from './components/subtitlelistbox';
-import { AudioTrackListBox } from './components/audiotracklistbox';
-import { SpatialNavigation } from './spatialnavigation/spatialnavigation';
-import { RootNavigationGroup } from './spatialnavigation/rootnavigationgroup';
-import { ListNavigationGroup, ListOrientation } from './spatialnavigation/ListNavigationGroup';
+import { PlayerUtils } from './playerutils';
 
 export namespace UIFactory {
 
-  export function buildDefaultUI(player: PlayerAPI, config: UIConfig = {}): UIManager {
-    return UIFactory.buildModernUI(player, config);
-  }
 
-  export function buildDefaultSmallScreenUI(player: PlayerAPI, config: UIConfig = {}): UIManager {
-    return UIFactory.buildModernSmallScreenUI(player, config);
-  }
-
-  export function buildDefaultCastReceiverUI(player: PlayerAPI, config: UIConfig = {}): UIManager {
-    return UIFactory.buildModernCastReceiverUI(player, config);
-  }
-
-  export function buildDefaultTvUI(player: PlayerAPI, config: UIConfig = {}): UIManager {
-    return UIFactory.buildModernTvUI(player, config);
-  }
-
-  export function modernUI() {
-    let subtitleOverlay = new SubtitleOverlay();
-
-    let mainSettingsPanelPage = new SettingsPanelPage({
-      components: [
-        new SettingsPanelItem(i18n.getLocalizer('settings.video.quality'), new VideoQualitySelectBox()),
-        new SettingsPanelItem(i18n.getLocalizer('speed'), new PlaybackSpeedSelectBox()),
-        new SettingsPanelItem(i18n.getLocalizer('settings.audio.track'), new AudioTrackSelectBox()),
-        new SettingsPanelItem(i18n.getLocalizer('settings.audio.quality'), new AudioQualitySelectBox()),
-      ],
-    });
-
-    let settingsPanel = new SettingsPanel({
-      components: [
-        mainSettingsPanelPage,
-      ],
-      hidden: true,
-    });
-
-    let subtitleSettingsPanelPage = new SubtitleSettingsPanelPage({
-      settingsPanel: settingsPanel,
-      overlay: subtitleOverlay,
-    });
-
-    const subtitleSelectBox = new SubtitleSelectBox();
-
-    let subtitleSettingsOpenButton = new SettingsPanelPageOpenButton({
-      targetPage: subtitleSettingsPanelPage,
-      container: settingsPanel,
-      ariaLabel: i18n.getLocalizer('settings.subtitles'),
-      text: i18n.getLocalizer('open'),
-    });
-
-    mainSettingsPanelPage.addComponent(
-      new SettingsPanelItem(
-        new SubtitleSettingsLabel({
-          text: i18n.getLocalizer('settings.subtitles'),
-          opener: subtitleSettingsOpenButton,
-        }),
-        subtitleSelectBox,
-        {
-          role: 'menubar',
-        },
-      ));
-
-    settingsPanel.addComponent(subtitleSettingsPanelPage);
-
-    let controlBar = new ControlBar({
-      components: [
-        settingsPanel,
-        new Container({
-          components: [
-            new PlaybackTimeLabel({ timeLabelMode: PlaybackTimeLabelMode.CurrentTime, hideInLivePlayback: true }),
-            new SeekBar({ label: new SeekBarLabel() }),
-            new PlaybackTimeLabel({ timeLabelMode: PlaybackTimeLabelMode.TotalTime, cssClasses: ['text-right'] }),
-          ],
-          cssClasses: ['controlbar-top'],
-        }),
-        new Container({
-          components: [
-            new PlaybackToggleButton(),
-            new VolumeToggleButton(),
-            new VolumeSlider(),
-            new Spacer(),
-            new PictureInPictureToggleButton(),
-            new AirPlayToggleButton(),
-            new CastToggleButton(),
-            new VRToggleButton(),
-            new SettingsToggleButton({ settingsPanel: settingsPanel }),
-            new FullscreenToggleButton(),
-          ],
-          cssClasses: ['controlbar-bottom'],
-        }),
-      ],
-    });
-
-    return new UIContainer({
-      components: [
-        subtitleOverlay,
-        new BufferingOverlay(),
-        new PlaybackToggleOverlay(),
-        new CastStatusOverlay(),
-        controlBar,
-        new TitleBar(),
-        new RecommendationOverlay(),
-        new Watermark(),
-        new ErrorMessageOverlay(),
-      ],
-      hideDelay: 2000,
-      hidePlayerStateExceptions: [
-        PlayerUtils.PlayerState.Prepared,
-        PlayerUtils.PlayerState.Paused,
-        PlayerUtils.PlayerState.Finished,
-      ],
-    });
-  }
-
-  export function modernAdsUI() {
-    return new UIContainer({
-      components: [
-        new BufferingOverlay(),
-        new AdClickOverlay(),
-        new PlaybackToggleOverlay(),
-        new Container({
-          components: [
-            new AdMessageLabel({ text: i18n.getLocalizer('ads.remainingTime')}),
-            new AdSkipButton(),
-          ],
-          cssClass: 'ui-ads-status',
-        }),
-        new ControlBar({
-          components: [
-            new Container({
-              components: [
-                new PlaybackToggleButton(),
-                new VolumeToggleButton(),
-                new VolumeSlider(),
-                new Spacer(),
-                new FullscreenToggleButton(),
-              ],
-              cssClasses: ['controlbar-bottom'],
-            }),
-          ],
-        }),
-      ],
-      cssClasses: ['ui-skin-ads'],
-      hideDelay: 2000,
-      hidePlayerStateExceptions: [
-        PlayerUtils.PlayerState.Prepared,
-        PlayerUtils.PlayerState.Paused,
-        PlayerUtils.PlayerState.Finished,
-      ],
-    });
-  }
-
-  export function modernSmallScreenUI() {
-    let subtitleOverlay = new SubtitleOverlay();
-
-    let mainSettingsPanelPage = new SettingsPanelPage({
-      components: [
-        new SettingsPanelItem(i18n.getLocalizer('settings.video.quality'), new VideoQualitySelectBox()),
-        new SettingsPanelItem(i18n.getLocalizer('speed'), new PlaybackSpeedSelectBox()),
-        new SettingsPanelItem(i18n.getLocalizer('settings.audio.track'), new AudioTrackSelectBox()),
-        new SettingsPanelItem(i18n.getLocalizer('settings.audio.quality'), new AudioQualitySelectBox()),
-      ],
-    });
-
-    let settingsPanel = new SettingsPanel({
-      components: [
-        mainSettingsPanelPage,
-      ],
-      hidden: true,
-      pageTransitionAnimation: false,
-      hideDelay: -1,
-    });
-
-    let subtitleSettingsPanelPage = new SubtitleSettingsPanelPage({
-      settingsPanel: settingsPanel,
-      overlay: subtitleOverlay,
-    });
-
-    let subtitleSettingsOpenButton = new SettingsPanelPageOpenButton({
-      targetPage: subtitleSettingsPanelPage,
-      container: settingsPanel,
-      ariaLabel: i18n.getLocalizer('settings.subtitles'),
-      text: i18n.getLocalizer('open'),
-    });
-
-    const subtitleSelectBox = new SubtitleSelectBox();
-
-    mainSettingsPanelPage.addComponent(
-      new SettingsPanelItem(
-        new SubtitleSettingsLabel({
-          text: i18n.getLocalizer('settings.subtitles'),
-          opener: subtitleSettingsOpenButton,
-        }),
-        subtitleSelectBox,
-        {
-          role: 'menubar',
-        },
-      ));
-
-    settingsPanel.addComponent(subtitleSettingsPanelPage);
-
-    settingsPanel.addComponent(new CloseButton({ target: settingsPanel }));
-    subtitleSettingsPanelPage.addComponent(new CloseButton({ target: settingsPanel }));
-
-    let controlBar = new ControlBar({
-      components: [
-        new Container({
-          components: [
-            new PlaybackTimeLabel({ timeLabelMode: PlaybackTimeLabelMode.CurrentTime, hideInLivePlayback: true }),
-            new SeekBar({ label: new SeekBarLabel() }),
-            new PlaybackTimeLabel({ timeLabelMode: PlaybackTimeLabelMode.TotalTime, cssClasses: ['text-right'] }),
-          ],
-          cssClasses: ['controlbar-top'],
-        }),
-      ],
-    });
-
-    return new UIContainer({
-      components: [
-        subtitleOverlay,
-        new BufferingOverlay(),
-        new CastStatusOverlay(),
-        new PlaybackToggleOverlay(),
-        new RecommendationOverlay(),
-        controlBar,
-        new TitleBar({
-          components: [
-            new MetadataLabel({ content: MetadataLabelContent.Title }),
-            new CastToggleButton(),
-            new VRToggleButton(),
-            new PictureInPictureToggleButton(),
-            new AirPlayToggleButton(),
-            new VolumeToggleButton(),
-            new SettingsToggleButton({ settingsPanel: settingsPanel }),
-            new FullscreenToggleButton(),
-          ],
-        }),
-        settingsPanel,
-        new Watermark(),
-        new ErrorMessageOverlay(),
-      ],
-      cssClasses: ['ui-skin-smallscreen'],
-      hideDelay: 2000,
-      hidePlayerStateExceptions: [
-        PlayerUtils.PlayerState.Prepared,
-        PlayerUtils.PlayerState.Paused,
-        PlayerUtils.PlayerState.Finished,
-      ],
-    });
-  }
-
-  export function modernSmallScreenAdsUI() {
-    return new UIContainer({
-      components: [
-        new BufferingOverlay(),
-        new AdClickOverlay(),
-        new PlaybackToggleOverlay(),
-        new TitleBar({
-          components: [
-            // dummy label with no content to move buttons to the right
-            new Label({ cssClass: 'label-metadata-title' }),
-            new FullscreenToggleButton(),
-          ],
-        }),
-        new Container({
-          components: [
-            new AdMessageLabel({ text: 'Ad: {remainingTime} secs' }),
-            new AdSkipButton(),
-          ],
-          cssClass: 'ui-ads-status',
-        }),
-      ],
-      cssClasses: ['ui-skin-ads', 'ui-skin-smallscreen'],
-      hideDelay: 2000,
-      hidePlayerStateExceptions: [
-        PlayerUtils.PlayerState.Prepared,
-        PlayerUtils.PlayerState.Paused,
-        PlayerUtils.PlayerState.Finished,
-      ],
-    });
-  }
-
-  export function modernCastReceiverUI() {
-    let controlBar = new ControlBar({
-      components: [
-        new Container({
-          components: [
-            new PlaybackTimeLabel({ timeLabelMode: PlaybackTimeLabelMode.CurrentTime, hideInLivePlayback: true }),
-            new SeekBar({ smoothPlaybackPositionUpdateIntervalMs: -1 }),
-            new PlaybackTimeLabel({ timeLabelMode: PlaybackTimeLabelMode.TotalTime, cssClasses: ['text-right'] }),
-          ],
-          cssClasses: ['controlbar-top'],
-        }),
-      ],
-    });
-
-    return new CastUIContainer({
-      components: [
-        new SubtitleOverlay(),
-        new BufferingOverlay(),
-        new PlaybackToggleOverlay(),
-        new Watermark(),
-        controlBar,
-        new TitleBar({ keepHiddenWithoutMetadata: true }),
-        new ErrorMessageOverlay(),
-      ],
-      cssClasses: ['ui-skin-cast-receiver'],
-      hideDelay: 2000,
-      hidePlayerStateExceptions: [
-        PlayerUtils.PlayerState.Prepared,
-        PlayerUtils.PlayerState.Paused,
-        PlayerUtils.PlayerState.Finished,
-      ],
-    });
-  }
-
-  export function buildModernUI(player: PlayerAPI, config: UIConfig = {}): UIManager {
-    // show smallScreen UI only on mobile/handheld devices
+  export function buildMusoraEndscreenUI(player: PlayerAPI, config: UIConfig = {}): UIManager {
+    // Use the same structure for all contexts - just Musora UI
     let smallScreenSwitchWidth = 600;
 
     return new UIManager(player, [{
-      ui: modernSmallScreenAdsUI(),
-      condition: (context: UIConditionContext) => {
-        return context.isMobile && context.documentWidth < smallScreenSwitchWidth && context.isAd
-          && context.adRequiresUi;
-      },
-    }, {
-      ui: modernAdsUI(),
-      condition: (context: UIConditionContext) => {
-        return context.isAd && context.adRequiresUi;
-      },
-    }, {
-      ui: modernSmallScreenUI(),
+      ui: modernUIWithMusora(),
       condition: (context: UIConditionContext) => {
         return !context.isAd && !context.adRequiresUi && context.isMobile
           && context.documentWidth < smallScreenSwitchWidth;
       },
     }, {
-      ui: modernUI(),
+      ui: modernUIWithMusora(),
       condition: (context: UIConditionContext) => {
         return !context.isAd && !context.adRequiresUi;
       },
     }], config);
   }
 
-  export function buildModernSmallScreenUI(player: PlayerAPI, config: UIConfig = {}): UIManager {
-    return new UIManager(player, [{
-      ui: modernSmallScreenAdsUI(),
-      condition: (context: UIConditionContext) => {
-        return context.isAd && context.adRequiresUi;
-      },
-    }, {
-      ui: modernSmallScreenUI(),
-      condition: (context: UIConditionContext) => {
-        return !context.isAd && !context.adRequiresUi;
-      },
-    }], config);
-  }
-
-  export function buildModernCastReceiverUI(player: PlayerAPI, config: UIConfig = {}): UIManager {
-    return new UIManager(player, modernCastReceiverUI(), config);
-  }
-
-  export function buildModernTvUI(player: PlayerAPI, config: UIConfig = {}): UIManager {
-        return new UIManager(player, [{
-          ...modernTvUI(),
-        }], config);
-  }
-
-  export function modernTvUI() {
-    const subtitleListBox = new SubtitleListBox();
-    const subtitleListPanel = new SettingsPanel({
-      components: [
-        new SettingsPanelPage({
-          components: [
-            new SettingsPanelItem(null, subtitleListBox),
-          ],
-        }),
-      ],
-      hidden: true,
-    });
-
-    const audioTrackListBox = new AudioTrackListBox();
-    const audioTrackListPanel = new SettingsPanel({
-      components: [
-        new SettingsPanelPage({
-          components: [
-            new SettingsPanelItem(null, audioTrackListBox),
-          ],
-        }),
-      ],
-      hidden: true,
-    });
-
-    const seekBar = new SeekBar({ label: new SeekBarLabel() });
-    const playbackToggleOverlay = new PlaybackToggleOverlay();
-    const subtitleToggleButton = new SettingsToggleButton({
-      settingsPanel: subtitleListPanel,
-      autoHideWhenNoActiveSettings: true,
-      cssClass: 'ui-subtitlesettingstogglebutton',
-      text: i18n.getLocalizer('settings.subtitles'),
-    });
-    const audioToggleButton = new SettingsToggleButton({
-      settingsPanel: audioTrackListPanel,
-      autoHideWhenNoActiveSettings: true,
-      cssClass: 'ui-audiotracksettingstogglebutton',
-      ariaLabel: i18n.getLocalizer('settings.audio.track'),
-      text: i18n.getLocalizer('settings.audio.track'),
-    });
-    const uiContainer = new UIContainer({
-      components: [
-        new SubtitleOverlay(),
-        new BufferingOverlay(),
-        playbackToggleOverlay,
-        new ControlBar({
-          components: [
-            new Container({
-              components: [
-                new PlaybackTimeLabel({ timeLabelMode: PlaybackTimeLabelMode.CurrentTime, hideInLivePlayback: true }),
-                seekBar,
-                new PlaybackTimeLabel({ timeLabelMode: PlaybackTimeLabelMode.RemainingTime, cssClasses: ['text-right'] }),
-              ],
-              cssClasses: ['controlbar-top'],
-            }),
-          ],
-        }),
-        new TitleBar({
-          components: [
-            new Container({
-              components: [
-                new MetadataLabel({ content: MetadataLabelContent.Title }),
-                subtitleToggleButton,
-                audioToggleButton,
-              ],
-              cssClasses: ['ui-titlebar-top'],
-            }),
-            new Container({
-              components: [
-                new MetadataLabel({ content: MetadataLabelContent.Description }),
-                subtitleListPanel,
-                audioTrackListPanel,
-              ],
-              cssClasses: ['ui-titlebar-bottom'],
-            }),
-          ],
-        }),
-        new RecommendationOverlay(),
-        new ErrorMessageOverlay(),
-      ],
-      cssClasses: ['ui-skin-tv'],
-      hideDelay: 2000,
-      hidePlayerStateExceptions: [
-        PlayerUtils.PlayerState.Prepared,
-        PlayerUtils.PlayerState.Paused,
-        PlayerUtils.PlayerState.Finished,
-      ],
-    });
-
-    const spatialNavigation = new SpatialNavigation(
-      new RootNavigationGroup(uiContainer, playbackToggleOverlay, seekBar, audioToggleButton, subtitleToggleButton),
-      new ListNavigationGroup(ListOrientation.Vertical, subtitleListPanel, subtitleListBox),
-      new ListNavigationGroup(ListOrientation.Vertical, audioTrackListPanel, audioTrackListBox),
-    );
-
-    return {
-      ui: uiContainer,
-      spatialNavigation: spatialNavigation,
-    };
-  }
-
-  export function buildCountdownEndscreenUI(player: PlayerAPI, config: UIConfig = {}): UIManager {
-    // Create the countdown endscreen with next video configuration
-    let countdownEndscreen = new CountdownEndscreen({
-      nextVideo: {
-        title: 'Big Buck Bunny',
-        url: 'https://bitmovin.com',
-        thumbnail: 'https://cdn.bitmovin.com/content/assets/blender/poster.jpg',
-        duration: 596,
-      },
-      countdownDuration: 5,
-      autoPlay: true,
-    });
-
-    // Use modern UI as base but replace RecommendationOverlay with CountdownEndscreen
-    return new UIManager(player, [{
-      ui: modernSmallScreenAdsUI(),
-      condition: (context: UIConditionContext) => {
-        return context.isMobile && context.documentWidth < 600 && context.isAd
-          && context.adRequiresUi;
-      },
-    }, {
-      ui: modernAdsUI(),
-      condition: (context: UIConditionContext) => {
-        return context.isAd && context.adRequiresUi;
-      },
-    }, {
-      ui: modernSmallScreenUIWithCountdown(),
-      condition: (context: UIConditionContext) => {
-        return !context.isAd && !context.adRequiresUi && context.isMobile
-          && context.documentWidth < 600;
-      },
-    }, {
-      ui: modernUIWithCountdown(),
-      condition: (context: UIConditionContext) => {
-        return !context.isAd && !context.adRequiresUi;
-      },
-    }], config);
-  }
-
-  function modernUIWithCountdown() {
+  function modernUIWithMusora() {
     let subtitleOverlay = new SubtitleOverlay();
 
     let mainSettingsPanelPage = new SettingsPanelPage({
@@ -611,6 +107,7 @@ export namespace UIFactory {
 
     let controlBar = new ControlBar({
       components: [
+        settingsPanel,
         new Container({
           components: [
             new PlaybackTimeLabel({ timeLabelMode: PlaybackTimeLabelMode.CurrentTime, hideInLivePlayback: true }),
@@ -622,6 +119,7 @@ export namespace UIFactory {
         new Container({
           components: [
             new PlaybackToggleButton(),
+            new VolumeToggleButton(),
             new VolumeSlider(),
             new Spacer(),
             new PictureInPictureToggleButton(),
@@ -636,59 +134,64 @@ export namespace UIFactory {
       ],
     });
 
-    // Create countdown endscreen with sample next video data
-    let countdownEndscreen = new CountdownEndscreen({
+    // Create Musora endscreen with sample next video data
+    let musoraEndscreen = new MusoraEndscreen({
       nextVideo: {
-        title: 'Big Buck Bunny',
-        url: 'https://bitmovin.com',
-        thumbnail: 'https://cdn.bitmovin.com/content/assets/blender/poster.jpg',
-        duration: 596,
+        title: 'Q&A with Kevin (Plus a Special Guest!) — In Theory',
+        url: 'https://musora.com/next-video',
+        thumbnail: 'https://i.vimeocdn.com/video/2031137885-9ca70a5b829937956ac3b0c0063dea24cc7c6bc31bb01851883fb873de3ee1b9-d?mw=80&q=85',
+        duration: 572, // 9:32 in seconds
+        category: 'Beginner • Workout',
+        instructor: 'Kevin Castro'
       },
       countdownDuration: 5,
       autoPlay: true,
     });
 
     // Handle auto-play event
-    countdownEndscreen.onAutoPlay.subscribe((sender, args) => {
-      console.log('Auto-play triggered for:', args.nextVideo.title);
-      alert('Would navigate to: ' + args.nextVideo.url);
+    musoraEndscreen.onAutoPlay.subscribe((sender, args) => {
+      console.log('Musora auto-play triggered for:', args.nextVideo.title);
+      // Hide the end screen and allow user to access regular controls
+      musoraEndscreen.hide();
+      // Add your navigation logic here
+    });
+
+    // Handle play now button
+    musoraEndscreen.onPlayNow.subscribe((sender, args) => {
+      console.log('Musora play now clicked for:', args.nextVideo.title);
+      // Hide the end screen and allow user to access regular controls
+      musoraEndscreen.hide();
+      // Add your navigation logic here
+    });
+
+    // Handle cancel button
+    musoraEndscreen.onCancelled.subscribe(() => {
+      console.log('Musora endscreen cancelled');
+      // Add your cancel logic here
     });
 
     return new UIContainer({
       components: [
         subtitleOverlay,
         new BufferingOverlay(),
-        new CastStatusOverlay(),
         new PlaybackToggleOverlay(),
-        countdownEndscreen,  // Use CountdownEndscreen instead of RecommendationOverlay
+        new CastStatusOverlay(),
         controlBar,
-        new TitleBar({
-          components: [
-            new MetadataLabel({ content: MetadataLabelContent.Title }),
-            new CastToggleButton(),
-            new VRToggleButton(),
-            new PictureInPictureToggleButton(),
-            new AirPlayToggleButton(),
-            new VolumeToggleButton(),
-            new SettingsToggleButton({ settingsPanel: settingsPanel }),
-            new FullscreenToggleButton(),
-          ],
-        }),
-        settingsPanel,
-        new Watermark(),
+        musoraEndscreen,  // Use MusoraEndscreen instead of RecommendationOverlay
         new ErrorMessageOverlay(),
       ],
-      cssClasses: ['ui-skin-modern'],
-      hideDelay: 2000,
+      hideDelay: -1, // Disable auto-hide completely - controls never auto-hide
       hidePlayerStateExceptions: [
-        PlayerUtils.PlayerState.Prepared,
-        PlayerUtils.PlayerState.Paused,
-        PlayerUtils.PlayerState.Finished,
+        PlayerUtils.PlayerState.Idle,      // Controls visible when idle
+        PlayerUtils.PlayerState.Prepared,  // Controls visible when prepared
+        PlayerUtils.PlayerState.Playing,   // Controls visible when playing
+        PlayerUtils.PlayerState.Paused,    // Controls visible when paused
+        PlayerUtils.PlayerState.Finished,  // Controls visible when video ends
       ],
     });
   }
 
-  function modernSmallScreenUIWithCountdown() {
+  function modernSmallScreenUIWithMusora() {
     let subtitleOverlay = new SubtitleOverlay();
 
     let mainSettingsPanelPage = new SettingsPanelPage({
@@ -753,22 +256,40 @@ export namespace UIFactory {
       ],
     });
 
-    // Create countdown endscreen for small screen
-    let countdownEndscreen = new CountdownEndscreen({
+    // Create Musora endscreen for small screen
+    let musoraEndscreen = new MusoraEndscreen({
       nextVideo: {
-        title: 'Big Buck Bunny',
-        url: 'https://bitmovin.com',
-        thumbnail: 'https://cdn.bitmovin.com/content/assets/blender/poster.jpg',
-        duration: 596,
+        title: 'Q&A with Kevin (Plus a Special Guest!) — In Theory',
+        url: 'https://musora.com/next-video',
+        thumbnail: 'https://i.vimeocdn.com/video/2031137885-9ca70a5b829937956ac3b0c0063dea24cc7c6bc31bb01851883fb873de3ee1b9-d?mw=80&q=85',
+        duration: 572, // 9:32 in seconds
+        category: 'Beginner • Workout',
+        instructor: 'Kevin Castro'
       },
       countdownDuration: 5,
       autoPlay: true,
     });
 
     // Handle auto-play event
-    countdownEndscreen.onAutoPlay.subscribe((sender, args) => {
-      console.log('Auto-play triggered for:', args.nextVideo.title);
-      alert('Would navigate to: ' + args.nextVideo.url);
+    musoraEndscreen.onAutoPlay.subscribe((sender, args) => {
+      console.log('Musora auto-play triggered for:', args.nextVideo.title);
+      // Hide the end screen and allow user to access regular controls
+      musoraEndscreen.hide();
+      // Add your navigation logic here
+    });
+
+    // Handle play now button
+    musoraEndscreen.onPlayNow.subscribe((sender, args) => {
+      console.log('Musora play now clicked for:', args.nextVideo.title);
+      // Hide the end screen and allow user to access regular controls
+      musoraEndscreen.hide();
+      // Add your navigation logic here
+    });
+
+    // Handle cancel button
+    musoraEndscreen.onCancelled.subscribe(() => {
+      console.log('Musora endscreen cancelled');
+      // Add your cancel logic here
     });
 
     return new UIContainer({
@@ -777,30 +298,19 @@ export namespace UIFactory {
         new BufferingOverlay(),
         new CastStatusOverlay(),
         new PlaybackToggleOverlay(),
-        countdownEndscreen,  // Use CountdownEndscreen instead of RecommendationOverlay
+        musoraEndscreen,  // Use MusoraEndscreen instead of RecommendationOverlay
         controlBar,
-        new TitleBar({
-          components: [
-            new MetadataLabel({ content: MetadataLabelContent.Title }),
-            new CastToggleButton(),
-            new VRToggleButton(),
-            new PictureInPictureToggleButton(),
-            new AirPlayToggleButton(),
-            new VolumeToggleButton(),
-            new SettingsToggleButton({ settingsPanel: settingsPanel }),
-            new FullscreenToggleButton(),
-          ],
-        }),
         settingsPanel,
-        new Watermark(),
         new ErrorMessageOverlay(),
       ],
       cssClasses: ['ui-skin-smallscreen'],
-      hideDelay: 2000,
+      hideDelay: -1, // Disable auto-hide completely - controls never auto-hide
       hidePlayerStateExceptions: [
-        PlayerUtils.PlayerState.Prepared,
-        PlayerUtils.PlayerState.Paused,
-        PlayerUtils.PlayerState.Finished,
+        PlayerUtils.PlayerState.Idle,      // Controls visible when idle
+        PlayerUtils.PlayerState.Prepared,  // Controls visible when prepared
+        PlayerUtils.PlayerState.Playing,   // Controls visible when playing
+        PlayerUtils.PlayerState.Paused,    // Controls visible when paused
+        PlayerUtils.PlayerState.Finished,  // Controls visible when video ends
       ],
     });
   }

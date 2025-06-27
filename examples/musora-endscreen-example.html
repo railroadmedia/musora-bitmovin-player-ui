@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Musora End Screen Example</title>
+    <script src="https://cdn.bitmovin.com/player/web/8/bitmovinplayer.js"></script>
+    <script src="../dist/js/bitmovinplayer-ui.js"></script>
+    <link rel="stylesheet" href="../dist/css/bitmovinplayer-ui.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+        }
+        
+        #player-container {
+            width: 100%;
+            max-width: 1280px;
+            margin: 0 auto;
+            background: #000;
+        }
+        
+        #player {
+            width: 100%;
+            height: 0;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            position: relative;
+        }
+        
+        #player video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .example-controls {
+            max-width: 1280px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .example-controls h3 {
+            margin-top: 0;
+        }
+
+        .example-controls button {
+            margin: 5px;
+            padding: 10px 15px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .example-controls button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div id="player-container">
+        <div id="player"></div>
+    </div>
+
+    <div class="example-controls">
+        <h3>Musora End Screen Controls</h3>
+        <p>These buttons demonstrate the Musora end screen functionality:</p>
+        <button onclick="showEndscreen()">Show End Screen</button>
+        <button onclick="hideEndscreen()">Hide End Screen</button>
+        <button onclick="updateNextVideo()">Update Next Video</button>
+        <button onclick="pauseVideo()">Pause Video</button>
+    </div>
+
+    <script>
+        // Player configuration
+        const config = {
+            key: 'YOUR_PLAYER_KEY_HERE', // Replace with your actual player key
+            ui: false, // We'll build our custom UI
+            playback: {
+                muted: true,
+                autoplay: false
+            }
+        };
+
+        // Sample video source
+        const source = {
+            progressive: [
+                {
+                    url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+                    type: 'video/mp4'
+                }
+            ],
+            poster: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg',
+            title: 'Big Buck Bunny',
+            description: 'A test video for demonstrating the Musora end screen'
+        };
+
+        // Initialize player
+        const player = new bitmovin.player.Player(document.getElementById('player'), config);
+
+        // Create custom UI with Musora end screen
+        const uiContainer = new bitmovin.playerui.UIContainer({
+            components: [
+                // Basic playback controls
+                new bitmovin.playerui.ClickOverlay(),
+                new bitmovin.playerui.HugePlaybackToggleButton(),
+                new bitmovin.playerui.ControlBar({
+                    components: [
+                        new bitmovin.playerui.PlaybackToggleButton(),
+                        new bitmovin.playerui.Spacer(),
+                        new bitmovin.playerui.PlaybackTimeLabel(),
+                        new bitmovin.playerui.SeekBar(),
+                        new bitmovin.playerui.PlaybackTimeLabel({ timeLabelMode: bitmovin.playerui.PlaybackTimeLabelMode.Duration }),
+                        new bitmovin.playerui.VolumeToggleButton(),
+                        new bitmovin.playerui.FullscreenToggleButton(),
+                    ]
+                }),
+                // Our custom Musora end screen
+                new bitmovin.playerui.MusoraEndscreen({
+                    nextVideo: {
+                        title: 'Q&A with Kevin (Plus a Special Guest!) — In Theory',
+                        url: 'https://example.com/next-video',
+                        thumbnail: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ElephantsDream.jpg',
+                        duration: 572, // 9:32 in seconds
+                        category: 'Beginner • Workout',
+                        instructor: 'Kevin Castro'
+                    },
+                    countdownDuration: 5,
+                    autoPlay: true
+                })
+            ]
+        });
+
+        // Get reference to the end screen component
+        const musoraEndscreen = uiContainer.getComponentsByType(bitmovin.playerui.MusoraEndscreen)[0];
+
+        // Set up event handlers for the end screen
+        if (musoraEndscreen) {
+            // Handle auto-play event
+            musoraEndscreen.onAutoPlay.subscribe((sender, args) => {
+                console.log('Auto-play triggered for:', args.nextVideo.title);
+                // In a real application, you would navigate to the next video
+                alert(`Auto-playing: ${args.nextVideo.title}`);
+            });
+
+            // Handle play now button
+            musoraEndscreen.onPlayNow.subscribe((sender, args) => {
+                console.log('Play now clicked for:', args.nextVideo.title);
+                // In a real application, you would navigate to the next video
+                alert(`Playing now: ${args.nextVideo.title}`);
+            });
+
+            // Handle cancel button
+            musoraEndscreen.onCancelled.subscribe(() => {
+                console.log('End screen cancelled');
+                alert('End screen cancelled');
+            });
+
+            // Handle countdown updates
+            musoraEndscreen.onCountdownUpdate.subscribe((sender, args) => {
+                console.log('Countdown:', args.countdown);
+            });
+        }
+
+        // Initialize the UI
+        const uiManager = new bitmovin.playerui.UIManager(player, uiContainer);
+
+        // Load the video
+        player.load(source);
+
+        // Example control functions
+        function showEndscreen() {
+            if (musoraEndscreen) {
+                musoraEndscreen.show();
+            }
+        }
+
+        function hideEndscreen() {
+            if (musoraEndscreen) {
+                musoraEndscreen.hide();
+            }
+        }
+
+        function updateNextVideo() {
+            if (musoraEndscreen) {
+                musoraEndscreen.setNextVideo({
+                    title: 'Advanced Guitar Techniques with Sarah',
+                    url: 'https://example.com/advanced-guitar',
+                    thumbnail: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ForBiggerEscapes.jpg',
+                    duration: 1200, // 20:00 in seconds
+                    category: 'Advanced • Guitar',
+                    instructor: 'Sarah Johnson'
+                });
+                alert('Next video updated!');
+            }
+        }
+
+        function pauseVideo() {
+            player.pause();
+        }
+
+        // Auto-show end screen when video finishes for demonstration
+        player.on(bitmovin.player.PlayerEvent.PlaybackFinished, () => {
+            console.log('Playback finished - end screen should show automatically');
+        });
+
+        // Log player events for debugging
+        player.on(bitmovin.player.PlayerEvent.Ready, () => {
+            console.log('Player ready');
+        });
+
+        player.on(bitmovin.player.PlayerEvent.Play, () => {
+            console.log('Playback started');
+        });
+
+        player.on(bitmovin.player.PlayerEvent.Paused, () => {
+            console.log('Playback paused');
+        });
+    </script>
+</body>
+</html>

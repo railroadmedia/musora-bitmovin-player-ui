@@ -26,27 +26,20 @@
         <div class="card-block">
             <h4 class="card-title">Player Config</h4>
 
-            <div class="form-group row">
-                <label for="config-source" class="col-sm-4 form-control-label">Video Source</label>
-                <div class="col-sm-4">
-                    <select class="form-control" id="config-source"></select>
-                </div>
-                <span class="col-sm-4 form-text">The video source to load into the player.</span>
-            </div>
 
             <div class="form-group row">
-                <label for="config-ui" class="col-sm-4 form-control-label">UI</label>
-                <div class="col-sm-4">
-                    <select class="form-control" id="config-ui"></select>
+                <label class="col-sm-4 form-control-label">UI Configuration</label>
+                <div class="col-sm-8">
+                    <p class="form-control-static"><strong>Musora Custom End Screen UI</strong> - Features custom orange branding, clean interface, and Musora-style end screen with countdown timer.</p>
                 </div>
-                <span class="col-sm-4 form-text">The UI skin or skin type to display. Try "buildCountdownEndscreenUI" to test the new countdown endscreen component!</span>
             </div>
             
             <div class="alert alert-info" role="alert">
-                <strong>New Feature:</strong> Select "buildCountdownEndscreenUI" to test the countdown endscreen component. 
-                After video ends, it shows a countdown timer with the next video preview. 
-                Use the "Test countdown endscreen" action button to trigger it manually.
+                <strong>Musora Custom Player:</strong> This demo features a custom Bitmovin Player UI with Musora branding and styling. 
+                When the video ends, you'll see a beautiful end screen with countdown timer and next video preview. 
+                Use the "Test Musora endscreen" action button to trigger it manually.
             </div>
+            
         </div>
 
         <div class="card-block">
@@ -107,85 +100,11 @@
 <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
 <script type="text/javascript">
   var sources = {
-    fullyFeatured: {
-      dash: '//bitdash-a.akamaihd.net/content/sintel/sintel.mpd',
-      hls: '//bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8',
-      progressive: [
-        {url: '//bitdash-a.akamaihd.net/content/sintel/Sintel.mp4', type: 'video/mp4'},
-        {url: '//bitdash-a.akamaihd.net/content/sintel/Sintel.webm', type: 'video/webm'}
-      ],
-      poster: '//bitdash-a.akamaihd.net/content/sintel/poster.png',
-      thumbnailTrack: {
-        url: '//bitdash-a.akamaihd.net/content/sintel/sprite/sprite.vtt',
-      },
-      title: 'Sintel',
-      description: 'A woman, Sintel, is attacked while traveling through a wintry mountainside. After defeating her attacker and taking his spear, she finds refuge in a shaman\'s hut...',
-      markers: [
-        {time: 0, title: 'Intro'},
-        {time: 102, title: 'Old Guy', duration: 30},
-        {time: 150, title: 'City', cssClasses: ['class1', 'class2']},
-        {time: 200, title: 'Dragon'},
-        {time: 370, title: 'Desert'},
-        {time: 385, title: 'Bamboo Forest'},
-        {time: 410, title: 'Winter again'},
-        {time: 755, title: 'Credits'},
-      ],
-      recommendations: [
-        {title: 'Recommendation 1: The best video ever', url: 'http://bitmovin.com', thumbnail: 'http://placehold.it/300x300', duration: 10.4},
-        {title: 'Recommendation 2: The second best video', url: 'http://bitmovin.com', thumbnail: 'http://placehold.it/300x300', duration: 64},
-        {title: 'Recommendation 3: The third best video of all time', url: 'http://bitmovin.com', thumbnail: 'http://placehold.it/300x300', duration: 195},
-      ],
-    },
-    basicProgressive: {
-      progressive: '//bitdash-a.akamaihd.net/content/sintel/Sintel.mp4',
-      poster: '//bitdash-a.akamaihd.net/content/sintel/poster.png',
-    },
-    basicMultiProgressive: {
-      progressive: [
-        {url: '//bitdash-a.akamaihd.net/content/sintel/Sintel.mp4', type: 'video/mp4', label: 'quality1'},
-        {url: '//bitdash-a.akamaihd.net/content/sintel/Sintel.mp4', type: 'video/mp4', label: 'quality2'},
-      ],
-    },
-    basicHls: {
-      hls: "//bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8",
-      poster: '//bitdash-a.akamaihd.net/content/sintel/poster.png',
-    },
-    basicDash: {
-      dash: 'http://bitdash-a.akamaihd.net/content/sintel/sintel.mpd'
-    },
-    basicDashAudioOnly: {
-      dash: 'http://bitmovin-a.akamaihd.net/content/sintel/sintel-audio.mpd'
-    },
-    basicDashVideoOnly: {
-      dash: 'http://bitmovin-a.akamaihd.net/content/sintel/sintel-video.mpd'
-    },
-    errorInvalidHost: {
-      dash: 'http://invalid/url/to/nonexistent/mpd.mpd'
-    },
-    errorMissingMpd: {
-      dash: 'http://bitdash-a.akamaihd.net/content/sintel/sintellll.mpd'
-    },
-    vr: {
-      dash: 'https://bitmovin-a.akamaihd.net/content/playhouse-vr/mpds/105560.mpd',
-      vr: {
-        contentType: 'single'
-      }
-    },
-    posterAndThumbnails: {
-      dash: '//bitdash-a.akamaihd.net/content/MI201109210084_1/mpds/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.mpd',
-      hls: '//bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8',
-      progressive: '//bitdash-a.akamaihd.net/content/MI201109210084_1/MI201109210084_mpeg-4_hd_high_1080p25_10mbits.mp4',
-      poster: '//bitdash-a.akamaihd.net/content/art-of-motion_drm/art-of-motion_poster.jpg',
-      thumbnailTrack: {
-        url: 'https://bitdash-a.akamaihd.net/content/MI201109210084_1/thumbnails/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.vtt',
-      },
-      userId: 'demo_html5_vts', videoId: 'art-of-motion'
-    },
-    live: {
-      dash: 'https://bitcdn-kronehit.bitmovin.com/v2/dash/manifest.mpd'
-    },
-    liveWithTimeshift: {
-      dash: 'http://demo-dash-live.zahs.tv/hd/manifest.mpd?timeshift=100'
+    musoraHLS: {
+      hls: 'https://player.vimeo.com/external/1096949207.m3u8?s=ee597bace7d2375ca39962e82d4248705512ec80&logging=false',
+      poster: 'https://i.vimeocdn.com/video/2031137885-9ca70a5b829937956ac3b0c0063dea24cc7c6bc31bb01851883fb873de3ee1b9-d?mw=80&q=85',
+      title: 'Musora Video',
+      description: 'Demo video for testing the Musora end screen component'
     }
   };
 
@@ -212,7 +131,7 @@
   var adsEnabled = false;
 
   var config = {
-    key: 'YOUR KEY HERE',
+    key: '20c0fb26-e0b8-45d6-9e7f-472e698dd4c6',
     ui: false,
     remotecontrol: {
       type: 'googlecast',
@@ -221,6 +140,9 @@
   };
 
   var uiConfig = {
+    // Force controls to always stay visible - especially important for end state
+    disableAutoHideWhenHovered: true,   // Prevent auto-hide when hovering (desktop)
+    autoUiVariantResolve: true,         // Allow automatic UI variant switching
     metadata: {
 //      title: 'UI Demo Video Title',
 //      description: 'Bacon ipsum dolor amet t-bone prosciutto cupim kevin tongue, venison tail pork beef ribs boudin beef shoulder bacon jerky. Pork tail spare ribs jowl jerky andouille corned beef frankfurter. Burgdoggen meatloaf short ribs andouille tail tri-tip cow kevin doner.',
@@ -271,9 +193,9 @@
     });
 
     // Add UI
-    uiManager = bitmovin.playerui.UIFactory.buildDefaultUI(player, uiConfig);
+    uiManager = bitmovin.playerui.UIFactory.buildMusoraEndscreenUI(player, uiConfig);
 
-    player.load(sources.fullyFeatured).then(function() {
+    player.load(sources.musoraHLS).then(function() {
       console.log('source successfully loaded');
     }, function(errorEvent) {
       console.log('error while loading source', errorEvent);
@@ -282,13 +204,6 @@
 
   playerSetup(config);
 
-  $.each(sources, function(key, value) {
-    $('#config-source').append($('<option></option>').attr('value', key).text(key));
-  });
-  $('#config-source').change(function() {
-    player.unload();
-    player.load(sources[$(this).val()]);
-  });
 
   var printResult = function(result, method) {
     console.log(method, result);
@@ -683,45 +598,6 @@
     }
   }, 'video.');
 
-  // Collect all UI factory methods which are basically the different built-in skins and skin types
-  var uiFactoryMethods = [];
-  for (var member in bitmovin.playerui.UIFactory) {
-    if (typeof bitmovin.playerui.UIFactory[member] == 'function' && member.indexOf('build') === 0) {
-      uiFactoryMethods.push(member);
-    }
-  }
-
-  var configUISelect = $('#config-ui');
-
-  // Collect all UI Demos
-  var uiDemos = [];
-  for (var member in bitmovin.playerui.DemoFactory) {
-    if (typeof bitmovin.playerui.DemoFactory[member] === 'function' && member.indexOf('buildDemo') === 0) {
-      uiDemos.push(member);
-    }
-  }
-
-  // Fill the UI factory method select box
-  $.each(uiFactoryMethods, function(key, value) {
-    configUISelect.append($('<option></option>').attr('value', value).text(value));
-  });
-  // put all demos in own select-opt-group
-  let demoGroup = $('<optgroup label="Demos" />');
-  $.each(uiDemos, function(key, value) {
-    $('<option></option>').attr('value', value).text(value).appendTo(demoGroup);
-  });
-  demoGroup.appendTo(configUISelect);
-
-  // Refresh UI when a factory is selected
-  configUISelect.change(function() {
-    uiManager.release();
-    var factoryMethod = $(this).val();
-    if (factoryMethod.indexOf('buildDemo') === 0) {
-      uiManager = bitmovin.playerui.DemoFactory[factoryMethod](player, uiConfig);
-    } else {
-      uiManager = bitmovin.playerui.UIFactory[factoryMethod](player, uiConfig);
-    }
-  });
 
   // Populate stats
   $('#userAgent').html(navigator.userAgent);

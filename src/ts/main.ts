@@ -47,6 +47,7 @@ export { Component } from './components/component';
 export { ErrorMessageOverlay } from './components/errormessageoverlay';
 export { RecommendationOverlay } from './components/recommendationoverlay';
 export { CountdownEndscreen } from './components/countdownendscreen';
+export { MusoraEndscreen } from './components/musoraendscreen';
 export { SeekBarLabel } from './components/seekbarlabel';
 export { SubtitleOverlay } from './components/subtitleoverlay';
 export { SubtitleSelectBox } from './components/subtitleselectbox';
