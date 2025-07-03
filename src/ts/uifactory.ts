@@ -25,51 +25,41 @@ import { CastToggleButton } from './components/casttogglebutton';
 import { VRToggleButton } from './components/vrtogglebutton';
 import { SettingsToggleButton } from './components/settingstogglebutton';
 import { FullscreenToggleButton } from './components/fullscreentogglebutton';
+import { CloseButton } from './components/closebutton';
 import { UIContainer } from './components/uicontainer';
 import { BufferingOverlay } from './components/bufferingoverlay';
 import { PlaybackToggleOverlay } from './components/playbacktoggleoverlay';
 import { CastStatusOverlay } from './components/caststatusoverlay';
-import { TitleBar } from './components/titlebar';
-import { RecommendationOverlay } from './components/recommendationoverlay';
-import { Watermark } from './components/watermark';
+import { MusoraEndscreen } from './components/musoraendscreen';
 import { ErrorMessageOverlay } from './components/errormessageoverlay';
-import { AdClickOverlay } from './components/adclickoverlay';
-import { AdMessageLabel } from './components/admessagelabel';
-import { AdSkipButton } from './components/adskipbutton';
-import { CloseButton } from './components/closebutton';
-import { MetadataLabel, MetadataLabelContent } from './components/metadatalabel';
-import { PlayerUtils } from './playerutils';
-import { Label } from './components/label';
-import { CastUIContainer } from './components/castuicontainer';
 import { UIConditionContext, UIManager } from './uimanager';
 import { UIConfig } from './uiconfig';
 import { PlayerAPI } from 'bitmovin-player';
 import { i18n } from './localization/i18n';
-import { SubtitleListBox } from './components/subtitlelistbox';
-import { AudioTrackListBox } from './components/audiotracklistbox';
-import { SpatialNavigation } from './spatialnavigation/spatialnavigation';
-import { RootNavigationGroup } from './spatialnavigation/rootnavigationgroup';
-import { ListNavigationGroup, ListOrientation } from './spatialnavigation/ListNavigationGroup';
+import { PlayerUtils } from './playerutils';
 
 export namespace UIFactory {
 
-  export function buildDefaultUI(player: PlayerAPI, config: UIConfig = {}): UIManager {
-    return UIFactory.buildModernUI(player, config);
+
+  export function buildMusoraEndscreenUI(player: PlayerAPI, config: UIConfig = {}): UIManager {
+    // Use the same structure for all contexts - just Musora UI
+    let smallScreenSwitchWidth = 600;
+
+    return new UIManager(player, [{
+      ui: modernUIWithMusora(),
+      condition: (context: UIConditionContext) => {
+        return !context.isAd && !context.adRequiresUi && context.isMobile
+          && context.documentWidth < smallScreenSwitchWidth;
+      },
+    }, {
+      ui: modernUIWithMusora(),
+      condition: (context: UIConditionContext) => {
+        return !context.isAd && !context.adRequiresUi;
+      },
+    }], config);
   }
 
-  export function buildDefaultSmallScreenUI(player: PlayerAPI, config: UIConfig = {}): UIManager {
-    return UIFactory.buildModernSmallScreenUI(player, config);
-  }
-
-  export function buildDefaultCastReceiverUI(player: PlayerAPI, config: UIConfig = {}): UIManager {
-    return UIFactory.buildModernCastReceiverUI(player, config);
-  }
-
-  export function buildDefaultTvUI(player: PlayerAPI, config: UIConfig = {}): UIManager {
-    return UIFactory.buildModernTvUI(player, config);
-  }
-
-  export function modernUI() {
+  function modernUIWithMusora() {
     let subtitleOverlay = new SubtitleOverlay();
 
     let mainSettingsPanelPage = new SettingsPanelPage({
@@ -145,6 +135,42 @@ export namespace UIFactory {
       ],
     });
 
+    // Create Musora endscreen with sample next video data
+    let musoraEndscreen = new MusoraEndscreen({
+      nextVideo: {
+        title: 'Q&A with Kevin (Plus a Special Guest!) — In Theory',
+        url: 'https://musora.com/next-video',
+        thumbnail: 'https://i.vimeocdn.com/video/2031137885-9ca70a5b829937956ac3b0c0063dea24cc7c6bc31bb01851883fb873de3ee1b9-d?mw=80&q=85',
+        duration: 340, // 5:40 in seconds
+        category: 'Beginner • Workout',
+        instructor: 'Kevin Castro'
+      },
+      countdownDuration: 5,
+      autoPlay: true,
+    });
+
+    // Handle auto-play event
+    musoraEndscreen.onAutoPlay.subscribe((sender, args) => {
+      console.log('Musora auto-play triggered for:', args.nextVideo.title);
+      // Hide the end screen and allow user to access regular controls
+      musoraEndscreen.hide();
+      // Add your navigation logic here
+    });
+
+    // Handle play now button
+    musoraEndscreen.onPlayNow.subscribe((sender, args) => {
+      console.log('Musora play now clicked for:', args.nextVideo.title);
+      // Hide the end screen and allow user to access regular controls
+      musoraEndscreen.hide();
+      // Add your navigation logic here
+    });
+
+    // Handle cancel button
+    musoraEndscreen.onCancelled.subscribe(() => {
+      console.log('Musora endscreen cancelled');
+      // Add your cancel logic here
+    });
+
     return new UIContainer({
       components: [
         subtitleOverlay,
@@ -152,59 +178,21 @@ export namespace UIFactory {
         new PlaybackToggleOverlay(),
         new CastStatusOverlay(),
         controlBar,
-        new TitleBar(),
-        new RecommendationOverlay(),
-        new Watermark(),
+        musoraEndscreen,  // Use MusoraEndscreen instead of RecommendationOverlay
         new ErrorMessageOverlay(),
       ],
-      hideDelay: 2000,
+      hideDelay: -1, // Disable auto-hide completely - controls never auto-hide
       hidePlayerStateExceptions: [
-        PlayerUtils.PlayerState.Prepared,
-        PlayerUtils.PlayerState.Paused,
-        PlayerUtils.PlayerState.Finished,
+        PlayerUtils.PlayerState.Idle,      // Controls visible when idle
+        PlayerUtils.PlayerState.Prepared,  // Controls visible when prepared
+        PlayerUtils.PlayerState.Playing,   // Controls visible when playing
+        PlayerUtils.PlayerState.Paused,    // Controls visible when paused
+        PlayerUtils.PlayerState.Finished,  // Controls visible when video ends
       ],
     });
   }
 
-  export function modernAdsUI() {
-    return new UIContainer({
-      components: [
-        new BufferingOverlay(),
-        new AdClickOverlay(),
-        new PlaybackToggleOverlay(),
-        new Container({
-          components: [
-            new AdMessageLabel({ text: i18n.getLocalizer('ads.remainingTime')}),
-            new AdSkipButton(),
-          ],
-          cssClass: 'ui-ads-status',
-        }),
-        new ControlBar({
-          components: [
-            new Container({
-              components: [
-                new PlaybackToggleButton(),
-                new VolumeToggleButton(),
-                new VolumeSlider(),
-                new Spacer(),
-                new FullscreenToggleButton(),
-              ],
-              cssClasses: ['controlbar-bottom'],
-            }),
-          ],
-        }),
-      ],
-      cssClasses: ['ui-skin-ads'],
-      hideDelay: 2000,
-      hidePlayerStateExceptions: [
-        PlayerUtils.PlayerState.Prepared,
-        PlayerUtils.PlayerState.Paused,
-        PlayerUtils.PlayerState.Finished,
-      ],
-    });
-  }
-
-  export function modernSmallScreenUI() {
+  function modernSmallScreenUIWithMusora() {
     let subtitleOverlay = new SubtitleOverlay();
 
     let mainSettingsPanelPage = new SettingsPanelPage({
@@ -269,256 +257,114 @@ export namespace UIFactory {
       ],
     });
 
+    // Create Musora endscreen for small screen
+    let musoraEndscreen = new MusoraEndscreen({
+      nextVideo: {
+        title: 'Q&A with Kevin (Plus a Special Guest!) — In Theory',
+        url: 'https://musora.com/next-video',
+        thumbnail: 'https://i.vimeocdn.com/video/2031137885-9ca70a5b829937956ac3b0c0063dea24cc7c6bc31bb01851883fb873de3ee1b9-d?mw=80&q=85',
+        duration: 340, // 5:40 in seconds
+        category: 'Beginner • Workout',
+        instructor: 'Kevin Castro'
+      },
+      countdownDuration: 5,
+      autoPlay: true,
+    });
+
+    // Handle auto-play event
+    musoraEndscreen.onAutoPlay.subscribe((sender, args) => {
+      console.log('Musora auto-play triggered for:', args.nextVideo.title);
+      // Hide the end screen and allow user to access regular controls
+      musoraEndscreen.hide();
+      // Add your navigation logic here
+    });
+
+    // Handle play now button
+    musoraEndscreen.onPlayNow.subscribe((sender, args) => {
+      console.log('Musora play now clicked for:', args.nextVideo.title);
+      // Hide the end screen and allow user to access regular controls
+      musoraEndscreen.hide();
+      // Add your navigation logic here
+    });
+
+    // Handle cancel button
+    musoraEndscreen.onCancelled.subscribe(() => {
+      console.log('Musora endscreen cancelled');
+      // Add your cancel logic here
+    });
+
     return new UIContainer({
       components: [
         subtitleOverlay,
         new BufferingOverlay(),
         new CastStatusOverlay(),
         new PlaybackToggleOverlay(),
-        new RecommendationOverlay(),
+        musoraEndscreen,  // Use MusoraEndscreen instead of RecommendationOverlay
         controlBar,
-        new TitleBar({
-          components: [
-            new MetadataLabel({ content: MetadataLabelContent.Title }),
-            new CastToggleButton(),
-            new VRToggleButton(),
-            new PictureInPictureToggleButton(),
-            new AirPlayToggleButton(),
-            new VolumeToggleButton(),
-            new SettingsToggleButton({ settingsPanel: settingsPanel }),
-            new FullscreenToggleButton(),
-          ],
-        }),
         settingsPanel,
-        new Watermark(),
         new ErrorMessageOverlay(),
       ],
       cssClasses: ['ui-skin-smallscreen'],
-      hideDelay: 2000,
+      hideDelay: -1, // Disable auto-hide completely - controls never auto-hide
       hidePlayerStateExceptions: [
-        PlayerUtils.PlayerState.Prepared,
-        PlayerUtils.PlayerState.Paused,
-        PlayerUtils.PlayerState.Finished,
+        PlayerUtils.PlayerState.Idle,      // Controls visible when idle
+        PlayerUtils.PlayerState.Prepared,  // Controls visible when prepared
+        PlayerUtils.PlayerState.Playing,   // Controls visible when playing
+        PlayerUtils.PlayerState.Paused,    // Controls visible when paused
+        PlayerUtils.PlayerState.Finished,  // Controls visible when video ends
       ],
     });
   }
 
-  export function modernSmallScreenAdsUI() {
-    return new UIContainer({
-      components: [
-        new BufferingOverlay(),
-        new AdClickOverlay(),
-        new PlaybackToggleOverlay(),
-        new TitleBar({
-          components: [
-            // dummy label with no content to move buttons to the right
-            new Label({ cssClass: 'label-metadata-title' }),
-            new FullscreenToggleButton(),
-          ],
-        }),
-        new Container({
-          components: [
-            new AdMessageLabel({ text: 'Ad: {remainingTime} secs' }),
-            new AdSkipButton(),
-          ],
-          cssClass: 'ui-ads-status',
-        }),
-      ],
-      cssClasses: ['ui-skin-ads', 'ui-skin-smallscreen'],
-      hideDelay: 2000,
-      hidePlayerStateExceptions: [
-        PlayerUtils.PlayerState.Prepared,
-        PlayerUtils.PlayerState.Paused,
-        PlayerUtils.PlayerState.Finished,
-      ],
-    });
+  export function modernSmallScreenUI() {
+    return modernSmallScreenUIWithMusora();
   }
 
-  export function modernCastReceiverUI() {
+  export function modernAdsUI() {
+    // Simple ads UI - minimal controls during ad playback
     let controlBar = new ControlBar({
       components: [
         new Container({
           components: [
-            new PlaybackTimeLabel({ timeLabelMode: PlaybackTimeLabelMode.CurrentTime, hideInLivePlayback: true }),
-            new SeekBar({ smoothPlaybackPositionUpdateIntervalMs: -1 }),
-            new PlaybackTimeLabel({ timeLabelMode: PlaybackTimeLabelMode.TotalTime, cssClasses: ['text-right'] }),
+            new PlaybackToggleButton(),
+            new Spacer(),
+            new VolumeToggleButton(),
+            new VolumeSlider(),
           ],
-          cssClasses: ['controlbar-top'],
+          cssClasses: ['controlbar-bottom'],
         }),
       ],
     });
 
-    return new CastUIContainer({
+    return new UIContainer({
       components: [
-        new SubtitleOverlay(),
         new BufferingOverlay(),
-        new PlaybackToggleOverlay(),
-        new Watermark(),
         controlBar,
-        new TitleBar({ keepHiddenWithoutMetadata: true }),
-        new ErrorMessageOverlay(),
       ],
-      cssClasses: ['ui-skin-cast-receiver'],
-      hideDelay: 2000,
-      hidePlayerStateExceptions: [
-        PlayerUtils.PlayerState.Prepared,
-        PlayerUtils.PlayerState.Paused,
-        PlayerUtils.PlayerState.Finished,
-      ],
+      cssClasses: ['ui-skin-ads'],
     });
   }
 
-  export function buildModernUI(player: PlayerAPI, config: UIConfig = {}): UIManager {
-    // show smallScreen UI only on mobile/handheld devices
-    let smallScreenSwitchWidth = 600;
-
-    return new UIManager(player, [{
-      ui: modernSmallScreenAdsUI(),
-      condition: (context: UIConditionContext) => {
-        return context.isMobile && context.documentWidth < smallScreenSwitchWidth && context.isAd
-          && context.adRequiresUi;
-      },
-    }, {
-      ui: modernAdsUI(),
-      condition: (context: UIConditionContext) => {
-        return context.isAd && context.adRequiresUi;
-      },
-    }, {
-      ui: modernSmallScreenUI(),
-      condition: (context: UIConditionContext) => {
-        return !context.isAd && !context.adRequiresUi && context.isMobile
-          && context.documentWidth < smallScreenSwitchWidth;
-      },
-    }, {
-      ui: modernUI(),
-      condition: (context: UIConditionContext) => {
-        return !context.isAd && !context.adRequiresUi;
-      },
-    }], config);
-  }
-
-  export function buildModernSmallScreenUI(player: PlayerAPI, config: UIConfig = {}): UIManager {
-    return new UIManager(player, [{
-      ui: modernSmallScreenAdsUI(),
-      condition: (context: UIConditionContext) => {
-        return context.isAd && context.adRequiresUi;
-      },
-    }, {
-      ui: modernSmallScreenUI(),
-      condition: (context: UIConditionContext) => {
-        return !context.isAd && !context.adRequiresUi;
-      },
-    }], config);
-  }
-
-  export function buildModernCastReceiverUI(player: PlayerAPI, config: UIConfig = {}): UIManager {
-    return new UIManager(player, modernCastReceiverUI(), config);
-  }
-
-  export function buildModernTvUI(player: PlayerAPI, config: UIConfig = {}): UIManager {
-        return new UIManager(player, [{
-          ...modernTvUI(),
-        }], config);
-  }
-
-  export function modernTvUI() {
-    const subtitleListBox = new SubtitleListBox();
-    const subtitleListPanel = new SettingsPanel({
+  export function modernSmallScreenAdsUI() {
+    // Small screen ads UI - minimal controls for mobile ad playback
+    let controlBar = new ControlBar({
       components: [
-        new SettingsPanelPage({
+        new Container({
           components: [
-            new SettingsPanelItem(null, subtitleListBox),
+            new PlaybackToggleButton(),
+            new VolumeToggleButton(),
           ],
+          cssClasses: ['controlbar-bottom'],
         }),
       ],
-      hidden: true,
     });
 
-    const audioTrackListBox = new AudioTrackListBox();
-    const audioTrackListPanel = new SettingsPanel({
+    return new UIContainer({
       components: [
-        new SettingsPanelPage({
-          components: [
-            new SettingsPanelItem(null, audioTrackListBox),
-          ],
-        }),
-      ],
-      hidden: true,
-    });
-
-    const seekBar = new SeekBar({ label: new SeekBarLabel() });
-    const playbackToggleOverlay = new PlaybackToggleOverlay();
-    const subtitleToggleButton = new SettingsToggleButton({
-      settingsPanel: subtitleListPanel,
-      autoHideWhenNoActiveSettings: true,
-      cssClass: 'ui-subtitlesettingstogglebutton',
-      text: i18n.getLocalizer('settings.subtitles'),
-    });
-    const audioToggleButton = new SettingsToggleButton({
-      settingsPanel: audioTrackListPanel,
-      autoHideWhenNoActiveSettings: true,
-      cssClass: 'ui-audiotracksettingstogglebutton',
-      ariaLabel: i18n.getLocalizer('settings.audio.track'),
-      text: i18n.getLocalizer('settings.audio.track'),
-    });
-    const uiContainer = new UIContainer({
-      components: [
-        new SubtitleOverlay(),
         new BufferingOverlay(),
-        playbackToggleOverlay,
-        new ControlBar({
-          components: [
-            new Container({
-              components: [
-                new PlaybackTimeLabel({ timeLabelMode: PlaybackTimeLabelMode.CurrentTime, hideInLivePlayback: true }),
-                seekBar,
-                new PlaybackTimeLabel({ timeLabelMode: PlaybackTimeLabelMode.RemainingTime, cssClasses: ['text-right'] }),
-              ],
-              cssClasses: ['controlbar-top'],
-            }),
-          ],
-        }),
-        new TitleBar({
-          components: [
-            new Container({
-              components: [
-                new MetadataLabel({ content: MetadataLabelContent.Title }),
-                subtitleToggleButton,
-                audioToggleButton,
-              ],
-              cssClasses: ['ui-titlebar-top'],
-            }),
-            new Container({
-              components: [
-                new MetadataLabel({ content: MetadataLabelContent.Description }),
-                subtitleListPanel,
-                audioTrackListPanel,
-              ],
-              cssClasses: ['ui-titlebar-bottom'],
-            }),
-          ],
-        }),
-        new RecommendationOverlay(),
-        new ErrorMessageOverlay(),
+        controlBar,
       ],
-      cssClasses: ['ui-skin-tv'],
-      hideDelay: 2000,
-      hidePlayerStateExceptions: [
-        PlayerUtils.PlayerState.Prepared,
-        PlayerUtils.PlayerState.Paused,
-        PlayerUtils.PlayerState.Finished,
-      ],
+      cssClasses: ['ui-skin-smallscreen-ads'],
     });
-
-    const spatialNavigation = new SpatialNavigation(
-      new RootNavigationGroup(uiContainer, playbackToggleOverlay, seekBar, audioToggleButton, subtitleToggleButton),
-      new ListNavigationGroup(ListOrientation.Vertical, subtitleListPanel, subtitleListBox),
-      new ListNavigationGroup(ListOrientation.Vertical, audioTrackListPanel, audioTrackListBox),
-    );
-
-    return {
-      ui: uiContainer,
-      spatialNavigation: spatialNavigation,
-    };
   }
 }

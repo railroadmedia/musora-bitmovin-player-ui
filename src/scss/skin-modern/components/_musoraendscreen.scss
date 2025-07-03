@@ -1,0 +1,393 @@
+@import '../variables';
+@import '../mixins';
+
+.#{$prefix}-ui-musora-endscreen {
+  @extend %ui-container;
+
+  @include layout-cover;
+  @include hidden-animated($animation-duration * 2);
+
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  cursor: default;
+  z-index: 1; // Lower than control bar
+  pointer-events: none; // Don't block clicks on controls
+  
+  // Reserve space for control bar at bottom
+  padding-bottom: 120px;
+  
+  // Allow interaction only with end screen elements
+  .#{$prefix}-ui-musora-countdown-label,
+  .#{$prefix}-ui-musora-next-video-card,
+  .#{$prefix}-ui-musora-cancel-button,
+  .#{$prefix}-ui-musora-play-button {
+    pointer-events: auto;
+  }
+  
+  box-sizing: border-box;
+
+  // Main container wrapper
+  > .#{$prefix}-container-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
+
+  // Countdown label in top-left
+  .#{$prefix}-ui-musora-countdown-label {
+    position: absolute;
+    top: 20px;
+    left: 40px;
+    width: 135.52px;
+    height: 13.82px;
+
+    font-family: 'Open Sans', Arial, sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 9px;
+    display: flex;
+    align-items: center;
+    color: #FFFFFF;
+    z-index: 10;
+  }
+
+  // Center content area - contains thumbnail and info side by side
+  .#{$prefix}-ui-musora-next-video-card {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+    width: auto;
+    height: auto;
+
+    .#{$prefix}-thumbnail-container {
+      position: relative;
+      width: 211px;
+      height: 118px;
+      flex-shrink: 0;
+
+      .#{$prefix}-thumbnail {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(0deg, rgba(12, 21, 36, 0.3), rgba(12, 21, 36, 0.3)), 
+                    url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 211 118" fill="%23333"><rect width="211" height="118" fill="%23333"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%23fff" font-family="Arial" font-size="14">Video Thumbnail</text></svg>');
+        background-size: cover;
+        background-position: center;
+        border-radius: 5px;
+        position: relative;
+
+        // Play overlay icon
+        .#{$prefix}-play-overlay {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 30px;
+          height: 30px;
+          z-index: 2;
+
+          &::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 8px 0 8px 12px;
+            border-color: transparent transparent transparent #FFFFFF;
+          }
+        }
+      }
+
+      // Duration badge
+      .#{$prefix}-duration-badge {
+        position: absolute;
+        right: 4px;
+        bottom: 6px;
+        z-index: 2;
+
+        .#{$prefix}-badge-text {
+          display: inline-block;
+          padding: 1px 6px;
+          background: rgba(12, 21, 36, 0.8);
+          border-radius: 20px;
+          font-family: 'Open Sans', Arial, sans-serif;
+          font-weight: 600;
+          font-size: 10px;
+          line-height: 14px;
+          color: #FFFFFF;
+          white-space: nowrap;
+        }
+      }
+    }
+
+    // Video info section - positioned to the right of thumbnail
+    .#{$prefix}-info {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+      min-width: 200px;
+
+      .#{$prefix}-info-content {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        width: 100%;
+
+        .#{$prefix}-title {
+          font-family: 'Open Sans', Arial, sans-serif;
+          font-weight: 700;
+          font-size: 14px;
+          line-height: 19px;
+          color: #FFFFFF;
+          margin: 0;
+          word-wrap: break-word;
+        }
+
+        .#{$prefix}-category {
+          font-family: 'Open Sans', Arial, sans-serif;
+          font-weight: 400;
+          font-size: 12px;
+          line-height: 16px;
+          color: #F6F8FC;
+          margin: 0;
+        }
+
+        .#{$prefix}-instructor {
+          font-family: 'Open Sans', Arial, sans-serif;
+          font-weight: 400;
+          font-size: 12px;
+          line-height: 16px;
+          color: #F6F8FC;
+          margin: 0;
+        }
+      }
+    }
+  }
+
+  // CTA Buttons container - positioned to avoid control bar area
+  .#{$prefix}-ui-musora-cancel-button,
+  .#{$prefix}-ui-musora-play-button {
+    position: absolute;
+    bottom: 140px; // Position above control bar area
+    height: 30px;
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+    z-index: 2; // Ensure buttons are clickable
+    
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 8px 60px;
+    gap: 10px;
+
+    font-family: 'Bebas Neue', Arial, sans-serif;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 14px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    letter-spacing: 1px;
+
+    transition: all 0.2s ease;
+
+    &:hover {
+      transform: scale(1.05);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+
+  // Cancel button (left)
+  .#{$prefix}-ui-musora-cancel-button {
+    left: calc(50% - 165px);
+    width: 158px;
+    background: #3D4450;
+    color: #C6CCD6;
+
+    &:hover {
+      background: #4A5260;
+    }
+  }
+
+  // Play button (right)
+  .#{$prefix}-ui-musora-play-button {
+    right: calc(50% - 175px);
+    width: 170px;
+    background: #FFFFFF;
+    color: #0C1524;
+
+    &:hover {
+      background: #F0F0F0;
+    }
+  }
+
+  // Back button (top-left corner)
+  .#{$prefix}-ui-musora-back-button {
+    position: absolute;
+    width: 31.6px;
+    height: 31.6px;
+    left: 8px;
+    top: 10px;
+    cursor: pointer;
+
+    .#{$prefix}-back-circle {
+      position: absolute;
+      width: 31.6px;
+      height: 31.6px;
+      background: rgba(0, 12, 23, 0.8);
+      border-radius: 50%;
+    }
+
+    .#{$prefix}-back-arrow {
+      position: absolute;
+      width: 20.79px;
+      height: 20.79px;
+      left: 5.4px;
+      top: 5.4px;
+
+      &::after {
+        content: '';
+        position: absolute;
+        left: 57.14%;
+        right: 2.86%;
+        top: 31.43%;
+        bottom: 48.57%;
+        border: 2px solid #FFFFFF;
+        border-top: none;
+        border-right: none;
+        transform: rotate(45deg);
+        width: 8px;
+        height: 8px;
+      }
+    }
+  }
+
+  // Responsive design for mobile
+  @media (max-width: 768px) {
+    .#{$prefix}-ui-musora-countdown-label {
+      top: 15px;
+      left: 20px;
+      font-size: 12px;
+    }
+
+    .#{$prefix}-ui-musora-next-video-card {
+      width: 90%;
+      max-width: 300px;
+      
+      .#{$prefix}-thumbnail-container .#{$prefix}-thumbnail {
+        width: 100%;
+        height: 160px;
+      }
+
+      .#{$prefix}-info {
+        position: relative;
+        left: 0;
+        top: 10px;
+        width: 100%;
+        padding: 0 20px;
+
+        .#{$prefix}-info-content {
+          width: 100%;
+        }
+      }
+    }
+
+    .#{$prefix}-ui-musora-cancel-button,
+    .#{$prefix}-ui-musora-play-button {
+      position: relative;
+      top: 50px;
+      left: 0;
+      right: 0;
+      margin: 0 10px;
+      width: auto;
+      min-width: 120px;
+    }
+
+    .#{$prefix}-ui-musora-cancel-button {
+      margin-right: 5px;
+    }
+
+    .#{$prefix}-ui-musora-play-button {
+      margin-left: 5px;
+    }
+  }
+
+  // Animation states
+  &.#{$prefix}-hidden {
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+  }
+
+  &.#{$prefix}-shown {
+    opacity: 1;
+    pointer-events: auto;
+    visibility: visible;
+  }
+
+  // Smooth transitions
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .#{$prefix}-ui-musora-endscreen {
+    .#{$prefix}-ui-musora-cancel-button {
+      border: 2px solid #C6CCD6;
+    }
+
+    .#{$prefix}-ui-musora-play-button {
+      border: 2px solid #0C1524;
+    }
+
+    .#{$prefix}-ui-musora-next-video-card .#{$prefix}-thumbnail-container .#{$prefix}-thumbnail {
+      border: 2px solid #FFFFFF;
+    }
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .#{$prefix}-ui-musora-endscreen {
+    .#{$prefix}-ui-musora-cancel-button,
+    .#{$prefix}-ui-musora-play-button {
+      transition: none;
+
+      &:hover {
+        transform: none;
+      }
+
+      &:active {
+        transform: none;
+      }
+    }
+
+    transition: none;
+  }
+}

@@ -303,3 +303,62 @@ The default vocabularies along with the keys can be found in the [languages fold
 The UI playground can be launched with `gulp serve` and opens a page in a local browser window. On this page, you can switch between different sources and UI styles, trigger API actions and observe events.
 
 This page uses BrowserSync to sync the state across multiple tabs and browsers and recompiles and reloads automatically files automatically when any `.scss` or `.ts` files are modified. It makes a helpful tool for developing and testing the UI.
+
+## React Native Integration
+
+### Using Custom UI Components in Mobile Apps
+
+The Bitmovin Player React Native SDK includes a **Web UI Bridge** that enables seamless integration of custom web UI components (built with this framework) into React Native applications.
+
+#### How It Works
+
+The React Native SDK uses the Bitmovin Player Web UI framework under the hood with a bridge system for communication between React Native and web components. This allows your custom UI components to run natively within mobile apps.
+
+#### Integration Steps
+
+1. **Build your custom UI** using this framework (e.g., custom end screen components)
+2. **Bundle your custom UI** with `gulp build-prod`
+3. **Include in React Native** using the Web UI Bridge:
+
+```typescript
+import { usePlayer, PlayerView } from 'bitmovin-player-react-native';
+
+const VideoPlayer = () => {
+  const player = usePlayer({
+    licenseKey: 'YOUR_LICENSE_KEY',
+    ui: {
+      customUIPath: './path/to/your/custom-ui-build.js',
+      // Or use CDN
+      customUIUrl: 'https://your-cdn.com/custom-ui.js'
+    }
+  });
+
+  // Communicate with your custom UI
+  player.customMessageHandler.sendMessage('LOAD_CUSTOM_CONFIG', {
+    endScreenConfig: yourConfig
+  });
+
+  player.customMessageHandler.on('UI_ACTION', (data) => {
+    console.log('Custom UI action:', data);
+  });
+
+  return <PlayerView player={player} style={{ flex: 1 }} />;
+};
+```
+
+4. **Handle communication** in your custom web components:
+
+```javascript
+// In your custom component
+window.bitmovin.customMessageHandler.on('LOAD_CUSTOM_CONFIG', (data) => {
+  this.configure(data.endScreenConfig);
+});
+
+// Send actions back to React Native
+window.bitmovin.customMessageHandler.sendMessage('UI_ACTION', {
+  action: 'replay',
+  data: {}
+});
+```
+
+This approach allows you to leverage the full power of this UI framework within React Native applications while maintaining native performance for video playback.

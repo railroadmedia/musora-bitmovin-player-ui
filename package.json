@@ -5,7 +5,10 @@
   "main": "./dist/js/framework/main.js",
   "types": "./dist/js/framework/main.d.ts",
   "scripts": {
-    "test": "npx jest"
+    "test": "npx jest",
+    "build": "gulp",
+    "build:pages": "npm run build && npm run copy:pages",
+    "copy:pages": "mkdir -p docs && cp src/html/*.html docs/ && cp -r dist/css docs/ && cp -r dist/js docs/ && cp -r assets docs/"
   },
   "repository": {
     "type": "git",
