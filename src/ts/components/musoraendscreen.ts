@@ -98,8 +98,8 @@ export class MusoraEndscreen extends Container<MusoraEndscreenConfig> {
   private currentCountdown: number = 0;
   private countdownLabel: MusoraCountdownLabel;
   private nextVideoCard: MusoraNextVideoCard | null = null;
-  private cancelButton: Button;
-  private playButton: Button;
+  private cancelButton: Button<ButtonConfig>;
+  private playButton: Button<ButtonConfig>;
 
   private musoraEndscreenEvents = {
     onAutoPlay: new EventDispatcher<MusoraEndscreen, MusoraEndscreenAutoPlayEventArgs>(),
@@ -368,7 +368,7 @@ export class MusoraEndscreen extends Container<MusoraEndscreenConfig> {
    */
   private forceControlsVisible(): void {
     setTimeout(() => {
-      const uiContainer = this.getDomElement().closest('.bmpui-ui-uicontainer');
+      const uiContainer = this.getDomElement().get(0).closest('.bmpui-ui-uicontainer');
       if (uiContainer) {
         // Force controls to show and stay shown
         uiContainer.classList.add('bmpui-controls-shown');
@@ -389,7 +389,7 @@ export class MusoraEndscreen extends Container<MusoraEndscreenConfig> {
         return;
       }
       
-      const uiContainer = this.getDomElement().closest('.bmpui-ui-uicontainer');
+      const uiContainer = this.getDomElement().get(0).closest('.bmpui-ui-uicontainer');
       if (uiContainer) {
         uiContainer.classList.add('bmpui-controls-shown');
         uiContainer.classList.remove('bmpui-controls-hidden');
@@ -401,7 +401,7 @@ export class MusoraEndscreen extends Container<MusoraEndscreenConfig> {
    * Restore normal control auto-hide behavior
    */
   private restoreNormalControlBehavior(): void {
-    const uiContainer = this.getDomElement().closest('.bmpui-ui-uicontainer');
+    const uiContainer = this.getDomElement().get(0).closest('.bmpui-ui-uicontainer');
     if (uiContainer) {
       // Remove forced visibility and let normal behavior resume
       uiContainer.classList.remove('bmpui-controls-shown');

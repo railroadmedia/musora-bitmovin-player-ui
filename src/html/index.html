@@ -95,6 +95,7 @@
     </div>
 </div>
 
+<script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
 <script src="https://cdn.bitmovin.com/player/web/8/bitmovinplayer.js"></script>
 <script src="js/bitmovinplayer-ui.js"></script>
 <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
@@ -104,7 +105,14 @@
       hls: 'https://player.vimeo.com/external/1096949207.m3u8?s=ee597bace7d2375ca39962e82d4248705512ec80&logging=false',
       poster: 'https://i.vimeocdn.com/video/2031137885-9ca70a5b829937956ac3b0c0063dea24cc7c6bc31bb01851883fb873de3ee1b9-d?mw=80&q=85',
       title: 'Musora Video',
-      description: 'Demo video for testing the Musora end screen component'
+      description: 'Demo video for testing the Musora end screen component',
+      markers: [
+        {time: 10, title: 'Introduction'},
+        {time: 45, title: 'Warm-up Exercises', duration: 30},
+        {time: 90, title: 'Main Technique Focus'},
+        {time: 180, title: 'Practice Session', duration: 120},
+        {time: 320, title: 'Cool Down & Wrap-up'}
+      ]
     }
   };
 
@@ -135,6 +143,10 @@
     ui: false,
     remotecontrol: {
       type: 'googlecast',
+      config: {
+        receiverApplicationId: 'CC1AD845', // Default Bitmovin Cast receiver
+        messageNamespace: 'urn:x-cast:com.bitmovin.player.cast'
+      }
     },
     advertising: adsEnabled ? advertisingConfig : null
   };

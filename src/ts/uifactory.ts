@@ -25,6 +25,7 @@ import { CastToggleButton } from './components/casttogglebutton';
 import { VRToggleButton } from './components/vrtogglebutton';
 import { SettingsToggleButton } from './components/settingstogglebutton';
 import { FullscreenToggleButton } from './components/fullscreentogglebutton';
+import { CloseButton } from './components/closebutton';
 import { UIContainer } from './components/uicontainer';
 import { BufferingOverlay } from './components/bufferingoverlay';
 import { PlaybackToggleOverlay } from './components/playbacktoggleoverlay';
@@ -140,7 +141,7 @@ export namespace UIFactory {
         title: 'Q&A with Kevin (Plus a Special Guest!) — In Theory',
         url: 'https://musora.com/next-video',
         thumbnail: 'https://i.vimeocdn.com/video/2031137885-9ca70a5b829937956ac3b0c0063dea24cc7c6bc31bb01851883fb873de3ee1b9-d?mw=80&q=85',
-        duration: 572, // 9:32 in seconds
+        duration: 340, // 5:40 in seconds
         category: 'Beginner • Workout',
         instructor: 'Kevin Castro'
       },
@@ -262,7 +263,7 @@ export namespace UIFactory {
         title: 'Q&A with Kevin (Plus a Special Guest!) — In Theory',
         url: 'https://musora.com/next-video',
         thumbnail: 'https://i.vimeocdn.com/video/2031137885-9ca70a5b829937956ac3b0c0063dea24cc7c6bc31bb01851883fb873de3ee1b9-d?mw=80&q=85',
-        duration: 572, // 9:32 in seconds
+        duration: 340, // 5:40 in seconds
         category: 'Beginner • Workout',
         instructor: 'Kevin Castro'
       },
@@ -312,6 +313,58 @@ export namespace UIFactory {
         PlayerUtils.PlayerState.Paused,    // Controls visible when paused
         PlayerUtils.PlayerState.Finished,  // Controls visible when video ends
       ],
+    });
+  }
+
+  export function modernSmallScreenUI() {
+    return modernSmallScreenUIWithMusora();
+  }
+
+  export function modernAdsUI() {
+    // Simple ads UI - minimal controls during ad playback
+    let controlBar = new ControlBar({
+      components: [
+        new Container({
+          components: [
+            new PlaybackToggleButton(),
+            new Spacer(),
+            new VolumeToggleButton(),
+            new VolumeSlider(),
+          ],
+          cssClasses: ['controlbar-bottom'],
+        }),
+      ],
+    });
+
+    return new UIContainer({
+      components: [
+        new BufferingOverlay(),
+        controlBar,
+      ],
+      cssClasses: ['ui-skin-ads'],
+    });
+  }
+
+  export function modernSmallScreenAdsUI() {
+    // Small screen ads UI - minimal controls for mobile ad playback
+    let controlBar = new ControlBar({
+      components: [
+        new Container({
+          components: [
+            new PlaybackToggleButton(),
+            new VolumeToggleButton(),
+          ],
+          cssClasses: ['controlbar-bottom'],
+        }),
+      ],
+    });
+
+    return new UIContainer({
+      components: [
+        new BufferingOverlay(),
+        controlBar,
+      ],
+      cssClasses: ['ui-skin-smallscreen-ads'],
     });
   }
 }
