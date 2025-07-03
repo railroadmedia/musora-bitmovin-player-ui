@@ -143,7 +143,7 @@ export namespace UIFactory {
         thumbnail: 'https://i.vimeocdn.com/video/2031137885-9ca70a5b829937956ac3b0c0063dea24cc7c6bc31bb01851883fb873de3ee1b9-d?mw=80&q=85',
         duration: 340, // 5:40 in seconds
         category: 'Beginner • Workout',
-        instructor: 'Kevin Castro'
+        instructor: 'Kevin Castro',
       },
       countdownDuration: 5,
       autoPlay: true,
@@ -265,7 +265,7 @@ export namespace UIFactory {
         thumbnail: 'https://i.vimeocdn.com/video/2031137885-9ca70a5b829937956ac3b0c0063dea24cc7c6bc31bb01851883fb873de3ee1b9-d?mw=80&q=85',
         duration: 340, // 5:40 in seconds
         category: 'Beginner • Workout',
-        instructor: 'Kevin Castro'
+        instructor: 'Kevin Castro',
       },
       countdownDuration: 5,
       autoPlay: true,

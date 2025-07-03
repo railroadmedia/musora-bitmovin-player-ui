@@ -16,14 +16,15 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
+          name: build-artifact
           path: .
 
       - name: Unpackage artifact files
-        run: tar -xzvf artifact/artifact.tar.gz -C .
+        run: tar -xzvf artifact.tar.gz -C .
         shell: bash
 
       - name: Publish
