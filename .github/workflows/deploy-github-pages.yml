@@ -30,7 +30,7 @@ jobs:
         run: npm install -g gulp-cli
         
       - name: Build project
-        run: gulp
+        run: gulp build-prod
         
       - name: Setup Pages
         uses: actions/configure-pages@v4
