@@ -8,7 +8,7 @@
   @include layout-center-children-in-container;
   @include hidden-animated($animation-duration * 2);
 
-  background-color: $color-background-highlight;
+  height: 75%;
 
   > .#{$prefix}-container-wrapper {
     padding: 3em;
@@ -25,9 +25,7 @@
 
   &.#{$prefix}-recommendations {
     .#{$prefix}-ui-hugereplaybutton {
-      bottom: 2em;
-      left: 2em;
-      position: absolute;
+      display: none;
     }
 
     .#{$prefix}-ui-recommendation-item {
