@@ -844,11 +844,10 @@ export namespace UIFactory {
         new BufferingOverlay(),
         new CastStatusOverlay(),
         new PlaybackToggleOverlay(),
-        new RecommendationOverlay(),
+        new MusoraStandardEndScreen(),
         controlBar,
         new TitleBar({
           components: [
-            new MetadataLabel({ content: MetadataLabelContent.Title }),
             new CastToggleButton(),
             new VRToggleButton(),
             new PictureInPictureToggleButton(),

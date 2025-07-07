@@ -48,6 +48,9 @@ export class MusoraStandardEndScreen extends Container<ContainerConfig> {
       this.addComponent(new MusoraStandardEndScreenItem({
         itemConfig: null, // Not using recommendations data
         cssClasses: ['musora-end-screen-item-1'],
+        player: player,
+        uimanager: uimanager,
+        parentEndScreen: this,
       }));
       
       this.updateComponents(); // create container DOM elements
@@ -69,6 +72,11 @@ export class MusoraStandardEndScreen extends Container<ContainerConfig> {
       this.hide();
     });
 
+    // Hide end screen when user seeks (uses seek bar)
+    player.on(player.exports.PlayerEvent.Seek, () => {
+      this.hide();
+    });
+
     // Init on startup
     setupRecommendations();
   }
@@ -79,6 +87,9 @@ export class MusoraStandardEndScreen extends Container<ContainerConfig> {
  */
 interface MusoraStandardEndScreenItemConfig extends ComponentConfig {
   itemConfig: UIRecommendationConfig;
+  player?: PlayerAPI;
+  uimanager?: UIInstanceManager;
+  parentEndScreen?: MusoraStandardEndScreen;
 }
 
 /**
@@ -101,11 +112,34 @@ class MusoraStandardEndScreenItem extends Component<MusoraStandardEndScreenItemC
       'class': this.getCssClasses(),
     }, this);
 
-    // Row 1: "Up Next in 5" text
+    // Row 1: "Up Next in 5" text and replay button
+    let topRow = new DOM('div', {
+      'class': this.prefixCss('top-row'),
+    });
+    
     let upNextText = new DOM('div', {
       'class': this.prefixCss('up-next-text'),
     }).html('Up Next in 5');
-    itemElement.append(upNextText);
+    
+    // Simple replay button element
+    let replayButton = new DOM('button', {
+      'class': this.prefixCss('ui-musora-replay-button'),
+    }).html('⟲');
+    
+    // Add click event to restart video and hide end screen
+    replayButton.on('click', () => {
+      if (this.config.player) {
+        this.config.player.seek(0);
+        this.config.player.play();
+      }
+      if (this.config.parentEndScreen) {
+        this.config.parentEndScreen.hide();
+      }
+    });
+    
+    topRow.append(upNextText);
+    topRow.append(replayButton);
+    itemElement.append(topRow);
 
     // Row 2: Thumbnail and text content side by side
     let contentRow = new DOM('div', {
@@ -120,9 +154,14 @@ class MusoraStandardEndScreenItem extends Component<MusoraStandardEndScreenItemC
     });
     contentRow.append(thumbnail);
 
-    // Text area with title and subtitle
+    // Text area with title, subtitle, and buttons
     let textArea = new DOM('div', {
       'class': this.prefixCss('text-area'),
+    });
+    
+    // Content text container
+    let contentText = new DOM('div', {
+      'class': this.prefixCss('content-text'),
     });
     
     let title = new DOM('div', {
@@ -133,12 +172,11 @@ class MusoraStandardEndScreenItem extends Component<MusoraStandardEndScreenItemC
       'class': this.prefixCss('subtitle'),
     }).html('This is a sample subtitle description for the upcoming video');
     
-    textArea.append(title);
-    textArea.append(subtitle);
-    contentRow.append(textArea);
-    itemElement.append(contentRow);
+    contentText.append(title);
+    contentText.append(subtitle);
+    textArea.append(contentText);
 
-    // Row 3: Cancel and Play Now buttons
+    // Button row inside text area
     let buttonRow = new DOM('div', {
       'class': this.prefixCss('button-row'),
     });
@@ -153,7 +191,10 @@ class MusoraStandardEndScreenItem extends Component<MusoraStandardEndScreenItemC
 
     buttonRow.append(cancelButton);
     buttonRow.append(playNowButton);
-    itemElement.append(buttonRow);
+    textArea.append(buttonRow);
+    
+    contentRow.append(textArea);
+    itemElement.append(contentRow);
 
     return itemElement;
   }
