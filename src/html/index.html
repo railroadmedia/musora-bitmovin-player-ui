@@ -265,7 +265,7 @@
     const playgroundConfig = getConfigFromStorage();
 
     // Add UI
-    uiManager = bitmovin.playerui.UIFactory[playgroundConfig.uiOption || 'buildDefaultUI'](player, uiConfig);
+    uiManager = bitmovin.playerui.UIFactory[playgroundConfig.uiOption || 'buildMusoraUI'](player, uiConfig);
 
     player.load(sources[playgroundConfig.source || 'fullyFeatured']).then(function() {
       console.log('source successfully loaded');
@@ -779,8 +779,8 @@
     if ($('#config-source') && config.source) {
       $('#config-source').val(config.source);
     }
-    if ($('#config-ui') && config.uiOption) {
-      $('#config-ui').val(config.uiOption);
+    if ($('#config-ui')) {
+      $('#config-ui').val(config.uiOption || 'buildMusoraUI');
     }
     if ($('#config-ads') && config.adsEnabled !== undefined) {
       $('#config-ads').prop('checked', config.adsEnabled);
