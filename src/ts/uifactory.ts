@@ -31,6 +31,7 @@ import { PlaybackToggleOverlay } from './components/playbacktoggleoverlay';
 import { CastStatusOverlay } from './components/caststatusoverlay';
 import { TitleBar } from './components/titlebar';
 import { RecommendationOverlay } from './components/recommendationoverlay';
+import { MusoraStandardEndScreen } from './components/musorastandardendscreen';
 import { Watermark } from './components/watermark';
 import { ErrorMessageOverlay } from './components/errormessageoverlay';
 import { AdClickOverlay } from './components/adclickoverlay';
@@ -754,7 +755,7 @@ export namespace UIFactory {
         new PlaybackToggleOverlay(),
         new CastStatusOverlay(),
         controlBar,
-        new RecommendationOverlay(),
+        new MusoraStandardEndScreen(),
         new ErrorMessageOverlay(),
       ],
       cssClasses: ['ui-skin-musora'],

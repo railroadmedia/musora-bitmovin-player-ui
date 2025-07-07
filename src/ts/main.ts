@@ -47,6 +47,7 @@ export { CastToggleButton } from './components/casttogglebutton';
 export { Component, ComponentConfig, ComponentHoverChangedEventArgs } from './components/component';
 export { ErrorMessageOverlay, ErrorMessageOverlayConfig, ErrorMessageTranslator, ErrorMessageMap } from './components/errormessageoverlay';
 export { RecommendationOverlay } from './components/recommendationoverlay';
+export { MusoraStandardEndScreen } from './components/musorastandardendscreen';
 export { SeekBarLabel, SeekBarLabelConfig } from './components/seekbarlabel';
 export { SubtitleOverlay } from './components/subtitleoverlay';
 export { SubtitleSelectBox } from './components/subtitleselectbox';
