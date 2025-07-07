@@ -684,6 +684,7 @@ export namespace UIFactory {
 
     let settingsPanel = new SettingsPanel({
       components: [mainSettingsPanelPage],
+      hidden: true,
     });
 
     let subtitleSettingsPanelPage = new SubtitleSettingsPanelPage({
@@ -753,9 +754,7 @@ export namespace UIFactory {
         new PlaybackToggleOverlay(),
         new CastStatusOverlay(),
         controlBar,
-        new TitleBar(),
         new RecommendationOverlay(),
-        new Watermark(),
         new ErrorMessageOverlay(),
       ],
       cssClasses: ['ui-skin-musora'],
@@ -859,7 +858,6 @@ export namespace UIFactory {
           ],
         }),
         settingsPanel,
-        new Watermark(),
         new ErrorMessageOverlay(),
       ],
       cssClasses: ['ui-skin-musora', 'ui-skin-smallscreen'],
