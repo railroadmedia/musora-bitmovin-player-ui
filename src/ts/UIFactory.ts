@@ -55,11 +55,11 @@ import { EcoModeContainer } from './components/ecomodecontainer';
 
 export namespace UIFactory {
   export function buildDefaultUI(player: PlayerAPI, config: UIConfig = {}): UIManager {
-    return UIFactory.buildModernUI(player, config);
+    return UIFactory.buildMusoraUI(player, config);
   }
 
   export function buildDefaultSmallScreenUI(player: PlayerAPI, config: UIConfig = {}): UIManager {
-    return UIFactory.buildModernSmallScreenUI(player, config);
+    return UIFactory.buildMusoraUI(player, config);
   }
 
   export function buildDefaultCastReceiverUI(player: PlayerAPI, config: UIConfig = {}): UIManager {
