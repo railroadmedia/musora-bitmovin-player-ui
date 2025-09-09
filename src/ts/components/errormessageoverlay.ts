@@ -1,7 +1,8 @@
-import {ContainerConfig, Container} from './container';
-import {Label, LabelConfig} from './label';
-import {UIInstanceManager} from '../uimanager';
-import {TvNoiseCanvas} from './tvnoisecanvas';
+import { ContainerConfig, Container } from './container';
+import { Label, LabelConfig } from './label';
+import { Button, ButtonConfig } from './button';
+import { UIInstanceManager } from '../uimanager';
+import { TvNoiseCanvas } from './tvnoisecanvas';
 import { ErrorUtils } from '../errorutils';
 import { ErrorEvent, PlayerAPI, PlayerEventBase } from 'bitmovin-player';
 import {
@@ -89,16 +90,21 @@ export class ErrorMessageOverlay extends Container<ErrorMessageOverlayConfig> {
 
   private errorLabel: Label<LabelConfig>;
   private tvNoiseBackground: TvNoiseCanvas;
+  private retryButton: Button<ButtonConfig>;
 
   constructor(config: ErrorMessageOverlayConfig = {}) {
     super(config);
 
     this.errorLabel = new Label<LabelConfig>({ cssClass: 'ui-errormessage-label' });
     this.tvNoiseBackground = new TvNoiseCanvas();
+    this.retryButton = new Button<ButtonConfig>({
+      cssClass: 'ui-errormessage-retry-button',
+      text: 'Retry'
+    });
 
     this.config = this.mergeConfig(config, {
       cssClass: 'ui-errormessage-overlay',
-      components: [this.tvNoiseBackground, this.errorLabel],
+      components: [this.errorLabel, this.retryButton],
       hidden: true,
       role: 'status',
     }, this.config);
@@ -108,6 +114,16 @@ export class ErrorMessageOverlay extends Container<ErrorMessageOverlayConfig> {
     super.configure(player, uimanager);
 
     let config = this.getConfig();
+
+    // Configure retry button to reload the source when clicked
+    this.retryButton.onClick.subscribe(() => {
+      // Both PlayerAPI and MobileV3PlayerAPI support load() method
+      // Reload the current source to retry playback
+      const currentSource = player.getSource();
+      if (currentSource) {
+        player.load(currentSource);
+      }
+    });
 
     const handleErrorMessage = (
       event: ErrorEvent | MobileV3SourceErrorEvent | MobileV3PlayerErrorEvent,
@@ -144,7 +160,7 @@ export class ErrorMessageOverlay extends Container<ErrorMessageOverlayConfig> {
   }
 
   display(errorMessage: string): void {
-    this.errorLabel.setText(errorMessage);
+    this.errorLabel.setText("Video unavailable. Please try again.");
     this.tvNoiseBackground.start();
     this.show();
   }
