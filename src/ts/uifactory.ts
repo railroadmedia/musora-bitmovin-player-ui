@@ -819,6 +819,18 @@ export namespace UIFactory {
     settingsPanel.addComponent(new CloseButton({ target: settingsPanel }));
     subtitleSettingsPanelPage.addComponent(new CloseButton({ target: settingsPanel }));
 
+    const titleBar = new TitleBar({
+      components: [
+        new CastToggleButton(),
+        new VRToggleButton(),
+        new PictureInPictureToggleButton(),
+        new AirPlayToggleButton(),
+        new VolumeToggleButton(),
+        new SettingsToggleButton({ settingsPanel: settingsPanel }),
+        new FullscreenToggleButton(),
+      ],
+    });
+
     let controlBar = new ControlBar({
       components: [
         new Container({
@@ -846,17 +858,7 @@ export namespace UIFactory {
         new PlaybackToggleOverlay(),
         new MusoraStandardEndScreen(),
         controlBar,
-        new TitleBar({
-          components: [
-            new CastToggleButton(),
-            new VRToggleButton(),
-            new PictureInPictureToggleButton(),
-            new AirPlayToggleButton(),
-            new VolumeToggleButton(),
-            new SettingsToggleButton({ settingsPanel: settingsPanel }),
-            new FullscreenToggleButton(),
-          ],
-        }),
+        titleBar,
         settingsPanel,
         new ErrorMessageOverlay(),
       ],
