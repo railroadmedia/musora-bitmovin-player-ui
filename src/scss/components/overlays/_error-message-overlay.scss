@@ -9,22 +9,32 @@
 
   background-color: $color-background;
   pointer-events: none;
+  
+  // Use flexbox for responsive layout
+  // flex-direction: column;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 3em;
+  box-sizing: border-box;
+
+  .#{$prefix}-container-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
 
   .#{$prefix}-ui-errormessage-label {
     color: $color-primary;
-    left: 3em;
-    position: absolute;
-    right: 3em;
+    font-size: 1.2em;
     text-align: center;
     user-select: text;
     white-space: pre-line; // enable linebreak in text
-    line-height: 1.2;
-
-    // Vertically center the label
-    & {
-      top: 50%;
-      transform: translateY(-50%);
-    }
+    margin-bottom: 2em; // Proportional spacing between label and button
+    max-width: 100%;
+    width: 100%;
+    order: 1;
 
     ul {
       color: $color-secondary;
@@ -36,9 +46,49 @@
     }
   }
 
+  .#{$prefix}-ui-errormessage-retry-button {
+    @extend %ui-button;
+    
+    pointer-events: auto;
+    padding: 0.8em 3em;
+    background-color: $color-musora-button;
+    border: none;
+    border-radius: 24px;
+    color: $color-primary;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    flex-shrink: 0; // Prevent button from shrinking
+    order: 2;
+    align-self: center;
+
+    
+    .#{$prefix}-label {
+      color: $color-primary;
+      font-weight: bold;
+      display: inline-block;
+    }
+    
+    &:hover {
+      background-color: lighten($color-musora-button, 10%);
+      
+      .#{$prefix}-label {
+        color: $color-primary;
+        display: inline-block;
+      }
+    }
+    
+    &:focus {
+      outline: 2px solid $color-highlight;
+      outline-offset: 2px;
+    }
+  }
+
   .#{$prefix}-ui-tvnoisecanvas {
     @include layout-cover;
 
     filter: blur(4px);
+    position: absolute;
+    z-index: -1;
   }
 }
