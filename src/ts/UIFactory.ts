@@ -31,7 +31,7 @@ import { PlaybackToggleOverlay } from './components/playbacktoggleoverlay';
 import { CastStatusOverlay } from './components/caststatusoverlay';
 import { TitleBar } from './components/titlebar';
 import { RecommendationOverlay } from './components/recommendationoverlay';
-import { MusoraStandardEndScreen } from './components/musorastandardendscreen';
+import { MusoraStandardEndScreen } from './components/MusoraStandardEndScreen';
 import { Watermark } from './components/watermark';
 import { ErrorMessageOverlay } from './components/errormessageoverlay';
 import { AdClickOverlay } from './components/adclickoverlay';

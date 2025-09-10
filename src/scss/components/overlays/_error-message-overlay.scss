@@ -91,4 +91,12 @@
     position: absolute;
     z-index: -1;
   }
+
+  .#{$prefix}-ui-errorbackground {
+    @include layout-cover;
+
+    filter: blur(4px);
+    position: absolute;
+    z-index: -1;
+  }
 }

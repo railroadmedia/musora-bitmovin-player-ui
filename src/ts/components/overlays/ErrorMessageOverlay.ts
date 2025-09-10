@@ -1,7 +1,6 @@
 import { ContainerConfig, Container } from '../Container';
 import { Label, LabelConfig } from '../labels/Label';
 import { UIInstanceManager } from '../../UIManager';
-import { TvNoiseCanvas } from '../TvNoiseCanvas';
 import { ErrorUtils } from '../../utils/ErrorUtils';
 import { ErrorEvent, PlayerAPI, PlayerEventBase } from 'bitmovin-player';
 import {
@@ -12,7 +11,7 @@ import {
   MobileV3SourceErrorEvent,
 } from '../../utils/MobileV3PlayerAPI';
 import { Button, ButtonConfig } from '../buttons/Button';
-
+import { ErrorBackground } from '../ErrorBackground';
 export interface ErrorMessageTranslator {
   (error: ErrorEvent | MobileV3PlayerErrorEvent): string;
 }
@@ -91,14 +90,14 @@ export interface ErrorMessageOverlayConfig extends ContainerConfig {
  */
 export class ErrorMessageOverlay extends Container<ErrorMessageOverlayConfig> {
   private errorLabel: Label<LabelConfig>;
-  private tvNoiseBackground: TvNoiseCanvas;
+  private background: ErrorBackground;
   private retryButton: Button<ButtonConfig>;
 
   constructor(config: ErrorMessageOverlayConfig = {}) {
     super(config);
 
     this.errorLabel = new Label<LabelConfig>({ cssClass: 'ui-errormessage-label' });
-    this.tvNoiseBackground = new TvNoiseCanvas();
+    this.background = new ErrorBackground();
     this.retryButton = new Button<ButtonConfig>({
       cssClass: 'ui-errormessage-retry-button',
       text: 'Retry'
@@ -108,7 +107,7 @@ export class ErrorMessageOverlay extends Container<ErrorMessageOverlayConfig> {
       config,
       {
         cssClass: 'ui-errormessage-overlay',
-        components: [this.errorLabel, this.retryButton],
+        components: [this.background, this.errorLabel, this.retryButton],
         hidden: true,
         role: 'status',
       },
@@ -167,15 +166,12 @@ export class ErrorMessageOverlay extends Container<ErrorMessageOverlayConfig> {
 
   display(errorMessage: string): void {
     this.errorLabel.setText("Video unavailable. Please try again.");
-    this.tvNoiseBackground.start();
+    this.background.start();
     this.show();
   }
 
   private clear(): void {
     this.errorLabel.setText('');
-
-    // Canvas rendering must be explicitly stopped, else it just continues forever and hogs resources
-    this.tvNoiseBackground.stop();
     this.hide();
   }
 
