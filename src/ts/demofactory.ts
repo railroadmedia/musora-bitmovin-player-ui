@@ -43,7 +43,7 @@ export namespace DemoFactory {
     let smallScreenSwitchWidth = 600;
 
     return new UIManager(player, [{
-      ui: UIFactory.modernSmallScreenAdsUI(),
+      ui: UIFactory.musoraSmallScreenUI(),
       condition: (context: UIConditionContext) => {
         return context.isMobile && context.documentWidth < smallScreenSwitchWidth
           && context.isAd && context.adRequiresUi;
@@ -54,7 +54,7 @@ export namespace DemoFactory {
         return context.isAd && context.adRequiresUi;
       },
     }, {
-      ui: UIFactory.modernSmallScreenUI(),
+      ui: UIFactory.musoraSmallScreenUI(),
       condition: (context: UIConditionContext) => {
         return context.isMobile && context.documentWidth < smallScreenSwitchWidth;
       },

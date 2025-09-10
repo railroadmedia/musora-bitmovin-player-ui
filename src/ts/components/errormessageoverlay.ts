@@ -2,7 +2,7 @@ import { ContainerConfig, Container } from './container';
 import { Label, LabelConfig } from './label';
 import { Button, ButtonConfig } from './button';
 import { UIInstanceManager } from '../uimanager';
-import { TvNoiseCanvas } from './tvnoisecanvas';
+import { ErrorBackground } from './errorbackground';
 import { ErrorUtils } from '../errorutils';
 import { ErrorEvent, PlayerAPI, PlayerEventBase } from 'bitmovin-player';
 import {
@@ -89,14 +89,14 @@ export interface ErrorMessageOverlayConfig extends ContainerConfig {
 export class ErrorMessageOverlay extends Container<ErrorMessageOverlayConfig> {
 
   private errorLabel: Label<LabelConfig>;
-  private tvNoiseBackground: TvNoiseCanvas;
+  private background: ErrorBackground;
   private retryButton: Button<ButtonConfig>;
 
   constructor(config: ErrorMessageOverlayConfig = {}) {
     super(config);
 
     this.errorLabel = new Label<LabelConfig>({ cssClass: 'ui-errormessage-label' });
-    this.tvNoiseBackground = new TvNoiseCanvas();
+    this.background = new ErrorBackground();
     this.retryButton = new Button<ButtonConfig>({
       cssClass: 'ui-errormessage-retry-button',
       text: 'Retry'
@@ -104,7 +104,7 @@ export class ErrorMessageOverlay extends Container<ErrorMessageOverlayConfig> {
 
     this.config = this.mergeConfig(config, {
       cssClass: 'ui-errormessage-overlay',
-      components: [this.errorLabel, this.retryButton],
+      components: [this.background, this.errorLabel, this.retryButton],
       hidden: true,
       role: 'status',
     }, this.config);
@@ -161,15 +161,12 @@ export class ErrorMessageOverlay extends Container<ErrorMessageOverlayConfig> {
 
   display(errorMessage: string): void {
     this.errorLabel.setText("Video unavailable. Please try again.");
-    this.tvNoiseBackground.start();
+    this.background.start();
     this.show();
   }
 
   private clear(): void {
     this.errorLabel.setText('');
-
-    // Canvas rendering must be explicitly stopped, else it just continues forever and hogs resources
-    this.tvNoiseBackground.stop();
     this.hide();
   }
 
