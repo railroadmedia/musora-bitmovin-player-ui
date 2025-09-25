@@ -640,15 +640,7 @@ export namespace UIFactory {
         {
           ui: musoraSmallScreenUI(),
           condition: (context: UIConditionContext) => {
-            return (
-              context.isMobile && context.documentWidth < smallScreenSwitchWidth
-            );
-          },
-        },
-        {
-          ui: musoraUI(config),
-          condition: (context: UIConditionContext) => {
-            return true; // Default case for desktop
+            return true;
           },
         },
       ],
