@@ -10,6 +10,15 @@ import {
   MobileV3PlayerAPI, MobileV3PlayerErrorEvent, MobileV3PlayerEvent, MobileV3SourceErrorEvent,
 } from '../mobilev3playerapi';
 
+declare const window: {
+  bitmovin?: {
+    customMessageHandler?: {
+      sendSynchronous: (message: string, payload?: string) => string;
+      sendAsynchronous: (message: string, payload?: string) => void;
+    };
+  };
+};
+
 export interface ErrorMessageTranslator {
   (error: ErrorEvent | MobileV3PlayerErrorEvent): string;
 }
@@ -117,11 +126,8 @@ export class ErrorMessageOverlay extends Container<ErrorMessageOverlayConfig> {
 
     // Configure retry button to reload the source when clicked
     this.retryButton.onClick.subscribe(() => {
-      // Both PlayerAPI and MobileV3PlayerAPI support load() method
-      // Reload the current source to retry playback
-      const currentSource = player.getSource();
-      if (currentSource) {
-        player.load(currentSource);
+      if (window.bitmovin.customMessageHandler) {
+        window.bitmovin.customMessageHandler.sendAsynchronous('retryLoad');
       }
     });
 
