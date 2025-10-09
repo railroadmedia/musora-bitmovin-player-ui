@@ -43,7 +43,7 @@ import { PlayerUtils } from './playerutils';
 import { Label } from './components/label';
 import { CastUIContainer } from './components/castuicontainer';
 import { UIConditionContext, UIManager } from './uimanager';
-import { UIConfig } from './uiconfig';
+import { TimelineMarker, UIConfig } from './uiconfig';
 import { PlayerAPI } from 'bitmovin-player';
 import { i18n } from './localization/i18n';
 import { SubtitleListBox } from './components/subtitlelistbox';
@@ -52,6 +52,14 @@ import { SpatialNavigation } from './spatialnavigation/spatialnavigation';
 import { RootNavigationGroup } from './spatialnavigation/rootnavigationgroup';
 import { ListNavigationGroup, ListOrientation } from './spatialnavigation/ListNavigationGroup';
 import { EcoModeContainer } from './components/ecomodecontainer';
+
+declare const window: {
+  bitmovin: {
+    customMessageHandler: {
+      on: (event: string, callback: (data?: string) => void) => void;
+    }
+  }
+}
 
 export namespace UIFactory {
   export function buildDefaultUI(player: PlayerAPI, config: UIConfig = {}): UIManager {
@@ -634,7 +642,9 @@ export namespace UIFactory {
     // show smallScreen UI only on mobile/handheld devices
     let smallScreenSwitchWidth = 600;
 
-    return new UIManager(
+    config.metadata.markers = [];
+
+    const manager = new UIManager(
       player,
       [
         {
@@ -646,6 +656,18 @@ export namespace UIFactory {
       ],
       config,
     );
+
+    if (window.bitmovin.customMessageHandler) {
+      window.bitmovin.customMessageHandler.on('addChapterMarkers', (data?: string) => {
+        let markers = JSON.parse(data) as TimelineMarker[];
+
+        markers.forEach((marker: TimelineMarker) => {
+          manager.addTimelineMarker(marker);
+        });
+      });
+    }
+
+    return manager;
   }
 
   export function musoraUI(config: UIConfig) {
