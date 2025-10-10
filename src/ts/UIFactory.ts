@@ -642,8 +642,6 @@ export namespace UIFactory {
     // show smallScreen UI only on mobile/handheld devices
     let smallScreenSwitchWidth = 600;
 
-    config.metadata.markers = [];
-
     const manager = new UIManager(
       player,
       [
@@ -658,8 +656,9 @@ export namespace UIFactory {
     );
 
     if (window.bitmovin.customMessageHandler) {
-      window.bitmovin.customMessageHandler.on('addChapterMarkers', (data?: string) => {
+      window.bitmovin.customMessageHandler.on('setChapterMarkers', (data?: string) => {
         let markers = JSON.parse(data) as TimelineMarker[];
+        manager.getConfig().metadata.markers = [];
 
         markers.forEach((marker: TimelineMarker) => {
           manager.addTimelineMarker(marker);
