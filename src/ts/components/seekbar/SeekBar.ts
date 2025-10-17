@@ -896,6 +896,13 @@ export class SeekBar extends Component<SeekBarConfig> {
 
       this.setSeekPosition(0);
 
+      // Update active marker based on current playback position when leaving seekbar
+      const handler = this.timelineMarkersHandler;
+      if (handler && this.player) {
+        const currentTime = this.getRelativeCurrentTime();
+        handler.updateActiveMarkerForPlayback(currentTime);
+      }
+
       if (this.hasLabel()) {
         this.getLabel().hide();
       }
@@ -998,6 +1005,12 @@ export class SeekBar extends Component<SeekBarConfig> {
     // Set position of the bar
     this.setPosition(this.seekBarPlaybackPosition, percent);
 
+    // Update active marker based on current playback time (only when not seeking)
+    if (this.timelineMarkersHandler && this.player && !this.isSeeking()) {
+      const currentTime = this.getRelativeCurrentTime();
+      this.timelineMarkersHandler.updateActiveMarkerForPlayback(currentTime);
+    }
+
     // Set position of the marker
     const totalSize = this.config.vertical
       ? this.seekBar.height() - this.seekBarPlaybackPositionMarker.height()
@@ -1009,17 +1022,17 @@ export class SeekBar extends Component<SeekBarConfig> {
 
     const style = this.config.vertical
       ? // -ms-transform required for IE9
-        // -webkit-transform required for Android 4.4 WebView
-        {
-          transform: 'translateY(' + px + 'px)',
-          '-ms-transform': 'translateY(' + px + 'px)',
-          '-webkit-transform': 'translateY(' + px + 'px)',
-        }
+      // -webkit-transform required for Android 4.4 WebView
+      {
+        transform: 'translateY(' + px + 'px)',
+        '-ms-transform': 'translateY(' + px + 'px)',
+        '-webkit-transform': 'translateY(' + px + 'px)',
+      }
       : {
-          transform: 'translateX(' + px + 'px)',
-          '-ms-transform': 'translateX(' + px + 'px)',
-          '-webkit-transform': 'translateX(' + px + 'px)',
-        };
+        transform: 'translateX(' + px + 'px)',
+        '-ms-transform': 'translateX(' + px + 'px)',
+        '-webkit-transform': 'translateX(' + px + 'px)',
+      };
     this.seekBarPlaybackPositionMarker.css(style);
   }
 
@@ -1067,17 +1080,17 @@ export class SeekBar extends Component<SeekBarConfig> {
 
     const style = this.config.vertical
       ? // -ms-transform required for IE9
-        // -webkit-transform required for Android 4.4 WebView
-        {
-          transform: 'scaleY(' + scale + ')',
-          '-ms-transform': 'scaleY(' + scale + ')',
-          '-webkit-transform': 'scaleY(' + scale + ')',
-        }
+      // -webkit-transform required for Android 4.4 WebView
+      {
+        transform: 'scaleY(' + scale + ')',
+        '-ms-transform': 'scaleY(' + scale + ')',
+        '-webkit-transform': 'scaleY(' + scale + ')',
+      }
       : {
-          transform: 'scaleX(' + scale + ')',
-          '-ms-transform': 'scaleX(' + scale + ')',
-          '-webkit-transform': 'scaleX(' + scale + ')',
-        };
+        transform: 'scaleX(' + scale + ')',
+        '-ms-transform': 'scaleX(' + scale + ')',
+        '-webkit-transform': 'scaleX(' + scale + ')',
+      };
     element.css(style);
   }
 
@@ -1165,6 +1178,12 @@ export class SeekBar extends Component<SeekBarConfig> {
       }
     }
 
+    // Set the active marker for visual feedback
+    const handler = this.timelineMarkersHandler;
+    if (handler) {
+      handler.setActiveMarker(snappedMarker);
+    }
+
     if (this.label) {
       this.updateLabelPosition(targetOffsetPx);
     }
@@ -1183,6 +1202,14 @@ export class SeekBar extends Component<SeekBarConfig> {
 
   protected onSeekedEvent(percentage: number) {
     this.clearAllThickenedMarkers();
+
+    // Update active marker based on new playback position after seek
+    const handler = this.timelineMarkersHandler;
+    if (handler && this.player) {
+      const currentTime = this.getRelativeCurrentTime();
+      handler.updateActiveMarkerForPlayback(currentTime);
+    }
+
     this.seekBarEvents.onSeeked.dispatch(this, percentage);
   }
 

@@ -40,6 +40,7 @@ $seekbar-bar-height: calc($font-size / 3);
     background-color: $color-highlight;
     border-radius: 50%;
     box-shadow: 0 0 3px 0 transparentize($color: #000, $amount: 0.75);
+    z-index: 11;
   }
 
   .#{$prefix}-seekbar {
@@ -70,7 +71,7 @@ $seekbar-bar-height: calc($font-size / 3);
 
     .#{$prefix}-seekbar-bufferlevel {
       @extend %bar;
-      background-color: transparentize($color-primary, 0.8);
+      background-color: mix($color-primary, $color-highlight, 70%);
       margin: $bar-inset 0;
       transition:
         0.3s linear,
@@ -92,6 +93,7 @@ $seekbar-bar-height: calc($font-size / 3);
         0.1s linear,
         0.1s linear;
       transition-property: transform;
+      z-index: 10;
     }
 
     .#{$prefix}-seekbar-markers {
@@ -105,16 +107,17 @@ $seekbar-bar-height: calc($font-size / 3);
       $marker-indicator-border-radius: 0.125em;
 
       height: $seekbar-bar-height;
+      z-index: 5;
 
       > .#{$prefix}-seekbar-marker {
         @extend %bar;
 
         background-color: $color-primary;
-        height: 100%;
+        height: $seekbar-height;
         text-align: center;
         transition-duration: 0.1s;
-        transition-property: transform;
-        transition-timing-function: linear;
+        transition-property: transform, height;
+        transition-timing-function: ease-in-out;
         width: $marker-width;
 
         transition:
@@ -136,6 +139,23 @@ $seekbar-bar-height: calc($font-size / 3);
           height: $seekbar-bar-height * 4;
           position: absolute;
           transform: translate(-50%, calc(-100% - 0.2rem));
+        }
+        
+        // Active marker styling
+        &.#{$prefix}-seekbar-marker-active {
+          height: $seekbar-height * 3 - .375em;
+        
+          // Partial fill overlay
+          &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background-color: $color-highlight;
+            width: var(--fill-percentage, 0%);
+            transition: width 0.3s ease-in-out, height 0.3s ease-in-out;
+          }
         }
 
         > .#{$prefix}-seekbar-marker-indicator {
