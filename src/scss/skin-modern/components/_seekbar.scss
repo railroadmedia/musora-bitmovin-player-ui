@@ -44,7 +44,7 @@ $seekbar-height: .3125em;
 
     .#{$prefix}-seekbar-bufferlevel {
       @extend %bar;
-      background-color: $color-primary;
+      background-color: mix($color-primary, $color-highlight, 70%);
       margin: $bar-inset 0;
       transition: .3s linear, .3s linear;
       transition-property: transform;
@@ -62,6 +62,7 @@ $seekbar-height: .3125em;
       margin: $bar-inset 0;
       transition: .1s linear, .1s linear;
       transition-property: transform;
+      z-index: 10;
     }
 
     .#{$prefix}-seekbar-playbackposition-marker {
@@ -71,6 +72,7 @@ $seekbar-height: .3125em;
       background-color: transparentize($color-highlight, .5);
       border: solid $color-highlight .1875em;
       border-radius: 50%;
+      z-index: 11;
     }
 
     .#{$prefix}-seekbar-markers {
@@ -79,22 +81,40 @@ $seekbar-height: .3125em;
       $marker-width: 2px;
 
       height: $seekbar-height * 3 - .375em;
+      z-index: 5;
 
       > .#{$prefix}-seekbar-marker {
         @extend %bar;
 
         background-color: $color-primary;
-        height: 100%;
+        height: $seekbar-height;
         text-align: center;
-        transition-duration: 1s;
-        transition-property: transform;
-        transition-timing-function: linear;
+        transition-duration: 0.1s;
+        transition-property: transform, height;
+        transition-timing-function: ease-in-out;
         width: $marker-width;
 
         > .#{$prefix}-seekbar-marker-image {
           height: $seekbar-height * 4;
           position: absolute;
           transform: translate(-50%, calc(-100% - .2em));
+        }
+
+        // Active marker styling
+        &.#{$prefix}-seekbar-marker-active {
+          height: $seekbar-height * 3 - .375em;
+          
+          // Partial fill overlay
+          &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background-color: $color-highlight;
+            width: var(--fill-percentage, 0%);
+            transition: width 0.3s ease-in-out, height 0.3s ease-in-out;
+          }
         }
       }
     }

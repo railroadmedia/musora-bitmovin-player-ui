@@ -84,6 +84,74 @@ export class TimelineMarkersHandler {
     return matchingMarker || null;
   }
 
+  public setActiveMarker(activeMarker: SeekBarMarker | null): void {
+    // Remove active class from all markers and reset fill percentage
+    this.timelineMarkers.forEach(marker => {
+      if (marker.element) {
+        marker.element.removeClass(this.prefixCss('seekbar-marker-active'));
+        marker.element.css('--fill-percentage', '0%');
+      }
+    });
+
+    // Add active class to the specified marker
+    if (activeMarker && activeMarker.element) {
+      activeMarker.element.addClass(this.prefixCss('seekbar-marker-active'));
+    }
+  }
+
+  public clearActiveMarker(): void {
+    this.setActiveMarker(null);
+  }
+
+  public updateActiveMarkerForPlayback(currentTime: number): void {
+    // Find the marker that contains the current playback time
+    const activeMarker = this.timelineMarkers.find(marker => {
+      const markerTime = getMarkerTime(marker.marker, this.player, this.player.getDuration());
+      const hasDuration = marker.duration > 0;
+
+      if (hasDuration) {
+        // For interval markers, check if current time is within the marker's time range
+        return currentTime >= markerTime && currentTime <= markerTime + marker.duration;
+      } else {
+        // For position markers, check if current time is very close to the marker time (within 0.5 seconds)
+        return Math.abs(currentTime - markerTime) <= 0.5;
+      }
+    });
+
+    this.setActiveMarker(activeMarker || null);
+
+    // If there's an active marker, calculate and set the fill percentage
+    if (activeMarker) {
+      this.updateMarkerFillPercentage(activeMarker, currentTime);
+    }
+  }
+
+  private updateMarkerFillPercentage(marker: SeekBarMarker, currentTime: number): void {
+    if (!marker.element) return;
+
+    const markerTime = getMarkerTime(marker.marker, this.player, this.player.getDuration());
+    const hasDuration = marker.duration > 0;
+
+    let fillPercentage = 0;
+
+    if (hasDuration) {
+      // For interval markers, calculate percentage based on progress within the marker's duration
+      const progressWithinMarker = currentTime - markerTime;
+      fillPercentage = Math.max(0, Math.min(100, (progressWithinMarker / marker.duration) * 100));
+    } else {
+      // For position markers, show full fill when we're close to the marker time
+      const timeDifference = Math.abs(currentTime - markerTime);
+      if (timeDifference <= 0.5) {
+        fillPercentage = 100;
+      } else {
+        fillPercentage = 0;
+      }
+    }
+
+    // Apply the fill percentage to the marker's ::before pseudo-element
+    marker.element.css('--fill-percentage', `${fillPercentage}%`);
+  }
+
   private clearMarkers(): void {
     this.timelineMarkers = [];
     this.markersContainer.empty();
@@ -145,7 +213,7 @@ export class TimelineMarkersHandler {
 
     const positionInPx = (seekBarWidthPx / 100) * (marker.position < 0 ? 0 : marker.position);
     const cssProperties: { [propertyName: string]: string } = {
-      'transform': `translateX(${positionInPx}px)`,
+      'left': `${positionInPx}px`,
     };
 
     if (marker.duration > 0) {

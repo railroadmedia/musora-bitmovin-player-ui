@@ -314,7 +314,7 @@ export class SeekBar extends Component<SeekBarConfig> {
         // Update playback position only in paused state or in the initial startup state where player is neither
         // paused nor playing. Playback updates are handled in the Timeout below.
         const isInInitialStartupState = this.config.smoothPlaybackPositionUpdateIntervalMs === SeekBar.SMOOTH_PLAYBACK_POSITION_UPDATE_DISABLED
-            || forceUpdate || player.isPaused();
+          || forceUpdate || player.isPaused();
         const isNeitherPausedNorPlaying = player.isPaused() === player.isPlaying();
 
         if ((isInInitialStartupState || isNeitherPausedNorPlaying) && !this.isSeeking()) {
@@ -819,6 +819,13 @@ export class SeekBar extends Component<SeekBarConfig> {
 
       this.setSeekPosition(0);
 
+      // Update active marker based on current playback position when leaving seekbar
+      const handler = this.timelineMarkersHandler;
+      if (handler && this.player) {
+        const currentTime = this.getRelativeCurrentTime();
+        handler.updateActiveMarkerForPlayback(currentTime);
+      }
+
       if (this.hasLabel()) {
         this.getLabel().hide();
       }
@@ -922,6 +929,12 @@ export class SeekBar extends Component<SeekBarConfig> {
 
     // Set position of the bar
     this.setPosition(this.seekBarPlaybackPosition, percent);
+
+    // Update active marker based on current playback time (only when not seeking)
+    if (this.timelineMarkersHandler && this.player && !this.isSeeking()) {
+      const currentTime = this.getRelativeCurrentTime();
+      this.timelineMarkersHandler.updateActiveMarkerForPlayback(currentTime);
+    }
 
     // Set position of the marker
     let totalSize = (this.config.vertical ? (this.seekBar.height() - this.seekBarPlaybackPositionMarker.height()) : this.seekBar.width());
@@ -1076,6 +1089,12 @@ export class SeekBar extends Component<SeekBarConfig> {
       }
     }
 
+    // Set the active marker for visual feedback
+    const handler = this.timelineMarkersHandler;
+    if (handler) {
+      handler.setActiveMarker(snappedMarker);
+    }
+
     if (this.label) {
       this.updateLabelPosition(targetOffsetPx);
     }
@@ -1088,6 +1107,13 @@ export class SeekBar extends Component<SeekBarConfig> {
   }
 
   protected onSeekedEvent(percentage: number) {
+    // Update active marker based on new playback position after seek
+    const handler = this.timelineMarkersHandler;
+    if (handler && this.player) {
+      const currentTime = this.getRelativeCurrentTime();
+      handler.updateActiveMarkerForPlayback(currentTime);
+    }
+
     this.seekBarEvents.onSeeked.dispatch(this, percentage);
   }
 
@@ -1129,10 +1155,10 @@ export class SeekBar extends Component<SeekBarConfig> {
     this.refreshPlaybackPosition();
   }
 
- /**
-   * Checks if TouchEvent is supported.
-   * @returns {boolean} true if TouchEvent not undefined, else false
-   */
+  /**
+    * Checks if TouchEvent is supported.
+    * @returns {boolean} true if TouchEvent not undefined, else false
+    */
   isTouchEvent(e: UIEvent): e is TouchEvent {
     return window.TouchEvent && e instanceof TouchEvent;
   }
