@@ -8,14 +8,17 @@
   @include layout-center-children-in-container;
   @include hidden-animated($animation-duration * 2);
 
-  height: 75%;
+  z-index: 100;
 
   > .#{$prefix}-container-wrapper {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100%;
-    padding: 2em;
+    flex: 1;
+    padding-left: 16px;
+    padding-right: 16px;
+    background-color: $color-musora-button;
   }
 
   &.#{$prefix}-recommendations {
@@ -24,25 +27,59 @@
     }
 
     .#{$prefix}-ui-musora-standard-end-screen-item {
-      background-color: $color-background;
-      border-radius: 8px;
-      padding: 2em;
-      max-width: 500px;
-      min-width: 400px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      flex: 1;
 
-      .#{$prefix}-up-next-text {
-        text-align: left;
-        font-size: 1.2em;
-        color: $color-primary;
-        margin-bottom: 0.5em;
+      .#{$prefix}-top-row {
+        display: flex;
+        flex: 1;
+        justify-content: space-between;
+        align-items: center;
+        padding-left: 32px;
+        padding-bottom: 32px;
+
+        .#{$prefix}-up-next-text {
+          text-align: left;
+          font-size: 14px;
+          color: $color-primary;
+          margin-bottom: 0;
+          flex: 1;
+
+          .#{$prefix}-timer {
+            font-weight: bold;
+          }
+        }
+
+        .#{$prefix}-close-button {
+          background: none;
+          border: none;
+          padding: 0.5em;
+          font-size: 1.2em;
+          cursor: pointer;
+          color: $color-primary;
+          flex-shrink: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          transition: all $animation-duration-short ease;
+
+          &:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            opacity: 0.8;
+          }
+
+          &:active {
+            transform: scale(0.95);
+          }
+        }
       }
 
       .#{$prefix}-content-row {
         display: flex;
         align-items: center;
-        margin-bottom: 1.5em;
-        gap: 1.5em;
+        margin-bottom: 28px;
 
         .#{$prefix}-thumbnail {
           width: 160px;
@@ -56,17 +93,17 @@
         .#{$prefix}-text-area {
           flex: 1;
           text-align: left;
+          padding-left: 8px;
 
           .#{$prefix}-title {
-            font-size: 1.1em;
+            font-size: 14px;
             font-weight: bold;
             color: $color-primary;
-            margin-bottom: 0.5em;
             line-height: 1.3;
           }
 
           .#{$prefix}-subtitle {
-            font-size: 0.9em;
+            font-size: 12px;
             color: $color-secondary;
             line-height: 1.4;
           }
@@ -74,51 +111,45 @@
       }
 
       // Hide replay button on desktop
-      .#{$prefix}-top-row {
-        .#{$prefix}-ui-musora-replay-button {
-          display: none;
-        }
+      .#{$prefix}-ui-musora-replay-button {
+        display: none;
       }
 
       .#{$prefix}-button-row {
         display: flex;
         justify-content: center;
-        gap: 1em;
+        gap: 8px;
         height: 32px;
         align-items: center;
-        margin-top: 0.7em;
+        flex-shrink: 0;
+        width: 100%;
 
         .#{$prefix}-cancel-button,
         .#{$prefix}-play-now-button {
-          padding: 0.5em 2.5em;
-          border: none;
-          border-radius: 50px;
-          font-size: 0.9em;
+          flex: 1;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+
+          border-radius: 24px;
+          font-size: 16px;
           font-weight: bold;
+          font-family: "Bebas Neue", sans-serif;
           cursor: pointer;
           transition: all $animation-duration-short ease;
-          min-width: 140px;
-          height: 32px;
+          height: 30px;
         }
 
         .#{$prefix}-cancel-button {
-          background-color: #666;
-          color: #bbb;
-
-          &:hover {
-            background-color: #777;
-            color: #ccc;
-          }
+          background-color: $color-musora-button;
+          color: white;
+          border: 1px solid white;
         }
 
         .#{$prefix}-play-now-button {
           background-color: #fff;
           color: #333;
-
-          &:hover {
-            background-color: #f0f0f0;
-            color: #222;
-          }
+          border: none;
         }
       }
     }
@@ -142,112 +173,4 @@
 // Fallback for browsers that don't support :has() selector
 .#{$prefix}-ui-skin-musora.#{$prefix}-ui-skin-smallscreen .#{$prefix}-ui-musora-standard-end-screen:not(.#{$prefix}-hidden) ~ .#{$prefix}-ui-titlebar {
   display: none;
-}
-
-.#{$prefix}-ui-skin-musora.#{$prefix}-ui-skin-smallscreen .#{$prefix}-ui-musora-standard-end-screen {
-  > .#{$prefix}-container-wrapper {
-    padding: 0;
-    width: 100vw;
-    height: 100%;
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    margin: 0;
-  }
-
-  &.#{$prefix}-recommendations {
-    .#{$prefix}-ui-musora-standard-end-screen-item {
-      width: 100vw;
-      max-width: 100vw;
-      min-width: 100vw;
-      padding: 0.8em 1.2em;
-      margin: 0;
-      box-sizing: border-box;
-
-      .#{$prefix}-top-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 0.5em;
-        width: 100%;
-
-        .#{$prefix}-up-next-text {
-          font-size: 0.85em;
-          margin-bottom: 0;
-        }
-
-        .#{$prefix}-ui-musora-replay-button {
-          background: none;
-          border: none;
-          padding: 0;
-          font-size: 1.2em;
-          cursor: pointer;
-          color: $color-primary;
-          flex-shrink: 0;
-          display: block;
-          
-          &:hover {
-            opacity: 0.8;
-          }
-        }
-      }
-
-      .#{$prefix}-content-row {
-        display: flex;
-        flex-direction: row;
-        align-items: flex-start;
-        gap: 0.75em;
-        margin-bottom: 0;
-        text-align: left;
-        width: 100%;
-        box-sizing: border-box;
-
-        .#{$prefix}-thumbnail {
-          flex: 1;
-          width: 100%;
-          height: 120px;
-          background-size: contain;
-          background-repeat: no-repeat;
-          background-position: center;
-          border-radius: 4px;
-        }
-
-        .#{$prefix}-text-area {
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          justify-content: flex-start;
-
-          .#{$prefix}-content-text {
-            .#{$prefix}-title {
-              font-size: 0.85em;
-              margin-bottom: 0.2em;
-              line-height: 1.2;
-            }
-
-            .#{$prefix}-subtitle {
-              font-size: 0.7em;
-              margin-bottom: 0.75em;
-              line-height: 1.3;
-            }
-          }
-
-          .#{$prefix}-button-row {
-            display: flex;
-            flex-direction: column;
-            gap: 0.4em;
-
-            .#{$prefix}-cancel-button,
-            .#{$prefix}-play-now-button {
-              padding: 0.4em 0.8em;
-              font-size: 0.75em;
-              min-width: 70px;
-              width: 100%;
-              border-radius: 20px;
-            }
-          }
-        }
-      }
-    }
-  }
 }

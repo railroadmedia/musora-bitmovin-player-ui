@@ -1,9 +1,9 @@
-import {ContainerConfig, Container} from './container';
-import {Component, ComponentConfig} from './component';
-import {DOM} from '../dom';
-import {UIInstanceManager} from '../uimanager';
-import {StringUtils} from '../stringutils';
-import {HugeReplayButton} from './hugereplaybutton';
+import { ContainerConfig, Container } from './container';
+import { Component, ComponentConfig } from './component';
+import { DOM } from '../dom';
+import { UIInstanceManager } from '../uimanager';
+import { StringUtils } from '../stringutils';
+import { HugeReplayButton } from './hugereplaybutton';
 import { UIRecommendationConfig } from '../uiconfig';
 import { PlayerAPI } from 'bitmovin-player';
 
@@ -30,6 +30,7 @@ export class MusoraStandardEndScreen extends Container<ContainerConfig> {
 
   configure(player: PlayerAPI, uimanager: UIInstanceManager): void {
     super.configure(player, uimanager);
+    const PlayerEvent = player.exports.PlayerEvent;
 
     let clearRecommendations = () => {
       for (let component of this.getComponents().slice()) {
@@ -52,28 +53,30 @@ export class MusoraStandardEndScreen extends Container<ContainerConfig> {
         uimanager: uimanager,
         parentEndScreen: this,
       }));
-      
+
       this.updateComponents(); // create container DOM elements
       this.getDomElement().addClass(this.prefixCss('recommendations'));
     };
 
     uimanager.getConfig().events.onUpdated.subscribe(setupRecommendations);
     // Remove recommendations and hide overlay when source is unloaded
-    player.on(player.exports.PlayerEvent.SourceUnloaded, () => {
+
+    player.on(PlayerEvent.SourceUnloaded, () => {
       clearRecommendations();
       this.hide();
     });
+
     // Display recommendations when playback has finished
-    player.on(player.exports.PlayerEvent.PlaybackFinished, () => {
+    player.on(PlayerEvent.PlaybackFinished, () => {
       this.show();
     });
     // Hide recommendations when playback starts, e.g. a restart
-    player.on(player.exports.PlayerEvent.Play, () => {
+    player.on(PlayerEvent.Play, () => {
       this.hide();
     });
 
     // Hide end screen when user seeks (uses seek bar)
-    player.on(player.exports.PlayerEvent.Seek, () => {
+    player.on(PlayerEvent.Seek, () => {
       this.hide();
     });
 
@@ -106,6 +109,12 @@ class MusoraStandardEndScreenItem extends Component<MusoraStandardEndScreenItemC
     }, this.config);
   }
 
+  onClose(): void {
+    if (this.config.parentEndScreen) {
+      this.config.parentEndScreen.hide();
+    }
+  }
+
   protected toDomElement(): DOM {
     let itemElement = new DOM('div', {
       'id': this.config.id,
@@ -116,29 +125,25 @@ class MusoraStandardEndScreenItem extends Component<MusoraStandardEndScreenItemC
     let topRow = new DOM('div', {
       'class': this.prefixCss('top-row'),
     });
-    
+
     let upNextText = new DOM('div', {
       'class': this.prefixCss('up-next-text'),
-    }).html('Up Next in 5');
-    
-    // Simple replay button element
-    let replayButton = new DOM('button', {
-      'class': this.prefixCss('ui-musora-replay-button'),
-    }).html('⟲');
-    
-    // Add click event to restart video and hide end screen
-    replayButton.on('click', () => {
-      if (this.config.player) {
-        this.config.player.seek(0);
-        this.config.player.play();
-      }
-      if (this.config.parentEndScreen) {
-        this.config.parentEndScreen.hide();
-      }
-    });
-    
+    }).html('Up Next in ');
+
+    let timer = new DOM('span', {
+      'class': this.prefixCss('timer'),
+    }).html('5');
+
+    upNextText.append(timer);
+
+    let closeButton = new DOM('button', {
+      'class': this.prefixCss('close-button'),
+    }).html('×');
+
+    closeButton.on('click', this.onClose.bind(this));
+
     topRow.append(upNextText);
-    topRow.append(replayButton);
+    topRow.append(closeButton);
     itemElement.append(topRow);
 
     // Row 2: Thumbnail and text content side by side
@@ -158,20 +163,20 @@ class MusoraStandardEndScreenItem extends Component<MusoraStandardEndScreenItemC
     let textArea = new DOM('div', {
       'class': this.prefixCss('text-area'),
     });
-    
+
     // Content text container
     let contentText = new DOM('div', {
       'class': this.prefixCss('content-text'),
     });
-    
+
     let title = new DOM('div', {
       'class': this.prefixCss('title'),
-    }).html('Sample Video Title');
-    
+    }).html('Chorus & Outro');
+
     let subtitle = new DOM('div', {
       'class': this.prefixCss('subtitle'),
-    }).html('This is a sample subtitle description for the upcoming video');
-    
+    }).html('Dreamfall');
+
     contentText.append(title);
     contentText.append(subtitle);
     textArea.append(contentText);
@@ -191,10 +196,10 @@ class MusoraStandardEndScreenItem extends Component<MusoraStandardEndScreenItemC
 
     buttonRow.append(cancelButton);
     buttonRow.append(playNowButton);
-    textArea.append(buttonRow);
-    
+
     contentRow.append(textArea);
     itemElement.append(contentRow);
+    itemElement.append(buttonRow);
 
     return itemElement;
   }
