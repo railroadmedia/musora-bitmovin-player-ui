@@ -26,7 +26,7 @@
       display: none;
     }
 
-    .#{$prefix}-ui-musora-standard-end-screen-item {
+    .#{$prefix}-musora-up-next-end-screen-item {
       flex: 1;
 
       .#{$prefix}-top-row {
@@ -52,8 +52,6 @@
         .#{$prefix}-close-button {
           background: none;
           border: none;
-          padding: 0.5em;
-          font-size: 1.2em;
           cursor: pointer;
           color: $color-primary;
           flex-shrink: 0;
@@ -62,9 +60,12 @@
           justify-content: center;
           width: 32px;
           height: 32px;
-          border-radius: 50%;
           transition: all $animation-duration-short ease;
-
+          background-image: url('../../assets/skin-modern/images/close.svg');
+          background-size: 16px;
+          background-position: center;
+          background-repeat: no-repeat;
+    
           &:hover {
             background-color: rgba(255, 255, 255, 0.1);
             opacity: 0.8;
@@ -146,6 +147,153 @@
           border: 1px solid white;
         }
 
+        .#{$prefix}-play-now-button {
+          background-color: #fff;
+          color: #333;
+          border: none;
+        }
+      }
+    }
+    
+    .#{$prefix}-musora-method-session-end-screen-item {
+      flex: 1;
+    
+      .#{$prefix}-top-row {
+        display: flex;
+        flex: 1;
+        justify-content: space-between;
+        align-items: center;
+        padding-left: 32px;
+        padding-bottom: 32px;
+    
+        .#{$prefix}-top-title {
+          text-align: center;
+          font-size: 14px;
+          color: $color-primary;
+          margin-bottom: 0;
+          flex: 1;
+          color: #FFF;
+          font-family: "Open Sans", sans-serif;
+          font-weight: 800;
+        }
+    
+        .#{$prefix}-close-button {
+          background: none;
+          border: none;
+          cursor: pointer;
+          color: $color-primary;
+          flex-shrink: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 32px;
+          height: 32px;
+          transition: all $animation-duration-short ease;
+          background-image: url('../../assets/skin-modern/images/close.svg');
+          background-size: 16px;
+          background-position: center;
+          background-repeat: no-repeat;
+    
+          &:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            opacity: 0.8;
+          }
+    
+          &:active {
+            transform: scale(0.95);
+          }
+        }
+      }
+    
+      .#{$prefix}-content-row {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 28px;
+        gap: 8px;
+
+        .#{$prefix}-session-step {
+          display: flex;
+          flex-direction: column;
+          // justify-content: start;
+          // align-items: center;
+          // margin-bottom: 28px;
+          
+          .#{$prefix}-thumbnail {
+            width: 115px;
+            height: 65px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 4px;
+            flex-shrink: 0;
+
+            .#{$prefix}-completed {
+              width: 100%;
+              height: 100%;
+              background-color: #0C152466;
+
+              background-image: url('../../assets/skin-modern/images/check.svg');
+              background-size: 40%;
+              background-position: center;
+              background-repeat: no-repeat;
+            }
+          }
+            
+          .#{$prefix}-label {
+            font-family: "Open Sans", sans-serif;
+            text-overflow: ellipsis;
+            font-size: 12px;
+            font-style: normal;
+            font-weight: 400;
+            line-height: normal;
+          
+            &.#{$prefix}-completed {
+              color: #666E7D;
+            }
+          
+            &.#{$prefix}-timer {
+
+              .#{$prefix}-time {
+                font-weight: 700;
+              }
+            }
+          }
+        }
+      }
+    
+      .#{$prefix}-button-row {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        height: 32px;
+        align-items: center;
+        flex-shrink: 0;
+        width: 100%;
+    
+        .#{$prefix}-cancel-button,
+        .#{$prefix}-play-now-button {
+          flex: 1;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+    
+          border-radius: 24px;
+          font-size: 16px;
+          font-weight: bold;
+          font-family: "BebasNeue", sans-serif;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all $animation-duration-short ease;
+          height: 30px;
+        }
+    
+        .#{$prefix}-cancel-button {
+          background-color: $color-musora-button;
+          color: white;
+          border: 1px solid white;
+        }
+    
         .#{$prefix}-play-now-button {
           background-color: #fff;
           color: #333;

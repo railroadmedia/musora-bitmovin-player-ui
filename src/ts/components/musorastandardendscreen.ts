@@ -12,6 +12,16 @@ import { PlayerAPI } from 'bitmovin-player';
  *
  * @category Containers
  */
+
+
+declare const window: {
+  bitmovin: {
+    customMessageHandler: {
+      on: (event: string, callback: (data?: string) => void) => void;
+    }
+  }
+}
+
 export class MusoraStandardEndScreen extends Container<ContainerConfig> {
 
   private replayButton: HugeReplayButton;
@@ -42,13 +52,13 @@ export class MusoraStandardEndScreen extends Container<ContainerConfig> {
       this.getDomElement().removeClass(this.prefixCss('recommendations'));
     };
 
-    let setupRecommendations = () => {
+    let setupUpNextScreen = () => {
       clearRecommendations();
 
       // Always create exactly one tile regardless of recommendations
-      this.addComponent(new MusoraStandardEndScreenItem({
+      this.addComponent(new MusoraUpNextEndScreenItem({
         itemConfig: null, // Not using recommendations data
-        cssClasses: ['musora-end-screen-item-1'],
+        cssClasses: ['musora-up-next-end-screen-item'],
         player: player,
         uimanager: uimanager,
         parentEndScreen: this,
@@ -58,30 +68,45 @@ export class MusoraStandardEndScreen extends Container<ContainerConfig> {
       this.getDomElement().addClass(this.prefixCss('recommendations'));
     };
 
-    uimanager.getConfig().events.onUpdated.subscribe(setupRecommendations);
+    let setupMethodSessionScreen = () => {
+      clearRecommendations();
+
+      this.addComponent(new MusoraMethodSessionEndScreenItem({
+        itemConfig: null, // Not using recommendations data
+        cssClasses: ['musora-method-session-end-screen-item'],
+        player: player,
+        uimanager: uimanager,
+        parentEndScreen: this,
+      }));
+
+      this.updateComponents(); // create container DOM elements
+      this.getDomElement().addClass(this.prefixCss('recommendations'));
+    };
+
+    // uimanager.getConfig().events.onUpdated.subscribe(setupRecommendations);
     // Remove recommendations and hide overlay when source is unloaded
 
-    player.on(PlayerEvent.SourceUnloaded, () => {
-      clearRecommendations();
-      this.hide();
-    });
-
-    // Display recommendations when playback has finished
-    player.on(PlayerEvent.PlaybackFinished, () => {
+    player.on(PlayerEvent.SourceLoaded, () => {
+      // setupUpNextScreen();
+      setupMethodSessionScreen();
       this.show();
     });
-    // Hide recommendations when playback starts, e.g. a restart
-    player.on(PlayerEvent.Play, () => {
-      this.hide();
-    });
 
-    // Hide end screen when user seeks (uses seek bar)
-    player.on(PlayerEvent.Seek, () => {
-      this.hide();
-    });
+    if (window.bitmovin.customMessageHandler) {
+      window.bitmovin.customMessageHandler.on('showUpNextEndScreen', (data?: string) => {
+        setupUpNextScreen();
+        this.show();
+      });
 
-    // Init on startup
-    setupRecommendations();
+      window.bitmovin.customMessageHandler.on('showMethodSessionEndScreen', (data?: string) => {
+        setupMethodSessionScreen();
+        this.show();
+      });
+
+      window.bitmovin.customMessageHandler.on('hideEndScreen', (data?: string) => {
+        this.hide();
+      });
+    }
   }
 }
 
@@ -107,6 +132,12 @@ class MusoraStandardEndScreenItem extends Component<MusoraStandardEndScreenItemC
       cssClass: 'ui-musora-standard-end-screen-item',
       itemConfig: null, // this must be passed in from outside
     }, this.config);
+  }
+}
+
+class MusoraUpNextEndScreenItem extends MusoraStandardEndScreenItem {
+  constructor(config: MusoraStandardEndScreenItemConfig) {
+    super(config);
   }
 
   onClose(): void {
@@ -199,6 +230,136 @@ class MusoraStandardEndScreenItem extends Component<MusoraStandardEndScreenItemC
 
     contentRow.append(textArea);
     itemElement.append(contentRow);
+    itemElement.append(buttonRow);
+
+    return itemElement;
+  }
+}
+
+class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
+  constructor(config: MusoraStandardEndScreenItemConfig) {
+    super(config);
+  }
+
+  onClose(): void {
+    if (this.config.parentEndScreen) {
+      this.config.parentEndScreen.hide();
+    }
+  }
+
+  protected toDomElement(): DOM {
+    let itemElement = new DOM('div', {
+      'id': this.config.id,
+      'class': this.getCssClasses(),
+    }, this);
+
+    let topRow = new DOM('div', {
+      'class': this.prefixCss('top-row'),
+    });
+
+    let topTitle = new DOM('div', {
+      'class': this.prefixCss('top-title'),
+    }).html("Here's what to do today!");
+
+    let closeButton = new DOM('button', {
+      'class': this.prefixCss('close-button'),
+    }).html('');
+
+    closeButton.on('click', this.onClose.bind(this));
+
+    topRow.append(topTitle);
+    topRow.append(closeButton);
+    itemElement.append(topRow);
+
+    // Center row with suggested lessons
+    let contentRow = new DOM('div', {
+      'class': this.prefixCss('content-row'),
+    });
+
+    [
+      {
+        thumbnail: 'https://i.vimeocdn.com/video/2024105170-4d38d750f3deeb57b3e03d5f5df160e40032bd4d5c1b30d2ade46ff1e14f2cd8-d?mw=1100&mh=620',
+        status: 'complete'
+      }, {
+        thumbnail: 'https://i.vimeocdn.com/video/2024105170-4d38d750f3deeb57b3e03d5f5df160e40032bd4d5c1b30d2ade46ff1e14f2cd8-d?mw=1100&mh=620',
+        status: 'next'
+      }, {
+        thumbnail: 'https://i.vimeocdn.com/video/2024105170-4d38d750f3deeb57b3e03d5f5df160e40032bd4d5c1b30d2ade46ff1e14f2cd8-d?mw=1100&mh=620',
+        status: 'upcoming'
+      }
+    ]
+      .forEach(item => {
+        let contentItem = new DOM('div', {
+          'class': this.prefixCss('session-step'),
+        });
+
+
+        let thumbnail = new DOM('div', {
+          'class': this.prefixCss('thumbnail'),
+        }).css({
+          'background-image': 'url(' + item.thumbnail + ')'
+        });
+
+        if (item.status === 'complete') {
+
+          let cover = new DOM('div', {
+            'class': this.prefixCss('completed'),
+          });
+
+          thumbnail.append(cover);
+        }
+
+        contentItem.append(thumbnail);
+
+        if (item.status === 'complete') {
+
+          let label = new DOM('div', {
+            'class': `${this.prefixCss(`label`)} ${this.prefixCss('completed')}`,
+          }).html('Completed');
+
+          contentItem.append(label);
+
+        } else if (item.status === 'next') {
+          let label = new DOM('div', {
+            'class': `${this.prefixCss(`label`)} ${this.prefixCss('timer')}`,
+          }).html('Starting in ');
+
+          let time = new DOM('span', {
+            'class': this.prefixCss('time'),
+          }).html('5');
+
+          label.append(time);
+
+          contentItem.append(label);
+        } else if (item.status === 'upcoming') {
+          let label = new DOM('div', {
+            'class': `${this.prefixCss(`label`)}`,
+          }).html('Upcoming');
+
+          contentItem.append(label);
+        }
+
+        contentRow.append(contentItem);
+      });
+
+    itemElement.append(contentRow);
+
+    // Button row inside text area
+    let buttonRow = new DOM('div', {
+      'class': this.prefixCss('button-row'),
+    });
+
+    let cancelButton = new DOM('button', {
+      'class': this.prefixCss('cancel-button'),
+    }).html('Cancel');
+
+    let playNowButton = new DOM('button', {
+      'class': this.prefixCss('play-now-button'),
+    }).html('Play Now');
+
+    buttonRow.append(cancelButton);
+    buttonRow.append(playNowButton);
+
     itemElement.append(buttonRow);
 
     return itemElement;
