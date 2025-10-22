@@ -16,14 +16,35 @@
     align-items: center;
     height: 100%;
     flex: 1;
-    padding-left: 16px;
-    padding-right: 16px;
     background-color: $color-musora-button;
   }
 
   &.#{$prefix}-recommendations {
     .#{$prefix}-ui-hugereplaybutton {
       display: none;
+    }
+
+    .#{$prefix}-close-button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: $color-primary;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      transition: all $animation-duration-short ease;
+      background-image: url('../../assets/skin-modern/images/close.svg');
+      background-size: 16px;
+      background-position: center;
+      background-repeat: no-repeat;
+
+      &:active {
+        transform: scale(0.95);
+      }
     }
 
     .#{$prefix}-musora-up-next-end-screen-item {
@@ -46,33 +67,6 @@
 
           .#{$prefix}-timer {
             font-weight: bold;
-          }
-        }
-
-        .#{$prefix}-close-button {
-          background: none;
-          border: none;
-          cursor: pointer;
-          color: $color-primary;
-          flex-shrink: 0;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 32px;
-          height: 32px;
-          transition: all $animation-duration-short ease;
-          background-image: url('../../assets/skin-modern/images/close.svg');
-          background-size: 16px;
-          background-position: center;
-          background-repeat: no-repeat;
-    
-          &:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-            opacity: 0.8;
-          }
-
-          &:active {
-            transform: scale(0.95);
           }
         }
       }
@@ -176,33 +170,6 @@
           font-family: "Open Sans", sans-serif;
           font-weight: 800;
         }
-    
-        .#{$prefix}-close-button {
-          background: none;
-          border: none;
-          cursor: pointer;
-          color: $color-primary;
-          flex-shrink: 0;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 32px;
-          height: 32px;
-          transition: all $animation-duration-short ease;
-          background-image: url('../../assets/skin-modern/images/close.svg');
-          background-size: 16px;
-          background-position: center;
-          background-repeat: no-repeat;
-    
-          &:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-            opacity: 0.8;
-          }
-    
-          &:active {
-            transform: scale(0.95);
-          }
-        }
       }
     
       .#{$prefix}-content-row {
@@ -297,6 +264,111 @@
         .#{$prefix}-play-now-button {
           background-color: #fff;
           color: #333;
+          border: none;
+        }
+      }
+    }
+    
+    .#{$prefix}-musora-award-end-screen-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      gap: 28px;
+
+      padding: 16px;
+      padding-top: 0;
+    
+      .#{$prefix}-top-row {
+        display: flex;
+        flex: 1;
+        align-items: center;
+        padding-left: 16px;
+    
+        .#{$prefix}-top-title {
+          text-align: center;
+          font-size: 14px;
+          color: $color-primary;
+          flex: 1;
+          color: #FFF;
+          font-family: "Open Sans", sans-serif;
+          font-weight: 800;
+        }
+      }
+    
+      .#{$prefix}-content-row {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 16px;
+
+        .#{$prefix}-award {
+          width: 100px;
+          height: 100px;
+          background-size: cover;
+          background-position: center;
+          border-radius: 4px;
+        }
+
+        .#{$prefix}-info {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: flex-start;
+
+          color: #FFF;
+          font-family: "Open Sans", sans-serif;
+          font-size: 12px;
+          font-style: normal;
+          line-height: 24px;
+
+          .#{$prefix}-info-count {
+            font-weight: 800;
+            font-family: 'Open Sans Bold', sans-serif;
+          }
+
+          .#{$prefix}-info-label {
+            font-weight: 400;
+          }
+        }
+      }
+    
+      .#{$prefix}-button-row {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        height: 32px;
+        align-items: center;
+        flex-shrink: 0;
+        width: 100%;
+    
+        .#{$prefix}-cancel-button,
+        .#{$prefix}-action-button {
+          flex: 1;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+    
+          border-radius: 24px;
+          font-size: 16px;
+          font-weight: bold;
+          font-family: "BebasNeue", sans-serif;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all $animation-duration-short ease;
+          height: 30px;
+        }
+    
+        .#{$prefix}-cancel-button {
+          background-color: $color-musora-button;
+          color: white;
+          border: 1px solid white;
+        }
+    
+        .#{$prefix}-action-button {
+          background-color: #fff;
+          color: $color-musora-button;
           border: none;
         }
       }

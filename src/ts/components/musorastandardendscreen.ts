@@ -83,12 +83,28 @@ export class MusoraStandardEndScreen extends Container<ContainerConfig> {
       this.getDomElement().addClass(this.prefixCss('recommendations'));
     };
 
+    let setupAwardEndScreen = () => {
+      clearRecommendations();
+
+      this.addComponent(new MusoraAwardEndScreenItem({
+        itemConfig: null, // Not using recommendations data
+        cssClasses: ['musora-award-end-screen-item'],
+        player: player,
+        uimanager: uimanager,
+        parentEndScreen: this,
+      }));
+
+      this.updateComponents(); // create container DOM elements
+      this.getDomElement().addClass(this.prefixCss('recommendations'));
+    };
+
     // uimanager.getConfig().events.onUpdated.subscribe(setupRecommendations);
     // Remove recommendations and hide overlay when source is unloaded
 
     player.on(PlayerEvent.SourceLoaded, () => {
       // setupUpNextScreen();
-      setupMethodSessionScreen();
+      // setupMethodSessionScreen();
+      // setupAwardEndScreen();
       this.show();
     });
 
@@ -100,6 +116,11 @@ export class MusoraStandardEndScreen extends Container<ContainerConfig> {
 
       window.bitmovin.customMessageHandler.on('showMethodSessionEndScreen', (data?: string) => {
         setupMethodSessionScreen();
+        this.show();
+      });
+
+      window.bitmovin.customMessageHandler.on('showAwardEndScreen', (data?: string) => {
+        setupAwardEndScreen();
         this.show();
       });
 
@@ -133,17 +154,17 @@ class MusoraStandardEndScreenItem extends Component<MusoraStandardEndScreenItemC
       itemConfig: null, // this must be passed in from outside
     }, this.config);
   }
-}
-
-class MusoraUpNextEndScreenItem extends MusoraStandardEndScreenItem {
-  constructor(config: MusoraStandardEndScreenItemConfig) {
-    super(config);
-  }
 
   onClose(): void {
     if (this.config.parentEndScreen) {
       this.config.parentEndScreen.hide();
     }
+  }
+}
+
+class MusoraUpNextEndScreenItem extends MusoraStandardEndScreenItem {
+  constructor(config: MusoraStandardEndScreenItemConfig) {
+    super(config);
   }
 
   protected toDomElement(): DOM {
@@ -241,12 +262,6 @@ class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
     super(config);
   }
 
-  onClose(): void {
-    if (this.config.parentEndScreen) {
-      this.config.parentEndScreen.hide();
-    }
-  }
-
   protected toDomElement(): DOM {
     let itemElement = new DOM('div', {
       'id': this.config.id,
@@ -263,7 +278,7 @@ class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
 
     let closeButton = new DOM('button', {
       'class': this.prefixCss('close-button'),
-    }).html('');
+    });
 
     closeButton.on('click', this.onClose.bind(this));
 
@@ -356,6 +371,120 @@ class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
     let playNowButton = new DOM('button', {
       'class': this.prefixCss('play-now-button'),
     }).html('Play Now');
+
+    buttonRow.append(cancelButton);
+    buttonRow.append(playNowButton);
+
+    itemElement.append(buttonRow);
+
+    return itemElement;
+  }
+}
+
+class MusoraAwardEndScreenItem extends MusoraStandardEndScreenItem {
+  constructor(config: MusoraStandardEndScreenItemConfig) {
+    super(config);
+  }
+
+  protected toDomElement(): DOM {
+    let data = {
+      award: 'https://i.vimeocdn.com/video/2024105170-4d38d750f3deeb57b3e03d5f5df160e40032bd4d5c1b30d2ade46ff1e14f2cd8-d?mw=1100&mh=620',
+      lessons: 52,
+      minutes: 345,
+      skills: 5
+    };
+
+    let itemElement = new DOM('div', {
+      'id': this.config.id,
+      'class': this.getCssClasses(),
+    }, this);
+
+    // Top row with title and close button
+    let topRow = new DOM('div', {
+      'class': this.prefixCss('top-row'),
+    });
+
+    let topTitle = new DOM('div', {
+      'class': this.prefixCss('top-title'),
+    }).html("Great job! Learning Path Complete!");
+
+    let closeButton = new DOM('button', {
+      'class': this.prefixCss('close-button'),
+    });
+
+    closeButton.on('click', this.onClose.bind(this));
+
+    topRow.append(topTitle);
+    topRow.append(closeButton);
+    itemElement.append(topRow);
+
+    // Center row with award & info
+    let contentRow = new DOM('div', {
+      'class': this.prefixCss('content-row'),
+    });
+
+    let award = new DOM('div', {
+      'class': this.prefixCss('award'),
+    }).css({
+      'background-image': 'url(' + data.award + ')'
+    });
+
+    contentRow.append(award);
+
+    let info = new DOM('div', {
+      'class': this.prefixCss('info'),
+    });
+
+    let lessons = new DOM('div', {
+      'class': this.prefixCss('lessons'),
+    })
+      .append(new DOM('span', {
+        'class': this.prefixCss('info-count')
+      }).html(`${data.lessons}`))
+      .append(new DOM('span', {
+        'class': this.prefixCss('info-label')
+      }).html(' Lessons Completed'));
+
+    let minutes = new DOM('div', {
+      'class': this.prefixCss('minutes'),
+    })
+      .append(new DOM('span', {
+        'class': this.prefixCss('info-count')
+      }).html(`${data.minutes}`))
+      .append(new DOM('span', {
+        'class': this.prefixCss('info-label')
+      }).html(' Minutes Practiced'));
+
+    let skills = new DOM('div', {
+      'class': this.prefixCss('skills'),
+    })
+      .append(new DOM('span', {
+        'class': this.prefixCss('info-count')
+      }).html(`${data.skills}`))
+      .append(new DOM('span', {
+        'class': this.prefixCss('info-label')
+      }).html(' Skills Learned'));
+
+    info.append(lessons);
+    info.append(minutes);
+    info.append(skills);
+
+    contentRow.append(info);
+
+    itemElement.append(contentRow);
+
+    // Bottom row with buttons
+    let buttonRow = new DOM('div', {
+      'class': this.prefixCss('button-row'),
+    });
+
+    let cancelButton = new DOM('button', {
+      'class': this.prefixCss('cancel-button'),
+    }).html('Go TO METHOD');
+
+    let playNowButton = new DOM('button', {
+      'class': this.prefixCss('action-button'),
+    }).html('START NEXT PATH');
 
     buttonRow.append(cancelButton);
     buttonRow.append(playNowButton);
