@@ -52,7 +52,7 @@ export class MusoraStandardEndScreen extends Container<ContainerConfig> {
       this.getDomElement().removeClass(this.prefixCss('recommendations'));
     };
 
-    let setupUpNextScreen = () => {
+    let setupUpNextScreen = (data: UpNextData) => {
       clearRecommendations();
 
       // Always create exactly one tile regardless of recommendations
@@ -61,14 +61,14 @@ export class MusoraStandardEndScreen extends Container<ContainerConfig> {
         cssClasses: ['musora-up-next-end-screen-item'],
         player: player,
         uimanager: uimanager,
-        parentEndScreen: this,
-      }));
+        parentEndScreen: this
+      }, data));
 
       this.updateComponents(); // create container DOM elements
       this.getDomElement().addClass(this.prefixCss('recommendations'));
     };
 
-    let setupMethodSessionScreen = () => {
+    let setupMethodSessionScreen = (data: MethodSessionData) => {
       clearRecommendations();
 
       this.addComponent(new MusoraMethodSessionEndScreenItem({
@@ -77,13 +77,13 @@ export class MusoraStandardEndScreen extends Container<ContainerConfig> {
         player: player,
         uimanager: uimanager,
         parentEndScreen: this,
-      }));
+      }, data));
 
       this.updateComponents(); // create container DOM elements
       this.getDomElement().addClass(this.prefixCss('recommendations'));
     };
 
-    let setupAwardEndScreen = () => {
+    let setupAwardEndScreen = (data: AwardData) => {
       clearRecommendations();
 
       this.addComponent(new MusoraAwardEndScreenItem({
@@ -92,7 +92,7 @@ export class MusoraStandardEndScreen extends Container<ContainerConfig> {
         player: player,
         uimanager: uimanager,
         parentEndScreen: this,
-      }));
+      }, data));
 
       this.updateComponents(); // create container DOM elements
       this.getDomElement().addClass(this.prefixCss('recommendations'));
@@ -105,22 +105,22 @@ export class MusoraStandardEndScreen extends Container<ContainerConfig> {
       // setupUpNextScreen();
       // setupMethodSessionScreen();
       // setupAwardEndScreen();
-      this.show();
+      // this.show();
     });
 
     if (window.bitmovin.customMessageHandler) {
       window.bitmovin.customMessageHandler.on('showUpNextEndScreen', (data?: string) => {
-        setupUpNextScreen();
+        setupUpNextScreen(JSON.parse(data));
         this.show();
       });
 
       window.bitmovin.customMessageHandler.on('showMethodSessionEndScreen', (data?: string) => {
-        setupMethodSessionScreen();
+        setupMethodSessionScreen(JSON.parse(data));
         this.show();
       });
 
       window.bitmovin.customMessageHandler.on('showAwardEndScreen', (data?: string) => {
-        setupAwardEndScreen();
+        setupAwardEndScreen(JSON.parse(data));
         this.show();
       });
 
@@ -162,9 +162,19 @@ class MusoraStandardEndScreenItem extends Component<MusoraStandardEndScreenItemC
   }
 }
 
+interface UpNextData {
+  title: string;
+  subtitle: string;
+  thumbnail: string;
+  duration: number;
+}
+
 class MusoraUpNextEndScreenItem extends MusoraStandardEndScreenItem {
-  constructor(config: MusoraStandardEndScreenItemConfig) {
+  data: UpNextData;
+
+  constructor(config: MusoraStandardEndScreenItemConfig, data: UpNextData) {
     super(config);
+    this.data = data;
   }
 
   protected toDomElement(): DOM {
@@ -182,15 +192,16 @@ class MusoraUpNextEndScreenItem extends MusoraStandardEndScreenItem {
       'class': this.prefixCss('up-next-text'),
     }).html('Up Next in ');
 
+    // TODO: make this count down.
     let timer = new DOM('span', {
       'class': this.prefixCss('timer'),
-    }).html('5');
+    }).html(this.data.duration.toString());
 
     upNextText.append(timer);
 
     let closeButton = new DOM('button', {
       'class': this.prefixCss('close-button'),
-    }).html('×');
+    });
 
     closeButton.on('click', this.onClose.bind(this));
 
@@ -207,7 +218,7 @@ class MusoraUpNextEndScreenItem extends MusoraStandardEndScreenItem {
     let thumbnail = new DOM('div', {
       'class': this.prefixCss('thumbnail'),
     }).css({
-      'background-image': 'url(https://i.vimeocdn.com/video/2024105170-4d38d750f3deeb57b3e03d5f5df160e40032bd4d5c1b30d2ade46ff1e14f2cd8-d?mw=1100&mh=620)'
+      'background-image': `url(${this.data.thumbnail})`
     });
     contentRow.append(thumbnail);
 
@@ -223,11 +234,11 @@ class MusoraUpNextEndScreenItem extends MusoraStandardEndScreenItem {
 
     let title = new DOM('div', {
       'class': this.prefixCss('title'),
-    }).html('Chorus & Outro');
+    }).html(this.data.title);
 
     let subtitle = new DOM('div', {
       'class': this.prefixCss('subtitle'),
-    }).html('Dreamfall');
+    }).html(this.data.subtitle);
 
     contentText.append(title);
     contentText.append(subtitle);
@@ -257,9 +268,19 @@ class MusoraUpNextEndScreenItem extends MusoraStandardEndScreenItem {
   }
 }
 
+interface MethodSessionData {
+  lessons: [{
+    thumbnail: string;
+    status: 'completed' | 'next' | 'upcoming';
+  }];
+}
+
 class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
-  constructor(config: MusoraStandardEndScreenItemConfig) {
+  data: MethodSessionData;
+
+  constructor(config: MusoraStandardEndScreenItemConfig, data: MethodSessionData) {
     super(config);
+    this.data = data;
   }
 
   protected toDomElement(): DOM {
@@ -291,71 +312,59 @@ class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
       'class': this.prefixCss('content-row'),
     });
 
-    [
-      {
-        thumbnail: 'https://i.vimeocdn.com/video/2024105170-4d38d750f3deeb57b3e03d5f5df160e40032bd4d5c1b30d2ade46ff1e14f2cd8-d?mw=1100&mh=620',
-        status: 'complete'
-      }, {
-        thumbnail: 'https://i.vimeocdn.com/video/2024105170-4d38d750f3deeb57b3e03d5f5df160e40032bd4d5c1b30d2ade46ff1e14f2cd8-d?mw=1100&mh=620',
-        status: 'next'
-      }, {
-        thumbnail: 'https://i.vimeocdn.com/video/2024105170-4d38d750f3deeb57b3e03d5f5df160e40032bd4d5c1b30d2ade46ff1e14f2cd8-d?mw=1100&mh=620',
-        status: 'upcoming'
-      }
-    ]
-      .forEach(item => {
-        let contentItem = new DOM('div', {
-          'class': this.prefixCss('session-step'),
-        });
-
-
-        let thumbnail = new DOM('div', {
-          'class': this.prefixCss('thumbnail'),
-        }).css({
-          'background-image': 'url(' + item.thumbnail + ')'
-        });
-
-        if (item.status === 'complete') {
-
-          let cover = new DOM('div', {
-            'class': this.prefixCss('completed'),
-          });
-
-          thumbnail.append(cover);
-        }
-
-        contentItem.append(thumbnail);
-
-        if (item.status === 'complete') {
-
-          let label = new DOM('div', {
-            'class': `${this.prefixCss(`label`)} ${this.prefixCss('completed')}`,
-          }).html('Completed');
-
-          contentItem.append(label);
-
-        } else if (item.status === 'next') {
-          let label = new DOM('div', {
-            'class': `${this.prefixCss(`label`)} ${this.prefixCss('timer')}`,
-          }).html('Starting in ');
-
-          let time = new DOM('span', {
-            'class': this.prefixCss('time'),
-          }).html('5');
-
-          label.append(time);
-
-          contentItem.append(label);
-        } else if (item.status === 'upcoming') {
-          let label = new DOM('div', {
-            'class': `${this.prefixCss(`label`)}`,
-          }).html('Upcoming');
-
-          contentItem.append(label);
-        }
-
-        contentRow.append(contentItem);
+    this.data.lessons.forEach(item => {
+      let contentItem = new DOM('div', {
+        'class': this.prefixCss('session-step'),
       });
+
+      let thumbnail = new DOM('div', {
+        'class': this.prefixCss('thumbnail'),
+      }).css({
+        'background-image': 'url(' + item.thumbnail + ')'
+      });
+
+      if (item.status === 'completed') {
+
+        let cover = new DOM('div', {
+          'class': this.prefixCss('completed'),
+        });
+
+        thumbnail.append(cover);
+      }
+
+      contentItem.append(thumbnail);
+
+      if (item.status === 'completed') {
+
+        let label = new DOM('div', {
+          'class': `${this.prefixCss(`label`)} ${this.prefixCss('completed')}`,
+        }).html('Completed');
+
+        contentItem.append(label);
+
+      } else if (item.status === 'next') {
+        let label = new DOM('div', {
+          'class': `${this.prefixCss(`label`)} ${this.prefixCss('timer')}`,
+        }).html('Starting in ');
+
+        // TODO: make this count down.
+        let time = new DOM('span', {
+          'class': this.prefixCss('time'),
+        }).html('5');
+
+        label.append(time);
+
+        contentItem.append(label);
+      } else if (item.status === 'upcoming') {
+        let label = new DOM('div', {
+          'class': `${this.prefixCss(`label`)}`,
+        }).html('Upcoming');
+
+        contentItem.append(label);
+      }
+
+      contentRow.append(contentItem);
+    });
 
     itemElement.append(contentRow);
 
@@ -381,19 +390,22 @@ class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
   }
 }
 
+interface AwardData {
+  award: string;
+  lessons: number;
+  minutes: number;
+  skills: number;
+}
+
 class MusoraAwardEndScreenItem extends MusoraStandardEndScreenItem {
-  constructor(config: MusoraStandardEndScreenItemConfig) {
+  data: AwardData;
+
+  constructor(config: MusoraStandardEndScreenItemConfig, data: AwardData) {
     super(config);
+    this.data = data;
   }
 
   protected toDomElement(): DOM {
-    let data = {
-      award: 'https://i.vimeocdn.com/video/2024105170-4d38d750f3deeb57b3e03d5f5df160e40032bd4d5c1b30d2ade46ff1e14f2cd8-d?mw=1100&mh=620',
-      lessons: 52,
-      minutes: 345,
-      skills: 5
-    };
-
     let itemElement = new DOM('div', {
       'id': this.config.id,
       'class': this.getCssClasses(),
@@ -426,7 +438,7 @@ class MusoraAwardEndScreenItem extends MusoraStandardEndScreenItem {
     let award = new DOM('div', {
       'class': this.prefixCss('award'),
     }).css({
-      'background-image': 'url(' + data.award + ')'
+      'background-image': 'url(' + this.data.award + ')'
     });
 
     contentRow.append(award);
@@ -440,7 +452,7 @@ class MusoraAwardEndScreenItem extends MusoraStandardEndScreenItem {
     })
       .append(new DOM('span', {
         'class': this.prefixCss('info-count')
-      }).html(`${data.lessons}`))
+      }).html(`${this.data.lessons}`))
       .append(new DOM('span', {
         'class': this.prefixCss('info-label')
       }).html(' Lessons Completed'));
@@ -450,7 +462,7 @@ class MusoraAwardEndScreenItem extends MusoraStandardEndScreenItem {
     })
       .append(new DOM('span', {
         'class': this.prefixCss('info-count')
-      }).html(`${data.minutes}`))
+      }).html(`${this.data.minutes}`))
       .append(new DOM('span', {
         'class': this.prefixCss('info-label')
       }).html(' Minutes Practiced'));
@@ -460,7 +472,7 @@ class MusoraAwardEndScreenItem extends MusoraStandardEndScreenItem {
     })
       .append(new DOM('span', {
         'class': this.prefixCss('info-count')
-      }).html(`${data.skills}`))
+      }).html(`${this.data.skills}`))
       .append(new DOM('span', {
         'class': this.prefixCss('info-label')
       }).html(' Skills Learned'));
