@@ -15,12 +15,14 @@ import { PlayerAPI } from 'bitmovin-player';
 
 
 declare const window: {
-  bitmovin: {
-    customMessageHandler: {
+  bitmovin?: {
+    customMessageHandler?: {
       on: (event: string, callback: (data?: string) => void) => void;
-    }
-  }
-}
+      sendSynchronous: (message: string, payload?: string) => string;
+      sendAsynchronous: (message: string, payload?: string) => void;
+    };
+  };
+};
 
 export class MusoraStandardEndScreen extends Container<ContainerConfig> {
 
@@ -187,6 +189,18 @@ class MusoraStandardEndScreenItem extends Component<MusoraStandardEndScreenItemC
       this.config.parentEndScreen.hide();
     }
   }
+
+  onCancel(): void {
+    if (window.bitmovin.customMessageHandler) {
+      window.bitmovin.customMessageHandler.sendAsynchronous('onEndScreenCancel');
+    }
+  }
+
+  onAction(): void {
+    if (window.bitmovin.customMessageHandler) {
+      window.bitmovin.customMessageHandler.sendAsynchronous('onEndScreenAction');
+    }
+  }
 }
 
 interface UpNextData {
@@ -280,9 +294,13 @@ class MusoraUpNextEndScreenItem extends MusoraStandardEndScreenItem {
       'class': this.prefixCss('cancel-button'),
     }).html('Cancel');
 
+    cancelButton.on('click', this.onCancel.bind(this));
+
     let playNowButton = new DOM('button', {
       'class': this.prefixCss('play-now-button'),
     }).html('Play Now');
+
+    playNowButton.on('click', this.onAction.bind(this));
 
     buttonRow.append(cancelButton);
     buttonRow.append(playNowButton);
@@ -422,9 +440,13 @@ class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
       'class': this.prefixCss('cancel-button'),
     }).html('Cancel');
 
+    cancelButton.on('click', this.onCancel.bind(this));
+
     let playNowButton = new DOM('button', {
       'class': this.prefixCss('play-now-button'),
     }).html('Play Now');
+
+    playNowButton.on('click', this.onAction.bind(this));
 
     buttonRow.append(cancelButton);
     buttonRow.append(playNowButton);
@@ -539,9 +561,13 @@ class MusoraAwardEndScreenItem extends MusoraStandardEndScreenItem {
       'class': this.prefixCss('cancel-button'),
     }).html('Go TO METHOD');
 
+    cancelButton.on('click', this.onCancel.bind(this));
+
     let playNowButton = new DOM('button', {
       'class': this.prefixCss('action-button'),
     }).html('START NEXT PATH');
+
+    playNowButton.on('click', this.onAction.bind(this));
 
     buttonRow.append(cancelButton);
     buttonRow.append(playNowButton);
