@@ -1,9 +1,9 @@
-import {ContainerConfig, Container} from './container';
-import {Component, ComponentConfig} from './component';
-import {DOM} from '../dom';
-import {UIInstanceManager} from '../uimanager';
-import {StringUtils} from '../stringutils';
-import {HugeReplayButton} from './hugereplaybutton';
+import { ContainerConfig, Container } from './container';
+import { Component, ComponentConfig } from './component';
+import { DOM } from '../dom';
+import { UIInstanceManager } from '../uimanager';
+import { StringUtils } from '../stringutils';
+import { HugeReplayButton } from './hugereplaybutton';
 import { UIRecommendationConfig } from '../uiconfig';
 import { PlayerAPI } from 'bitmovin-player';
 
@@ -12,6 +12,18 @@ import { PlayerAPI } from 'bitmovin-player';
  *
  * @category Containers
  */
+
+
+declare const window: {
+  bitmovin?: {
+    customMessageHandler?: {
+      on: (event: string, callback: (data?: string) => void) => void;
+      sendSynchronous: (message: string, payload?: string) => string;
+      sendAsynchronous: (message: string, payload?: string) => void;
+    };
+  };
+};
+
 export class MusoraStandardEndScreen extends Container<ContainerConfig> {
 
   private replayButton: HugeReplayButton;
@@ -30,6 +42,7 @@ export class MusoraStandardEndScreen extends Container<ContainerConfig> {
 
   configure(player: PlayerAPI, uimanager: UIInstanceManager): void {
     super.configure(player, uimanager);
+    const PlayerEvent = player.exports.PlayerEvent;
 
     let clearRecommendations = () => {
       for (let component of this.getComponents().slice()) {
@@ -41,44 +54,110 @@ export class MusoraStandardEndScreen extends Container<ContainerConfig> {
       this.getDomElement().removeClass(this.prefixCss('recommendations'));
     };
 
-    let setupRecommendations = () => {
+    let setupUpNextScreen = (data: UpNextData) => {
       clearRecommendations();
 
       // Always create exactly one tile regardless of recommendations
-      this.addComponent(new MusoraStandardEndScreenItem({
+      this.addComponent(new MusoraUpNextEndScreenItem({
         itemConfig: null, // Not using recommendations data
-        cssClasses: ['musora-end-screen-item-1'],
+        cssClasses: ['musora-up-next-end-screen-item'],
         player: player,
         uimanager: uimanager,
-        parentEndScreen: this,
-      }));
-      
+        parentEndScreen: this
+      }, data));
+
       this.updateComponents(); // create container DOM elements
       this.getDomElement().addClass(this.prefixCss('recommendations'));
     };
 
-    uimanager.getConfig().events.onUpdated.subscribe(setupRecommendations);
-    // Remove recommendations and hide overlay when source is unloaded
-    player.on(player.exports.PlayerEvent.SourceUnloaded, () => {
+    let setupMethodSessionScreen = (data: MethodSessionData) => {
       clearRecommendations();
-      this.hide();
-    });
-    // Display recommendations when playback has finished
-    player.on(player.exports.PlayerEvent.PlaybackFinished, () => {
-      this.show();
-    });
-    // Hide recommendations when playback starts, e.g. a restart
-    player.on(player.exports.PlayerEvent.Play, () => {
-      this.hide();
-    });
 
-    // Hide end screen when user seeks (uses seek bar)
-    player.on(player.exports.PlayerEvent.Seek, () => {
-      this.hide();
-    });
+      this.addComponent(new MusoraMethodSessionEndScreenItem({
+        itemConfig: null, // Not using recommendations data
+        cssClasses: ['musora-method-session-end-screen-item'],
+        player: player,
+        uimanager: uimanager,
+        parentEndScreen: this,
+      }, data));
 
-    // Init on startup
-    setupRecommendations();
+      this.updateComponents(); // create container DOM elements
+      this.getDomElement().addClass(this.prefixCss('recommendations'));
+    };
+
+    let setupAwardEndScreen = (data: AwardData) => {
+      clearRecommendations();
+
+      this.addComponent(new MusoraAwardEndScreenItem({
+        itemConfig: null, // Not using recommendations data
+        cssClasses: ['musora-award-end-screen-item'],
+        player: player,
+        uimanager: uimanager,
+        parentEndScreen: this,
+      }, data));
+
+      this.updateComponents(); // create container DOM elements
+      this.getDomElement().addClass(this.prefixCss('recommendations'));
+    };
+
+    // uimanager.getConfig().events.onUpdated.subscribe(setupRecommendations);
+    // Remove recommendations and hide overlay when source is unloaded
+
+    // player.on(PlayerEvent.SourceLoaded, () => {
+    // setupUpNextScreen({
+    //   title: 'Chorus & Outro',
+    //   subtitle: 'Dreamfall',
+    //   thumbnail: 'https://i.vimeocdn.com/video/2024105170-4d38d750f3deeb57b3e03d5f5df160e40032bd4d5c1b30d2ade46ff1e14f2cd8-d?mw=1100&mh=620',
+    //   delay: 5,
+    // });
+    // setupMethodSessionScreen({
+    //   lessons: [
+    //     {
+    //       thumbnail: 'https://i.vimeocdn.com/video/2024105170-4d38d750f3deeb57b3e03d5f5df160e40032bd4d5c1b30d2ade46ff1e14f2cd8-d?mw=1100&mh=620',
+    //       status: 'completed',
+    //     },
+    //     {
+    //       thumbnail: 'https://i.vimeocdn.com/video/2024105170-4d38d750f3deeb57b3e03d5f5df160e40032bd4d5c1b30d2ade46ff1e14f2cd8-d?mw=1100&mh=620',
+    //       status: 'next',
+    //     },
+    //     {
+    //       thumbnail: 'https://i.vimeocdn.com/video/2024105170-4d38d750f3deeb57b3e03d5f5df160e40032bd4d5c1b30d2ade46ff1e14f2cd8-d?mw=1100&mh=620',
+    //       status: 'upcoming',
+    //     },
+    //   ],
+    //   sessionCompleted: true,
+    //   completedText: '🎉  Great job! Today’s Method session has been completed.',
+    //   nextLessonDelay: 5,
+    // });
+    // setupAwardEndScreen({
+    //   award: 'https://cdn.sanity.io/files/4032r8py/staging/9470587f03479b7c1f8019c3cbcbdfe12aa267f3.png',
+    //   lessons: 52,
+    //   minutes: 345,
+    //   skills: 5,
+    // });
+    // this.show();
+    // });
+
+    if (window.bitmovin.customMessageHandler) {
+      window.bitmovin.customMessageHandler.on('showUpNextEndScreen', (data?: string) => {
+        setupUpNextScreen(JSON.parse(data));
+        this.show();
+      });
+
+      window.bitmovin.customMessageHandler.on('showMethodSessionEndScreen', (data?: string) => {
+        setupMethodSessionScreen(JSON.parse(data));
+        this.show();
+      });
+
+      window.bitmovin.customMessageHandler.on('showAwardEndScreen', (data?: string) => {
+        setupAwardEndScreen(JSON.parse(data));
+        this.show();
+      });
+
+      window.bitmovin.customMessageHandler.on('hideEndScreen', (data?: string) => {
+        this.hide();
+      });
+    }
   }
 }
 
@@ -97,6 +176,9 @@ interface MusoraStandardEndScreenItemConfig extends ComponentConfig {
  */
 class MusoraStandardEndScreenItem extends Component<MusoraStandardEndScreenItemConfig> {
 
+  countdownTimer: NodeJS.Timeout;
+  countdownValue: number;
+
   constructor(config: MusoraStandardEndScreenItemConfig) {
     super(config);
 
@@ -104,6 +186,56 @@ class MusoraStandardEndScreenItem extends Component<MusoraStandardEndScreenItemC
       cssClass: 'ui-musora-standard-end-screen-item',
       itemConfig: null, // this must be passed in from outside
     }, this.config);
+  }
+
+  setupTimer(duration: number): void {
+    this.countdownValue = duration;
+    this.countdownTimer = setInterval(() => {
+      this.countdownValue--;
+
+      const timerElement = document.querySelector(`.${this.prefixCss('timer')}`);
+      if (timerElement) {
+        timerElement.textContent = this.countdownValue.toString();
+      }
+      if (this.countdownValue <= 0) {
+        clearInterval(this.countdownTimer);
+      }
+    }, 1000);
+  }
+
+  onClose(): void {
+    if (this.config.parentEndScreen) {
+      this.config.parentEndScreen.hide();
+    }
+  }
+
+  onCancel(): void {
+    if (window.bitmovin.customMessageHandler) {
+      window.bitmovin.customMessageHandler.sendAsynchronous('onEndScreenCancel');
+    }
+  }
+
+  onAction(): void {
+    if (window.bitmovin.customMessageHandler) {
+      window.bitmovin.customMessageHandler.sendAsynchronous('onEndScreenAction');
+    }
+  }
+}
+
+interface UpNextData {
+  title: string;
+  subtitle: string;
+  thumbnail: string;
+  delay: number;
+}
+
+class MusoraUpNextEndScreenItem extends MusoraStandardEndScreenItem {
+  data: UpNextData;
+
+  constructor(config: MusoraStandardEndScreenItemConfig, data: UpNextData) {
+    super(config);
+    this.data = data;
+    this.setupTimer(data.delay);
   }
 
   protected toDomElement(): DOM {
@@ -116,29 +248,25 @@ class MusoraStandardEndScreenItem extends Component<MusoraStandardEndScreenItemC
     let topRow = new DOM('div', {
       'class': this.prefixCss('top-row'),
     });
-    
+
     let upNextText = new DOM('div', {
       'class': this.prefixCss('up-next-text'),
-    }).html('Up Next in 5');
-    
-    // Simple replay button element
-    let replayButton = new DOM('button', {
-      'class': this.prefixCss('ui-musora-replay-button'),
-    }).html('⟲');
-    
-    // Add click event to restart video and hide end screen
-    replayButton.on('click', () => {
-      if (this.config.player) {
-        this.config.player.seek(0);
-        this.config.player.play();
-      }
-      if (this.config.parentEndScreen) {
-        this.config.parentEndScreen.hide();
-      }
+    }).html('Up Next in ');
+
+    let timer = new DOM('span', {
+      'class': this.prefixCss('timer'),
+    }).html(this.countdownValue.toString());
+
+    upNextText.append(timer);
+
+    let closeButton = new DOM('button', {
+      'class': this.prefixCss('close-button'),
     });
-    
+
+    closeButton.on('click', this.onClose.bind(this));
+
     topRow.append(upNextText);
-    topRow.append(replayButton);
+    topRow.append(closeButton);
     itemElement.append(topRow);
 
     // Row 2: Thumbnail and text content side by side
@@ -150,7 +278,7 @@ class MusoraStandardEndScreenItem extends Component<MusoraStandardEndScreenItemC
     let thumbnail = new DOM('div', {
       'class': this.prefixCss('thumbnail'),
     }).css({
-      'background-image': 'url(https://i.vimeocdn.com/video/2024105170-4d38d750f3deeb57b3e03d5f5df160e40032bd4d5c1b30d2ade46ff1e14f2cd8-d?mw=1100&mh=620)'
+      'background-image': `url(${this.data.thumbnail})`
     });
     contentRow.append(thumbnail);
 
@@ -158,20 +286,20 @@ class MusoraStandardEndScreenItem extends Component<MusoraStandardEndScreenItemC
     let textArea = new DOM('div', {
       'class': this.prefixCss('text-area'),
     });
-    
+
     // Content text container
     let contentText = new DOM('div', {
       'class': this.prefixCss('content-text'),
     });
-    
+
     let title = new DOM('div', {
       'class': this.prefixCss('title'),
-    }).html('Sample Video Title');
-    
+    }).html(this.data.title);
+
     let subtitle = new DOM('div', {
       'class': this.prefixCss('subtitle'),
-    }).html('This is a sample subtitle description for the upcoming video');
-    
+    }).html(this.data.subtitle);
+
     contentText.append(title);
     contentText.append(subtitle);
     textArea.append(contentText);
@@ -185,16 +313,286 @@ class MusoraStandardEndScreenItem extends Component<MusoraStandardEndScreenItemC
       'class': this.prefixCss('cancel-button'),
     }).html('Cancel');
 
+    cancelButton.on('click', this.onCancel.bind(this));
+
     let playNowButton = new DOM('button', {
       'class': this.prefixCss('play-now-button'),
     }).html('Play Now');
 
+    playNowButton.on('click', this.onAction.bind(this));
+
     buttonRow.append(cancelButton);
     buttonRow.append(playNowButton);
-    textArea.append(buttonRow);
-    
+
     contentRow.append(textArea);
     itemElement.append(contentRow);
+    itemElement.append(buttonRow);
+
+    return itemElement;
+  }
+}
+
+interface MethodSessionData {
+  lessons: {
+    thumbnail: string;
+    status: 'completed' | 'next' | 'upcoming';
+  }[];
+  sessionCompleted: boolean;
+  completedText: string;
+  nextLessonDelay: number;
+}
+
+class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
+  data: MethodSessionData;
+
+  constructor(config: MusoraStandardEndScreenItemConfig, data: MethodSessionData) {
+    super(config);
+    this.data = data;
+    this.setupTimer(data.nextLessonDelay);
+  }
+
+  protected toDomElement(): DOM {
+    let itemElement = new DOM('div', {
+      'id': this.config.id,
+      'class': this.getCssClasses(),
+    }, this);
+
+    let topRow = new DOM('div', {
+      'class': this.prefixCss('top-row'),
+    });
+
+    let topTitle = new DOM('div', {
+      'class': this.prefixCss('top-title'),
+    }).html(this.data.sessionCompleted ? 'Method Session Complete!' : "Here's what you did today!");
+
+    let closeButton = new DOM('button', {
+      'class': this.prefixCss('close-button'),
+    });
+
+    closeButton.on('click', this.onClose.bind(this));
+
+    topRow.append(topTitle);
+    topRow.append(closeButton);
+    itemElement.append(topRow);
+
+    // Center row with suggested lessons
+    let contentRow = new DOM('div', {
+      'class': this.prefixCss('content-row'),
+    });
+
+    let thumbnailContainer = new DOM('div', {
+      'class': this.prefixCss('thumbnail-container'),
+    });
+
+    contentRow.append(thumbnailContainer);
+
+    this.data.lessons.forEach(item => {
+      let contentItem = new DOM('div', {
+        'class': this.prefixCss('session-step'),
+      });
+
+      let thumbnail = new DOM('div', {
+        'class': this.prefixCss('thumbnail'),
+      }).css({
+        'background-image': 'url(' + item.thumbnail + ')'
+      });
+
+      if (item.status === 'completed') {
+
+        let cover = new DOM('div', {
+          'class': this.prefixCss('completed'),
+        });
+
+        thumbnail.append(cover);
+      }
+
+      contentItem.append(thumbnail);
+
+      if (!this.data.sessionCompleted) {
+        if (item.status === 'completed') {
+
+          let label = new DOM('div', {
+            'class': `${this.prefixCss(`label`)} ${this.prefixCss('completed')}`,
+          }).html('Completed');
+
+          contentItem.append(label);
+
+        } else if (item.status === 'next') {
+          let label = new DOM('div', {
+            'class': `${this.prefixCss(`label`)} ${this.prefixCss('time')}`,
+          }).html('Starting in ');
+
+          let time = new DOM('span', {
+            'class': this.prefixCss('timer'),
+          }).html(this.countdownValue.toString());
+
+          label.append(time);
+
+          contentItem.append(label);
+        } else if (item.status === 'upcoming') {
+          let label = new DOM('div', {
+            'class': `${this.prefixCss(`label`)}`,
+          }).html('Upcoming');
+
+          contentItem.append(label);
+        }
+      }
+
+      thumbnailContainer.append(contentItem);
+    });
+
+    if (this.data.sessionCompleted) {
+      let completeText = new DOM('div', {
+        'class': this.prefixCss('complete-text'),
+      }).html(this.data.completedText);
+
+      contentRow.append(completeText);
+    }
+
+    itemElement.append(contentRow);
+
+    // Button row inside text area
+    let buttonRow = new DOM('div', {
+      'class': this.prefixCss('button-row'),
+    });
+
+    let cancelButton = new DOM('button', {
+      'class': this.prefixCss('cancel-button'),
+    }).html('Cancel');
+
+    cancelButton.on('click', this.onCancel.bind(this));
+
+    let playNowButton = new DOM('button', {
+      'class': this.prefixCss('play-now-button'),
+    }).html('Play Now');
+
+    playNowButton.on('click', this.onAction.bind(this));
+
+    buttonRow.append(cancelButton);
+    buttonRow.append(playNowButton);
+
+    itemElement.append(buttonRow);
+
+    return itemElement;
+  }
+}
+
+interface AwardData {
+  award: string;
+  lessons: number;
+  minutes: number;
+  skills: number;
+}
+
+class MusoraAwardEndScreenItem extends MusoraStandardEndScreenItem {
+  data: AwardData;
+
+  constructor(config: MusoraStandardEndScreenItemConfig, data: AwardData) {
+    super(config);
+    this.data = data;
+  }
+
+  protected toDomElement(): DOM {
+    let itemElement = new DOM('div', {
+      'id': this.config.id,
+      'class': this.getCssClasses(),
+    }, this);
+
+    // Top row with title and close button
+    let topRow = new DOM('div', {
+      'class': this.prefixCss('top-row'),
+    });
+
+    let topTitle = new DOM('div', {
+      'class': this.prefixCss('top-title'),
+    }).html("Great job! Learning Path Complete!");
+
+    let closeButton = new DOM('button', {
+      'class': this.prefixCss('close-button'),
+    });
+
+    closeButton.on('click', this.onClose.bind(this));
+
+    topRow.append(topTitle);
+    topRow.append(closeButton);
+    itemElement.append(topRow);
+
+    // Center row with award & info
+    let contentRow = new DOM('div', {
+      'class': this.prefixCss('content-row'),
+    });
+
+    let award = new DOM('div', {
+      'class': this.prefixCss('award'),
+    }).css({
+      'background-image': 'url(' + this.data.award + ')'
+    });
+
+    contentRow.append(award);
+
+    let info = new DOM('div', {
+      'class': this.prefixCss('info'),
+    });
+
+    let lessons = new DOM('div', {
+      'class': this.prefixCss('lessons'),
+    })
+      .append(new DOM('span', {
+        'class': this.prefixCss('info-count')
+      }).html(`${this.data.lessons}`))
+      .append(new DOM('span', {
+        'class': this.prefixCss('info-label')
+      }).html(' Lessons Completed'));
+
+    let minutes = new DOM('div', {
+      'class': this.prefixCss('minutes'),
+    })
+      .append(new DOM('span', {
+        'class': this.prefixCss('info-count')
+      }).html(`${this.data.minutes}`))
+      .append(new DOM('span', {
+        'class': this.prefixCss('info-label')
+      }).html(' Minutes Practiced'));
+
+    let skills = new DOM('div', {
+      'class': this.prefixCss('skills'),
+    })
+      .append(new DOM('span', {
+        'class': this.prefixCss('info-count')
+      }).html(`${this.data.skills}`))
+      .append(new DOM('span', {
+        'class': this.prefixCss('info-label')
+      }).html(' Skills Learned'));
+
+    info.append(lessons);
+    info.append(minutes);
+    info.append(skills);
+
+    contentRow.append(info);
+
+    itemElement.append(contentRow);
+
+    // Bottom row with buttons
+    let buttonRow = new DOM('div', {
+      'class': this.prefixCss('button-row'),
+    });
+
+    let cancelButton = new DOM('button', {
+      'class': this.prefixCss('cancel-button'),
+    }).html('Go TO METHOD');
+
+    cancelButton.on('click', this.onCancel.bind(this));
+
+    let playNowButton = new DOM('button', {
+      'class': this.prefixCss('action-button'),
+    }).html('START NEXT PATH');
+
+    playNowButton.on('click', this.onAction.bind(this));
+
+    buttonRow.append(cancelButton);
+    buttonRow.append(playNowButton);
+
+    itemElement.append(buttonRow);
 
     return itemElement;
   }
