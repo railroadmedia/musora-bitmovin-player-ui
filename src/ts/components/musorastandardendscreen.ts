@@ -274,6 +274,7 @@ interface MethodSessionData {
     status: 'completed' | 'next' | 'upcoming';
   }[];
   sessionCompleted: boolean;
+  completedText: string;
 }
 
 class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
@@ -296,7 +297,7 @@ class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
 
     let topTitle = new DOM('div', {
       'class': this.prefixCss('top-title'),
-    }).html("Here's what to do today!");
+    }).html(this.data.sessionCompleted ? 'Method Session Complete!' : "Here's what you did today!");
 
     let closeButton = new DOM('button', {
       'class': this.prefixCss('close-button'),
@@ -312,6 +313,12 @@ class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
     let contentRow = new DOM('div', {
       'class': this.prefixCss('content-row'),
     });
+
+    let thumbnailContainer = new DOM('div', {
+      'class': this.prefixCss('thumbnail-container'),
+    });
+
+    contentRow.append(thumbnailContainer);
 
     this.data.lessons.forEach(item => {
       let contentItem = new DOM('div', {
@@ -335,37 +342,47 @@ class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
 
       contentItem.append(thumbnail);
 
-      if (item.status === 'completed') {
+      if (!this.data.sessionCompleted) {
+        if (item.status === 'completed') {
 
-        let label = new DOM('div', {
-          'class': `${this.prefixCss(`label`)} ${this.prefixCss('completed')}`,
-        }).html('Completed');
+          let label = new DOM('div', {
+            'class': `${this.prefixCss(`label`)} ${this.prefixCss('completed')}`,
+          }).html('Completed');
 
-        contentItem.append(label);
+          contentItem.append(label);
 
-      } else if (item.status === 'next') {
-        let label = new DOM('div', {
-          'class': `${this.prefixCss(`label`)} ${this.prefixCss('timer')}`,
-        }).html('Starting in ');
+        } else if (item.status === 'next') {
+          let label = new DOM('div', {
+            'class': `${this.prefixCss(`label`)} ${this.prefixCss('timer')}`,
+          }).html('Starting in ');
 
-        // TODO: make this count down.
-        let time = new DOM('span', {
-          'class': this.prefixCss('time'),
-        }).html('5');
+          // TODO: make this count down.
+          let time = new DOM('span', {
+            'class': this.prefixCss('time'),
+          }).html('5');
 
-        label.append(time);
+          label.append(time);
 
-        contentItem.append(label);
-      } else if (item.status === 'upcoming') {
-        let label = new DOM('div', {
-          'class': `${this.prefixCss(`label`)}`,
-        }).html('Upcoming');
+          contentItem.append(label);
+        } else if (item.status === 'upcoming') {
+          let label = new DOM('div', {
+            'class': `${this.prefixCss(`label`)}`,
+          }).html('Upcoming');
 
-        contentItem.append(label);
+          contentItem.append(label);
+        }
       }
 
-      contentRow.append(contentItem);
+      thumbnailContainer.append(contentItem);
     });
+
+    if (this.data.sessionCompleted) {
+      let completeText = new DOM('div', {
+        'class': this.prefixCss('complete-text'),
+      }).html(this.data.completedText);
+
+      contentRow.append(completeText);
+    }
 
     itemElement.append(contentRow);
 
