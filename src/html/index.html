@@ -119,9 +119,10 @@
       title: 'Sintel',
       description: 'A woman, Sintel, is attacked while traveling through a wintry mountainside. After defeating her attacker and taking his spear, she finds refuge in a shaman\'s hut...',
       markers: [
-        {time: 20, title: 'Intro'},
-        {time: 102, title: 'Lisa', duration: 30},
-        {time: 200, title: 'Marker'},
+        {time: 0, title: 'First one', duration: 19},
+        {time: 20, title: 'Intro', duration: 81},
+        {time: 102, title: 'Lisa', duration: 97},
+        {time: 200, title: 'Marker', duration: 90},
       ],
       recommendations: [
         {title: 'Recommendation 1: The best video ever', url: 'http://bitmovin.com', thumbnail: 'http://placehold.it/300x300', duration: 10.4},
@@ -203,6 +204,9 @@
 
   var config = {
     key: '20c0fb26-e0b8-45d6-9e7f-472e698dd4c6',
+    playback: {
+      muted: true,
+    },
     ui: false,
     remotecontrol: {
       type: 'googlecast',
