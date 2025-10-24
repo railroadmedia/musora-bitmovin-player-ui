@@ -176,58 +176,71 @@
     
       .#{$prefix}-content-row {
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
         justify-content: center;
         align-items: center;
-        margin-bottom: 28px;
-        gap: 8px;
+        gap: 12px;
 
-        .#{$prefix}-session-step {
+        .#{$prefix}-thumbnail-container {
           display: flex;
-          flex-direction: column;
-          // justify-content: start;
-          // align-items: center;
-          // margin-bottom: 28px;
-          
-          .#{$prefix}-thumbnail {
-            width: 115px;
-            height: 65px;
-            background-size: cover;
-            background-position: center;
-            border-radius: 4px;
-            flex-shrink: 0;
+          flex-direction: row;
+          justify-content: center;
+          align-items: center;
+          gap: 8px;
 
-            .#{$prefix}-completed {
-              width: 100%;
-              height: 100%;
-              background-color: #0C152466;
-
-              background-image: url('../../assets/skin-modern/images/check.svg');
-              background-size: 40%;
-              background-position: center;
-              background-repeat: no-repeat;
-            }
-          }
+          .#{$prefix}-session-step {
+            display: flex;
+            flex-direction: column;
             
-          .#{$prefix}-label {
-            font-family: "Open Sans", sans-serif;
-            text-overflow: ellipsis;
-            font-size: 12px;
-            font-style: normal;
-            font-weight: 400;
-            line-height: normal;
-          
-            &.#{$prefix}-completed {
-              color: #666E7D;
-            }
-          
-            &.#{$prefix}-timer {
+            .#{$prefix}-thumbnail {
+              width: 115px;
+              height: 65px;
+              background-size: cover;
+              background-position: center;
+              border-radius: 4px;
+              flex-shrink: 0;
 
-              .#{$prefix}-time {
-                font-weight: 700;
+              .#{$prefix}-completed {
+                width: 100%;
+                height: 100%;
+                background-color: #0C152466;
+
+                background-image: url('../../assets/skin-modern/images/check.svg');
+                background-size: 40%;
+                background-position: center;
+                background-repeat: no-repeat;
+              }
+            }
+              
+            .#{$prefix}-label {
+              font-family: "Open Sans", sans-serif;
+              text-overflow: ellipsis;
+              font-size: 12px;
+              font-style: normal;
+              font-weight: 400;
+              line-height: normal;
+            
+              &.#{$prefix}-completed {
+                color: #666E7D;
+              }
+            
+              &.#{$prefix}-timer {
+
+                .#{$prefix}-time {
+                  font-weight: 700;
+                }
               }
             }
           }
+        }
+
+        .#{$prefix}-complete-text {
+          color: #FFF;
+          font-family: "Open Sans", sans-serif;
+          font-size: 12px;
+          font-style: normal;
+          font-weight: 400;
+          line-height: normal;
         }
       }
     
