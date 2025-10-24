@@ -175,6 +175,9 @@ interface MusoraStandardEndScreenItemConfig extends ComponentConfig {
  */
 class MusoraStandardEndScreenItem extends Component<MusoraStandardEndScreenItemConfig> {
 
+  countdownTimer: NodeJS.Timeout;
+  countdownValue: number;
+
   constructor(config: MusoraStandardEndScreenItemConfig) {
     super(config);
 
@@ -182,6 +185,21 @@ class MusoraStandardEndScreenItem extends Component<MusoraStandardEndScreenItemC
       cssClass: 'ui-musora-standard-end-screen-item',
       itemConfig: null, // this must be passed in from outside
     }, this.config);
+  }
+
+  setupTimer(duration: number): void {
+    this.countdownValue = duration;
+    this.countdownTimer = setInterval(() => {
+      this.countdownValue--;
+
+      const timerElement = document.querySelector(`.${this.prefixCss('timer')}`);
+      if (timerElement) {
+        timerElement.textContent = this.countdownValue.toString();
+      }
+      if (this.countdownValue <= 0) {
+        clearInterval(this.countdownTimer);
+      }
+    }, 1000);
   }
 
   onClose(): void {
@@ -207,7 +225,7 @@ interface UpNextData {
   title: string;
   subtitle: string;
   thumbnail: string;
-  duration: number;
+  delay: number;
 }
 
 class MusoraUpNextEndScreenItem extends MusoraStandardEndScreenItem {
@@ -216,6 +234,7 @@ class MusoraUpNextEndScreenItem extends MusoraStandardEndScreenItem {
   constructor(config: MusoraStandardEndScreenItemConfig, data: UpNextData) {
     super(config);
     this.data = data;
+    this.setupTimer(data.delay);
   }
 
   protected toDomElement(): DOM {
@@ -233,10 +252,9 @@ class MusoraUpNextEndScreenItem extends MusoraStandardEndScreenItem {
       'class': this.prefixCss('up-next-text'),
     }).html('Up Next in ');
 
-    // TODO: make this count down.
     let timer = new DOM('span', {
       'class': this.prefixCss('timer'),
-    }).html(this.data.duration.toString());
+    }).html(this.countdownValue.toString());
 
     upNextText.append(timer);
 
@@ -320,6 +338,7 @@ interface MethodSessionData {
   }[];
   sessionCompleted: boolean;
   completedText: string;
+  nextLessonDelay: number;
 }
 
 class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
@@ -328,6 +347,7 @@ class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
   constructor(config: MusoraStandardEndScreenItemConfig, data: MethodSessionData) {
     super(config);
     this.data = data;
+    this.setupTimer(data.nextLessonDelay);
   }
 
   protected toDomElement(): DOM {
@@ -398,13 +418,12 @@ class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
 
         } else if (item.status === 'next') {
           let label = new DOM('div', {
-            'class': `${this.prefixCss(`label`)} ${this.prefixCss('timer')}`,
+            'class': `${this.prefixCss(`label`)} ${this.prefixCss('time')}`,
           }).html('Starting in ');
 
-          // TODO: make this count down.
           let time = new DOM('span', {
-            'class': this.prefixCss('time'),
-          }).html('5');
+            'class': this.prefixCss('timer'),
+          }).html(this.countdownValue.toString());
 
           label.append(time);
 
