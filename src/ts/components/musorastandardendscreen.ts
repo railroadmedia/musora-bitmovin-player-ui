@@ -269,10 +269,11 @@ class MusoraUpNextEndScreenItem extends MusoraStandardEndScreenItem {
 }
 
 interface MethodSessionData {
-  lessons: [{
+  lessons: {
     thumbnail: string;
     status: 'completed' | 'next' | 'upcoming';
-  }];
+  }[];
+  sessionCompleted: boolean;
 }
 
 class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
