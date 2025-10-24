@@ -108,7 +108,7 @@ export class MusoraStandardEndScreen extends Container<ContainerConfig> {
     //   title: 'Chorus & Outro',
     //   subtitle: 'Dreamfall',
     //   thumbnail: 'https://i.vimeocdn.com/video/2024105170-4d38d750f3deeb57b3e03d5f5df160e40032bd4d5c1b30d2ade46ff1e14f2cd8-d?mw=1100&mh=620',
-    //   duration: 5,
+    //   delay: 5,
     // });
     // setupMethodSessionScreen({
     //   lessons: [
@@ -127,6 +127,7 @@ export class MusoraStandardEndScreen extends Container<ContainerConfig> {
     //   ],
     //   sessionCompleted: true,
     //   completedText: '🎉  Great job! Today’s Method session has been completed.',
+    //   nextLessonDelay: 5,
     // });
     // setupAwardEndScreen({
     //   award: 'https://cdn.sanity.io/files/4032r8py/staging/9470587f03479b7c1f8019c3cbcbdfe12aa267f3.png',
