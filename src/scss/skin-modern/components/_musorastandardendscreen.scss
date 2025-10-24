@@ -224,10 +224,10 @@
                 color: #666E7D;
               }
             
-              &.#{$prefix}-timer {
+              &.#{$prefix}-time {
 
-                .#{$prefix}-time {
-                  font-weight: 700;
+                .#{$prefix}-timer {
+                  font-weight: bold;
                 }
               }
             }
