@@ -189,6 +189,9 @@ class MusoraStandardEndScreenItem extends Component<MusoraStandardEndScreenItemC
   }
 
   setupTimer(duration: number): void {
+    if (this.countdownTimer) {
+      clearInterval(this.countdownTimer);
+    }
     this.countdownValue = duration;
     this.countdownTimer = setInterval(() => {
       this.countdownValue--;
@@ -198,6 +201,7 @@ class MusoraStandardEndScreenItem extends Component<MusoraStandardEndScreenItemC
         timerElement.textContent = this.countdownValue.toString();
       }
       if (this.countdownValue <= 0) {
+        this.onAction();
         clearInterval(this.countdownTimer);
       }
     }, 1000);
