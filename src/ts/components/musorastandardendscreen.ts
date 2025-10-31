@@ -208,12 +208,18 @@ class MusoraStandardEndScreenItem extends Component<MusoraStandardEndScreenItemC
   }
 
   onClose(): void {
+    if (this.countdownTimer) {
+      clearInterval(this.countdownTimer);
+    }
     if (this.config.parentEndScreen) {
       this.config.parentEndScreen.hide();
     }
   }
 
   onCancel(): void {
+    if (this.countdownTimer) {
+      clearInterval(this.countdownTimer);
+    }
     if (window.bitmovin.customMessageHandler) {
       window.bitmovin.customMessageHandler.sendAsynchronous('onEndScreenCancel');
     }
