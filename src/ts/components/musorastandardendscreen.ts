@@ -225,6 +225,12 @@ class MusoraStandardEndScreenItem extends Component<MusoraStandardEndScreenItemC
     }
   }
 
+  onReplay(): void {
+    if (window.bitmovin?.customMessageHandler) {
+      window.bitmovin.customMessageHandler.sendAsynchronous('onEndScreenReplay');
+    }
+  }
+
   onAction(): void {
     if (window.bitmovin.customMessageHandler) {
       window.bitmovin.customMessageHandler.sendAsynchronous('onEndScreenAction');
@@ -247,6 +253,9 @@ interface UpNextData {
 
 class MusoraUpNextEndScreenItem extends MusoraStandardEndScreenItem {
   data: UpNextData;
+  private upNextTextElement: DOM | null = null;
+  private cancelButtonElement: DOM | null = null;
+  private cancelButtonHandler: (() => void) | null = null;
 
   constructor(config: MusoraStandardEndScreenItemConfig, data: UpNextData) {
     super(config);
@@ -274,6 +283,7 @@ class MusoraUpNextEndScreenItem extends MusoraStandardEndScreenItem {
     }).html(this.countdownValue.toString());
 
     upNextText.append(timer);
+    this.upNextTextElement = upNextText;
 
     let closeButton = new DOM('button', {
       'class': this.prefixCss('close-button'),
@@ -330,7 +340,9 @@ class MusoraUpNextEndScreenItem extends MusoraStandardEndScreenItem {
       'class': this.prefixCss('cancel-button'),
     }).html('Cancel');
 
-    cancelButton.on('click', this.onCancel.bind(this));
+    this.cancelButtonHandler = this.onCancel.bind(this);
+    cancelButton.on('click', this.cancelButtonHandler);
+    this.cancelButtonElement = cancelButton;
 
     let playNowButton = new DOM('button', {
       'class': this.prefixCss('play-now-button'),
@@ -347,6 +359,18 @@ class MusoraUpNextEndScreenItem extends MusoraStandardEndScreenItem {
 
     return itemElement;
   }
+
+  onCancel(): void {
+    super.onCancel();
+    if (this.upNextTextElement) {
+      this.upNextTextElement.html('Up Next');
+    }
+    if (this.cancelButtonElement && this.cancelButtonHandler) {
+      this.cancelButtonElement.html('Replay');
+      this.cancelButtonElement.off('click', this.cancelButtonHandler);
+      this.cancelButtonElement.on('click', this.onReplay.bind(this));
+    }
+  }
 }
 
 interface MethodSessionData {
@@ -361,6 +385,9 @@ interface MethodSessionData {
 
 class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
   data: MethodSessionData;
+  private nextLabelElement: DOM | null = null;
+  private cancelButtonElement: DOM | null = null;
+  private cancelButtonHandler: (() => void) | null = null;
 
   constructor(config: MusoraStandardEndScreenItemConfig, data: MethodSessionData) {
     super(config);
@@ -446,6 +473,7 @@ class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
           }).html(this.countdownValue.toString());
 
           label.append(time);
+          this.nextLabelElement = label;
 
           contentItem.append(label);
         } else if (item.status === 'upcoming') {
@@ -479,7 +507,9 @@ class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
       'class': this.prefixCss('cancel-button'),
     }).html('Cancel');
 
-    cancelButton.on('click', this.onCancel.bind(this));
+    this.cancelButtonHandler = this.onCancel.bind(this);
+    cancelButton.on('click', this.cancelButtonHandler);
+    this.cancelButtonElement = cancelButton;
 
     let playNowButton = new DOM('button', {
       'class': this.prefixCss('play-now-button'),
@@ -493,6 +523,19 @@ class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
     itemElement.append(buttonRow);
 
     return itemElement;
+  }
+
+  onCancel(): void {
+    super.onCancel();
+    if (this.nextLabelElement) {
+      this.nextLabelElement.html('Up Next');
+      this.nextLabelElement.removeClass(this.prefixCss('time'));
+    }
+    if (this.cancelButtonElement && this.cancelButtonHandler) {
+      this.cancelButtonElement.html('Replay');
+      this.cancelButtonElement.off('click', this.cancelButtonHandler);
+      this.cancelButtonElement.on('click', this.onReplay.bind(this));
+    }
   }
 }
 
