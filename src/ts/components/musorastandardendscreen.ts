@@ -230,6 +230,12 @@ class MusoraStandardEndScreenItem extends Component<MusoraStandardEndScreenItemC
       window.bitmovin.customMessageHandler.sendAsynchronous('onEndScreenAction');
     }
   }
+
+  onCardPress(index: number): void {
+    if (window.bitmovin.customMessageHandler) {
+      window.bitmovin.customMessageHandler.sendAsynchronous('onCardPress', JSON.stringify({ index }));
+    }
+  }
 }
 
 interface UpNextData {
@@ -290,6 +296,7 @@ class MusoraUpNextEndScreenItem extends MusoraStandardEndScreenItem {
     }).css({
       'background-image': `url(${this.data.thumbnail})`
     });
+    thumbnail.on('click', this.onCardPress.bind(this, 0));
     contentRow.append(thumbnail);
 
     // Text area with title, subtitle, and buttons
@@ -396,7 +403,7 @@ class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
 
     contentRow.append(thumbnailContainer);
 
-    this.data.lessons.forEach(item => {
+    this.data.lessons.forEach((item, index) => {
       let contentItem = new DOM('div', {
         'class': this.prefixCss('session-step'),
       });
@@ -406,6 +413,8 @@ class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
       }).css({
         'background-image': 'url(' + item.thumbnail + ')'
       });
+
+      thumbnail.on('click', this.onCardPress.bind(this, index));
 
       if (item.status === 'completed') {
 
