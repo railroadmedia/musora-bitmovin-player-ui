@@ -392,7 +392,9 @@ class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
   constructor(config: MusoraStandardEndScreenItemConfig, data: MethodSessionData) {
     super(config);
     this.data = data;
-    this.setupTimer(data.nextLessonDelay);
+    if (!data.sessionCompleted) {
+      this.setupTimer(data.nextLessonDelay);
+    }
   }
 
   protected toDomElement(): DOM {
@@ -443,7 +445,7 @@ class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
 
       thumbnail.on('click', this.onCardPress.bind(this, index));
 
-      if (item.status === 'completed') {
+      if (item.status === 'completed' || this.data.sessionCompleted) {
 
         let cover = new DOM('div', {
           'class': this.prefixCss('completed'),
@@ -505,7 +507,7 @@ class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
 
     let cancelButton = new DOM('button', {
       'class': this.prefixCss('cancel-button'),
-    }).html('Cancel');
+    }).html(this.data.sessionCompleted ? 'Back to Home' : 'Cancel');
 
     this.cancelButtonHandler = this.onCancel.bind(this);
     cancelButton.on('click', this.cancelButtonHandler);
@@ -513,7 +515,7 @@ class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
 
     let playNowButton = new DOM('button', {
       'class': this.prefixCss('play-now-button'),
-    }).html('Play Now');
+    }).html(this.data.sessionCompleted ? 'Keep Going' : 'Play Now');
 
     playNowButton.on('click', this.onAction.bind(this));
 
