@@ -126,8 +126,10 @@ export class HugePlaybackToggleButton extends PlaybackToggleButton {
       player.seek(0);
       setTimeout(() => {
         player.play('ui');
-        player.pause('ui');
       }, 100);
+      setTimeout(() => {
+        player.pause('ui');
+      }, 200);
     })
 
     const suppressPlayButtonTransitionAnimation = () => {
