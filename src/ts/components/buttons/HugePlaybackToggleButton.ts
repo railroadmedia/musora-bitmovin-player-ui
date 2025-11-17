@@ -1,7 +1,6 @@
 import { PlaybackToggleButton, PlaybackToggleButtonConfig } from './PlaybackToggleButton';
-import { DOM } from '../../DOM';
 import { UIInstanceManager } from '../../UIManager';
-import { PlayerAPI, PlayerEventBase, WarningEvent } from 'bitmovin-player';
+import { PlayerAPI, WarningEvent } from 'bitmovin-player';
 import { i18n } from '../../localization/i18n';
 
 /**
@@ -124,6 +123,14 @@ export class HugePlaybackToggleButton extends PlaybackToggleButton {
         firstPlay = true;
       }
     });
+
+    player.on(player.exports.PlayerEvent.PlaybackFinished, () => {
+      player.seek(0);
+      setTimeout(() => {
+        player.play('ui');
+        player.pause('ui');
+      }, 100);
+    })
 
     const suppressPlayButtonTransitionAnimation = () => {
       // Disable the current animation
