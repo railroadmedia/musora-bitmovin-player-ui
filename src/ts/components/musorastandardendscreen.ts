@@ -122,10 +122,10 @@ export class MusoraStandardEndScreen extends Container<ContainerConfig> {
     //     },
     //     {
     //       thumbnail: 'https://i.vimeocdn.com/video/2024105170-4d38d750f3deeb57b3e03d5f5df160e40032bd4d5c1b30d2ade46ff1e14f2cd8-d?mw=1100&mh=620',
-    //       status: 'upcoming',
+    //       status: 'locked',
     //     },
     //   ],
-    //   sessionCompleted: true,
+    //   sessionCompleted: false,
     //   completedText: '🎉  Great job! Today’s Method session has been completed.',
     //   nextLessonDelay: 5,
     // });
@@ -376,7 +376,7 @@ class MusoraUpNextEndScreenItem extends MusoraStandardEndScreenItem {
 interface MethodSessionData {
   lessons: {
     thumbnail: string;
-    status: 'completed' | 'next' | 'upcoming';
+    status: 'completed' | 'next' | 'upcoming' | 'locked';
   }[];
   sessionCompleted: boolean;
   completedText: string;
@@ -454,6 +454,14 @@ class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
         thumbnail.append(cover);
       }
 
+      if (item.status === 'locked') {
+        let cover = new DOM('div', {
+          'class': this.prefixCss('locked'),
+        });
+
+        thumbnail.append(cover);
+      }
+
       contentItem.append(thumbnail);
 
       if (!this.data.sessionCompleted) {
@@ -482,6 +490,12 @@ class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
           let label = new DOM('div', {
             'class': `${this.prefixCss(`label`)}`,
           }).html('Upcoming');
+
+          contentItem.append(label);
+        } else if (item.status === 'locked') {
+          let label = new DOM('div', {
+            'class': `${this.prefixCss(`label`)} ${this.prefixCss('locked')}`,
+          }).html('Locked');
 
           contentItem.append(label);
         }
