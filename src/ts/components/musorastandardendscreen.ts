@@ -452,9 +452,7 @@ class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
         });
 
         thumbnail.append(cover);
-      }
-
-      if (item.status === 'locked') {
+      } else if (item.status === 'locked') {
         let cover = new DOM('div', {
           'class': this.prefixCss('locked'),
         });
