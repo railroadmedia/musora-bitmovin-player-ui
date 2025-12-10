@@ -245,6 +245,24 @@
           }
         }
 
+        .#{$prefix}-complete-container {
+          display: flex;
+          flex-direction: row;
+          justify-content: center;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .#{$prefix}-complete-image {
+          width: 24px;
+          aspect-ratio: 1;
+          display: block;
+          margin: 0 auto;
+          background-image: url('../../assets/skin-modern/images/session-complete.svg');
+          background-position: center;
+          background-repeat: no-repeat;
+        }
+
         .#{$prefix}-complete-text {
           color: #FFF;
           font-family: "Open Sans", sans-serif;

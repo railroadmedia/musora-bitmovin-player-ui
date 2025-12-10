@@ -505,11 +505,21 @@ class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
     });
 
     if (this.data.sessionCompleted) {
+      let completeContainer = new DOM('div', {
+        'class': this.prefixCss('complete-container'),
+      });
+
+      let completeImage = new DOM('div', {
+        'class': this.prefixCss('complete-image'),
+      }).html('');
+
       let completeText = new DOM('div', {
         'class': this.prefixCss('complete-text'),
       }).html(this.data.completedText);
 
-      contentRow.append(completeText);
+      completeContainer.append(completeImage);
+      completeContainer.append(completeText);
+      contentRow.append(completeContainer);
     }
 
     itemElement.append(contentRow);
