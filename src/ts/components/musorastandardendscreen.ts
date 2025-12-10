@@ -125,8 +125,8 @@ export class MusoraStandardEndScreen extends Container<ContainerConfig> {
     //       status: 'locked',
     //     },
     //   ],
-    //   sessionCompleted: false,
-    //   completedText: '🎉  Great job! Today’s Method session has been completed.',
+    //   sessionCompleted: true,
+    //   completedText: 'Great job! Today’s Method session has been completed.',
     //   nextLessonDelay: 5,
     // });
     // setupAwardEndScreen({
