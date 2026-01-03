@@ -334,6 +334,7 @@
           cursor: pointer;
           transition: all $animation-duration-short ease;
           height: 30px;
+          letter-spacing: 1px;
         }
     
         .#{$prefix}-cancel-button {
@@ -438,6 +439,7 @@
           cursor: pointer;
           transition: all $animation-duration-short ease;
           height: 30px;
+          letter-spacing: 1px;
         }
     
         .#{$prefix}-cancel-button {
