@@ -449,7 +449,7 @@ class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
 
     let topTitle = new DOM('div', {
       'class': this.prefixCss('top-title'),
-    }).html(this.data.sessionCompleted ? 'Method Session Complete!' : "Here's what you did today!");
+    }).html(this.data.sessionCompleted ? 'Method Session Complete!' : "Here's What To Do Today");
 
     let closeButton = new DOM('button', {
       'class': this.prefixCss('close-button'),
