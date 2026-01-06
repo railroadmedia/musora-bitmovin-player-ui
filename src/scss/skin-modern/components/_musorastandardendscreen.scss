@@ -13,11 +13,15 @@
   > .#{$prefix}-container-wrapper {
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: stretch;
     height: 100%;
+    width: 100%;
     flex: 1;
     background-color: $color-musora-button;
-    padding: 0 16px;
+    padding: 16px 16px 24px 16px;
+    max-width: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
   }
 
   &.#{$prefix}-recommendations {
@@ -48,12 +52,36 @@
       }
     }
 
+    .#{$prefix}-back-button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: $color-primary;
+      flex-shrink: 0;
+      display: none; // Hidden by default
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      transition: all $animation-duration-short ease;
+      background-image: url('../../assets/skin-modern/images/chev-left.svg');
+      background-size: 16px;
+      background-position: center;
+      background-repeat: no-repeat;
+
+      &:active {
+        transform: scale(0.95);
+      }
+    }
+
     .#{$prefix}-musora-up-next-end-screen-item {
       flex: 1;
       display: flex;
       flex-direction: column;
+      width: 100%;
+      height: 100%;
       justify-content: space-between;
-      aspect-ratio: 2;
 
       .#{$prefix}-top-row {
         display: flex;
@@ -62,7 +90,7 @@
 
         .#{$prefix}-up-next-text {
           text-align: left;
-          font-size: 14px;
+          font-size: clamp(14px, 2vw, 16px);
           color: $color-primary;
           flex: 1;
 
@@ -75,15 +103,17 @@
       .#{$prefix}-content-row {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: clamp(8px, 3vw, 16px);
 
         .#{$prefix}-thumbnail {
           width: 160px;
-          height: 90px;
+          height: auto;
+          aspect-ratio: 16 / 9;
           background-size: cover;
           background-position: center;
           border-radius: 4px;
           flex-shrink: 0;
+          max-width: 340px;
         }
 
         .#{$prefix}-text-area {
@@ -91,14 +121,14 @@
           text-align: left;
 
           .#{$prefix}-title {
-            font-size: 14px;
+            font-size: clamp(14px, 3vw, 16px);
             font-weight: bold;
             color: $color-primary;
             line-height: 1.3;
           }
 
           .#{$prefix}-subtitle {
-            font-size: 12px;
+            font-size: clamp(12px, 2.5vw, 14px);
             color: $color-secondary;
             line-height: 1.4;
           }
@@ -122,6 +152,7 @@
         .#{$prefix}-cancel-button,
         .#{$prefix}-play-now-button {
           flex: 1;
+          max-width: 320px;
           display: flex;
           justify-content: center;
           align-items: center;
@@ -154,7 +185,6 @@
       display: flex;
       justify-content: space-between;
       flex-direction: column;
-      aspect-ratio: 2;
 
       .#{$prefix}-top-row {
         display: flex;
@@ -164,9 +194,8 @@
     
         .#{$prefix}-top-title {
           text-align: center;
-          font-size: 14px;
+          font-size: clamp(14px, 2.5vw, 18px);
           color: $color-primary;
-          margin-bottom: 0;
           flex: 1;
           color: #FFF;
           font-family: "Open Sans", sans-serif;
@@ -180,21 +209,27 @@
         justify-content: center;
         align-items: center;
         gap: 12px;
+        flex: 1;
+        width: 100%;
 
         .#{$prefix}-thumbnail-container {
           display: flex;
           flex-direction: row;
           justify-content: center;
           align-items: center;
-          gap: 8px;
+          gap: clamp(8px, 2vh, 15px);
+          flex-wrap: wrap;
+          width: 100%;
 
           .#{$prefix}-session-step {
+            flex: 1;
             display: flex;
             flex-direction: column;
             
             .#{$prefix}-thumbnail {
-              width: 115px;
-              height: 65px;
+              width: 100%;
+              height: auto;
+              aspect-ratio: 16 / 9;
               background-size: cover;
               background-position: center;
               border-radius: 4px;
@@ -226,7 +261,7 @@
             .#{$prefix}-label {
               font-family: "Open Sans", sans-serif;
               text-overflow: ellipsis;
-              font-size: 12px;
+              font-size: clamp(12px, 2.2vw, 14px);
               font-style: normal;
               font-weight: 400;
               line-height: normal;
@@ -250,17 +285,18 @@
           flex-direction: row;
           justify-content: center;
           align-items: center;
-          gap: 8px;
+          gap: clamp(8px, 2vw, 16px);
         }
 
         .#{$prefix}-complete-image {
-          width: 24px;
+          width: clamp(20px, 3vw, 28px);
           aspect-ratio: 1;
           display: block;
           margin: 0 auto;
           background-image: url('../../assets/skin-modern/images/session-complete.svg');
           background-position: center;
           background-repeat: no-repeat;
+          background-size: contain;
         }
 
         .#{$prefix}-complete-text {
@@ -285,6 +321,7 @@
         .#{$prefix}-cancel-button,
         .#{$prefix}-play-now-button {
           flex: 1;
+          max-width: 320px;
           display: flex;
           justify-content: center;
           align-items: center;
@@ -297,6 +334,7 @@
           cursor: pointer;
           transition: all $animation-duration-short ease;
           height: 30px;
+          letter-spacing: 1px;
         }
     
         .#{$prefix}-cancel-button {
@@ -318,7 +356,10 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      aspect-ratio: 2;
+      max-width: 100%;
+      max-height: 100%;
+      min-height: 0;
+      width: 100%;
     
       .#{$prefix}-top-row {
         display: flex;
@@ -327,7 +368,7 @@
     
         .#{$prefix}-top-title {
           text-align: center;
-          font-size: 14px;
+          font-size: clamp(14px, 2.5vw, 16px);
           color: $color-primary;
           flex: 1;
           color: #FFF;
@@ -344,9 +385,9 @@
         gap: 16px;
 
         .#{$prefix}-award {
-          height: 96px;
+          height: clamp(96px, 18vh, 170px);
           aspect-ratio: 0.9;
-          background-size: cover;
+          background-size: contain;
           background-position: center;
           border-radius: 4px;
         }
@@ -359,9 +400,9 @@
 
           color: #FFF;
           font-family: "Open Sans", sans-serif;
-          font-size: 12px;
+          font-size: clamp(12px, 2.5vw, 16px);
           font-style: normal;
-          line-height: 24px;
+          line-height: clamp(24px, 4vh, 32px);
 
           .#{$prefix}-info-count {
             font-weight: 800;
@@ -398,6 +439,7 @@
           cursor: pointer;
           transition: all $animation-duration-short ease;
           height: 30px;
+          letter-spacing: 1px;
         }
     
         .#{$prefix}-cancel-button {
@@ -433,4 +475,196 @@
 // Fallback for browsers that don't support :has() selector
 .#{$prefix}-ui-skin-musora.#{$prefix}-ui-skin-smallscreen .#{$prefix}-ui-musora-standard-end-screen:not(.#{$prefix}-hidden) ~ .#{$prefix}-ui-titlebar {
   display: none;
+}
+
+// Landscape styles - Applied when landscape class is present
+// This class is set via 'setLandscapeMode' message from React Native
+.#{$prefix}-ui-musora-standard-end-screen.#{$prefix}-landscape {
+  &.#{$prefix}-recommendations {
+    > .#{$prefix}-container-wrapper {
+      position: relative;
+      padding: 30px 30px;
+    }
+
+    .#{$prefix}-musora-up-next-end-screen-item .#{$prefix}-top-row .#{$prefix}-back-button,
+    .#{$prefix}-musora-method-session-end-screen-item .#{$prefix}-top-row .#{$prefix}-back-button {
+      display: flex !important;
+    }
+
+    .#{$prefix}-musora-up-next-end-screen-item {
+        .#{$prefix}-top-row {
+          .#{$prefix}-up-next-text {
+            font-size: 16px;
+            margin-left: 16px;
+          }
+        }
+
+        .#{$prefix}-content-row {
+          .#{$prefix}-thumbnail {
+            width: 60%;
+            max-width: 340px;
+          }
+
+          .#{$prefix}-text-area {
+            .#{$prefix}-title {
+              font-size: 16px;
+            }
+
+            .#{$prefix}-subtitle {
+              font-size: 14px;
+            }
+          }
+        }
+      }
+
+    .#{$prefix}-musora-method-session-end-screen-item {
+      padding: 30px;
+
+      .#{$prefix}-top-row {
+        padding-left: 0px;
+      }
+    }
+
+    .#{$prefix}-musora-award-end-screen-item {
+      .#{$prefix}-content-row {
+        gap: 24px;
+
+        .#{$prefix}-award {
+          height: 175px;
+        }
+
+        .#{$prefix}-info {
+          font-size: 16px;
+          line-height: 24px;
+        }
+      }
+
+      .#{$prefix}-button-row {
+        max-width: 430px;
+        align-self: center;
+      }
+    }
+  }
+}
+
+// Tablet mode - constrain content items when tablet class is present
+// This class is set via setTabletMode() method or 'setTabletMode' message from React Native
+.#{$prefix}-ui-musora-standard-end-screen.#{$prefix}-tablet {
+  &.#{$prefix}-recommendations {
+    > .#{$prefix}-container-wrapper {
+      position: relative;
+    }
+
+    // Constrain the content items to be smaller and centered
+    .#{$prefix}-musora-up-next-end-screen-item,
+    .#{$prefix}-musora-method-session-end-screen-item,
+    .#{$prefix}-musora-award-end-screen-item {
+      max-width: min(65vw, 600px);
+      max-height: 65vh;
+      width: auto;
+      height: auto;
+      min-width: min(400px, 60vw);
+      min-height: min(300px, 55vh);
+      margin: auto;
+      border-radius: 8px;
+      overflow: visible;
+    }
+
+    > .#{$prefix}-container-wrapper {
+      .#{$prefix}-musora-up-next-end-screen-item .#{$prefix}-back-button,
+      .#{$prefix}-musora-method-session-end-screen-item .#{$prefix}-back-button {
+        position: absolute;
+        top: clamp(12px, 2vh, 20px);
+        left: clamp(12px, 2vw, 20px);
+        z-index: 1001;
+        display: flex !important;
+      }
+
+      .#{$prefix}-musora-up-next-end-screen-item .#{$prefix}-close-button,
+      .#{$prefix}-musora-method-session-end-screen-item .#{$prefix}-close-button,
+      .#{$prefix}-musora-award-end-screen-item .#{$prefix}-close-button {
+        position: absolute;
+        top: clamp(12px, 2vh, 20px);
+        right: clamp(12px, 2vw, 20px);
+        z-index: 1001;
+      }
+    }
+
+    .#{$prefix}-musora-up-next-end-screen-item {
+      .#{$prefix}-top-row {
+        .#{$prefix}-up-next-text {
+          text-align: center;
+          font-size: 16px;
+        }
+      }
+    }
+
+    .#{$prefix}-musora-up-next-end-screen-item {
+      .#{$prefix}-content-row {
+        .#{$prefix}-thumbnail {
+          width: 170px;
+        }
+      }
+    }
+
+    .#{$prefix}-musora-award-end-screen-item {
+      .#{$prefix}-content-row {
+        gap: 24px;
+
+        .#{$prefix}-award {
+          height: 145px;
+        }
+
+        .#{$prefix}-info {
+          font-size: 14px;
+          line-height: 20px;
+        }
+      }
+
+      .#{$prefix}-button-row {
+        max-width: 365px;
+        align-self: center;
+      }
+    }
+  }
+}
+
+// Small screen adjustments
+@media (max-width: 600px) {
+  .#{$prefix}-ui-musora-standard-end-screen {
+    > .#{$prefix}-container-wrapper {
+      padding: 16px 16px 24px 16px;
+      align-items: stretch;
+    }
+
+    &.#{$prefix}-recommendations {
+      .#{$prefix}-musora-up-next-end-screen-item,
+      .#{$prefix}-musora-method-session-end-screen-item,
+      .#{$prefix}-musora-award-end-screen-item {
+        gap: clamp(8px, 1.5vh, 12px);
+      }
+
+      .#{$prefix}-musora-up-next-end-screen-item {
+        .#{$prefix}-content-row {
+          flex-direction: row;
+          gap: 8px;
+          align-items: center;
+          
+          .#{$prefix}-thumbnail {
+            width: 130px;
+            height: auto;
+            aspect-ratio: 16 / 9;
+            flex-shrink: 0;
+          }
+
+        }
+      }
+
+      .#{$prefix}-musora-method-session-end-screen-item {
+        .#{$prefix}-button-row {
+          margin-top: 8px;
+        }
+      }
+    }
+  }
 }

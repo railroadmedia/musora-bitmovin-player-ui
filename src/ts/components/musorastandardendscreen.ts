@@ -157,6 +157,24 @@ export class MusoraStandardEndScreen extends Container<ContainerConfig> {
       window.bitmovin.customMessageHandler.on('hideEndScreen', (data?: string) => {
         this.hide();
       });
+
+      window.bitmovin.customMessageHandler.on('setTabletMode', (data?: string) => {
+        const isTablet = data ? JSON.parse(data) : true;
+        if (isTablet) {
+          this.getDomElement().addClass(this.prefixCss('tablet'));
+        } else {
+          this.getDomElement().removeClass(this.prefixCss('tablet'));
+        }
+      });
+
+      window.bitmovin.customMessageHandler.on('setLandscapeMode', (data?: string) => {
+        const isLandscape = data ? JSON.parse(data) : true;
+        if (isLandscape) {
+          this.getDomElement().addClass(this.prefixCss('landscape'));
+        } else {
+          this.getDomElement().removeClass(this.prefixCss('landscape'));
+        }
+      });
     }
   }
 }
@@ -213,6 +231,15 @@ class MusoraStandardEndScreenItem extends Component<MusoraStandardEndScreenItemC
     }
     if (this.config.parentEndScreen) {
       this.config.parentEndScreen.hide();
+    }
+  }
+
+  onBack(): void {
+    if (this.countdownTimer) {
+      clearInterval(this.countdownTimer);
+    }
+    if (window.bitmovin.customMessageHandler) {
+      window.bitmovin.customMessageHandler.sendAsynchronous('onEndScreenBack');
     }
   }
 
@@ -274,6 +301,12 @@ class MusoraUpNextEndScreenItem extends MusoraStandardEndScreenItem {
       'class': this.prefixCss('top-row'),
     });
 
+    let backButton = new DOM('button', {
+      'class': this.prefixCss('back-button'),
+    });
+
+    backButton.on('click', this.onBack.bind(this));
+
     let upNextText = new DOM('div', {
       'class': this.prefixCss('up-next-text'),
     }).html('Up Next in ');
@@ -291,6 +324,7 @@ class MusoraUpNextEndScreenItem extends MusoraStandardEndScreenItem {
 
     closeButton.on('click', this.onClose.bind(this));
 
+    topRow.append(backButton);
     topRow.append(upNextText);
     topRow.append(closeButton);
     itemElement.append(topRow);
@@ -407,9 +441,15 @@ class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
       'class': this.prefixCss('top-row'),
     });
 
+    let backButton = new DOM('button', {
+      'class': this.prefixCss('back-button'),
+    });
+
+    backButton.on('click', this.onBack.bind(this));
+
     let topTitle = new DOM('div', {
       'class': this.prefixCss('top-title'),
-    }).html(this.data.sessionCompleted ? 'Method Session Complete!' : "Here's what you did today!");
+    }).html(this.data.sessionCompleted ? 'Method Session Complete!' : "Here's What To Do Today");
 
     let closeButton = new DOM('button', {
       'class': this.prefixCss('close-button'),
@@ -417,6 +457,7 @@ class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
 
     closeButton.on('click', this.onClose.bind(this));
 
+    topRow.append(backButton);
     topRow.append(topTitle);
     topRow.append(closeButton);
     itemElement.append(topRow);
