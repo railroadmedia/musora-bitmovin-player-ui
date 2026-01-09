@@ -11,6 +11,17 @@ import {
   MobileV3PlayerEvent,
   MobileV3SourceErrorEvent,
 } from '../../utils/MobileV3PlayerAPI';
+import { Button, ButtonConfig } from '../buttons/Button';
+import { ErrorBackground } from '../ErrorBackground';
+
+declare const window: {
+  bitmovin?: {
+    customMessageHandler?: {
+      sendSynchronous: (message: string, payload?: string) => string;
+      sendAsynchronous: (message: string, payload?: string) => void;
+    };
+  };
+};
 
 export interface ErrorMessageTranslator {
   (error: ErrorEvent | MobileV3PlayerErrorEvent): string;
@@ -90,19 +101,24 @@ export interface ErrorMessageOverlayConfig extends ContainerConfig {
  */
 export class ErrorMessageOverlay extends Container<ErrorMessageOverlayConfig> {
   private errorLabel: Label<LabelConfig>;
-  private tvNoiseBackground: TvNoiseCanvas;
+  private background: ErrorBackground;
+  private retryButton: Button<ButtonConfig>;
 
   constructor(config: ErrorMessageOverlayConfig = {}) {
     super(config);
 
     this.errorLabel = new Label<LabelConfig>({ cssClass: 'ui-errormessage-label' });
-    this.tvNoiseBackground = new TvNoiseCanvas();
+    this.background = new ErrorBackground();
+    this.retryButton = new Button<ButtonConfig>({
+      cssClass: 'ui-errormessage-retry-button',
+      text: 'Retry',
+    });
 
     this.config = this.mergeConfig(
       config,
       {
         cssClass: 'ui-errormessage-overlay',
-        components: [this.tvNoiseBackground, this.errorLabel],
+        components: [this.background, this.errorLabel, this.retryButton],
         hidden: true,
         role: 'status',
       },
@@ -114,6 +130,13 @@ export class ErrorMessageOverlay extends Container<ErrorMessageOverlayConfig> {
     super.configure(player, uimanager);
 
     const config = this.getConfig();
+
+    // Configure retry button to reload the source when clicked
+    this.retryButton.onClick.subscribe(() => {
+      if (window.bitmovin.customMessageHandler) {
+        window.bitmovin.customMessageHandler.sendAsynchronous('retryLoad');
+      }
+    });
 
     const handleErrorMessage = (
       event: ErrorEvent | MobileV3SourceErrorEvent | MobileV3PlayerErrorEvent,
@@ -151,7 +174,8 @@ export class ErrorMessageOverlay extends Container<ErrorMessageOverlayConfig> {
 
   display(errorMessage: string): void {
     this.errorLabel.setText(errorMessage);
-    this.tvNoiseBackground.start();
+    this.errorLabel.setText('Video unavailable. Please try again.');
+    this.background.start();
     this.show();
   }
 
@@ -159,7 +183,6 @@ export class ErrorMessageOverlay extends Container<ErrorMessageOverlayConfig> {
     this.errorLabel.setText('');
 
     // Canvas rendering must be explicitly stopped, else it just continues forever and hogs resources
-    this.tvNoiseBackground.stop();
     this.hide();
   }
 
