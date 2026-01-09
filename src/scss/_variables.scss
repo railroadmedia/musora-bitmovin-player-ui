@@ -12,7 +12,11 @@ $color-red: #f00 !default;
 /**
  * Accent color to highlight certain elements.
  */
-$color-highlight: #fff !default;
+$color-highlight: #ffae00 !default; //Musora orange
+/**
+ * Musora button color
+ */
+$color-musora-button: #0c1524 !default; //Musora black
 /**
  * Primary text color
  */
@@ -36,7 +40,7 @@ $color-background-text: rgba(20, 20, 20, 0.8);
 /**
  * Color for visualizing focus on elements
  */
-$color-focus: transparentize($color-highlight, 0.8) !default;
+$color-focus: #e69a00;
 
 /**
  * Background color for Settings Panel title rows
