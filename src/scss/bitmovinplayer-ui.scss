@@ -33,6 +33,7 @@
 @import 'components/overlays/error-message-overlay';
 @import 'components/title-bar';
 @import 'components/overlays/recommendation-overlay';
+@import 'components/musorastandardendscreen';
 @import 'components/overlays/click-overlay';
 @import 'components/overlays/click-to-dismiss-overlay';
 @import 'components/buttons/huge-replay-button';
@@ -74,7 +75,6 @@
 
   &.#{$prefix}-player-state-finished {
     .#{$prefix}-ui-titlebar,
-    .#{$prefix}-ui-controlbar,
     .#{$prefix}-ui-hugeplaybacktogglebutton,
     .#{$prefix}-ui-smallcenteredplaybacktogglebutton {
       display: none;

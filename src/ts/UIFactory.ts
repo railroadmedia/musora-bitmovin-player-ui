@@ -38,7 +38,7 @@ import { MetadataLabel, MetadataLabelContent } from './components/labels/Metadat
 import { PlayerUtils } from './utils/PlayerUtils';
 import { CastUIContainer } from './components/CastUIContainer';
 import { UIConditionContext, UIManager } from './UIManager';
-import { UIConfig } from './UIConfig';
+import { TimelineMarker, UIConfig } from './UIConfig';
 import { PlayerAPI } from 'bitmovin-player';
 import { i18n } from './localization/i18n';
 import { SubtitleListBox } from './components/lists/SubtitleListBox';
@@ -55,6 +55,16 @@ import { AdMessageLabel } from './components/ads/AdMessageLabel';
 import { FocusableContainer } from './spatialnavigation/FocusableContainer';
 import { BrowserUtils } from './utils/BrowserUtils';
 import { RecommendationOverlayNavigationGroup } from './spatialnavigation/RecommendationOverlayNavigationGroup';
+import { MusoraStandardEndScreen } from './components/musorastandardendscreen';
+import { CloseButton } from './components/buttons/CloseButton';
+
+declare const window: {
+  bitmovin: {
+    customMessageHandler: {
+      on: (event: string, callback: (data?: string) => void) => void;
+    };
+  };
+};
 
 /**
  * Provides factory methods to create Bitmovin provided UIs.
@@ -82,47 +92,53 @@ export namespace UIFactory {
       player,
       [
         {
-          ui: emptyStateUILayout(),
-          condition: context => {
-            return !context.isSourceLoaded;
-          },
-        },
-        {
-          ui: smallScreenAdsUILayout(),
+          ui: musoraSmallScreenUILayout(),
           condition: (context: UIConditionContext) => {
-            return context.documentWidth < smallScreenSwitchWidth && context.isAd && context.adRequiresUi;
+            return true;
           },
         },
-        {
-          ui: smallScreenUILayout(),
-          condition: (context: UIConditionContext) => {
-            return !context.isAd && !context.adRequiresUi && context.documentWidth < smallScreenSwitchWidth;
-          },
-        },
-        {
-          ...tvAdsUILayout(),
-          condition: (context: UIConditionContext) => {
-            return context.isTv && context.isAd && context.adRequiresUi;
-          },
-        },
-        {
-          ...tvUILayout(),
-          condition: (context: UIConditionContext) => {
-            return context.isTv && !context.isAd && !context.adRequiresUi;
-          },
-        },
-        {
-          ui: adsUILayout(),
-          condition: (context: UIConditionContext) => {
-            return context.isAd && context.adRequiresUi;
-          },
-        },
-        {
-          ui: uiLayout(config),
-          condition: (context: UIConditionContext) => {
-            return !context.isAd && !context.adRequiresUi;
-          },
-        },
+        // {
+        //   ui: emptyStateUILayout(),
+        //   condition: context => {
+        //     return !context.isSourceLoaded;
+        //   },
+        // },
+        // {
+        //   ui: smallScreenAdsUILayout(),
+        //   condition: (context: UIConditionContext) => {
+        //     return context.documentWidth < smallScreenSwitchWidth && context.isAd && context.adRequiresUi;
+        //   },
+        // },
+        // {
+        //   ui: smallScreenUILayout(),
+        //   condition: (context: UIConditionContext) => {
+        //     return !context.isAd && !context.adRequiresUi && context.documentWidth < smallScreenSwitchWidth;
+        //   },
+        // },
+        // {
+        //   ...tvAdsUILayout(),
+        //   condition: (context: UIConditionContext) => {
+        //     return context.isTv && context.isAd && context.adRequiresUi;
+        //   },
+        // },
+        // {
+        //   ...tvUILayout(),
+        //   condition: (context: UIConditionContext) => {
+        //     return context.isTv && !context.isAd && !context.adRequiresUi;
+        //   },
+        // },
+        // {
+        //   ui: adsUILayout(),
+        //   condition: (context: UIConditionContext) => {
+        //     return context.isAd && context.adRequiresUi;
+        //   },
+        // },
+        // {
+        //   ui: uiLayout(config),
+        //   condition: (context: UIConditionContext) => {
+        //     return !context.isAd && !context.adRequiresUi;
+        //   },
+        // },
       ],
       config,
     );
@@ -158,6 +174,34 @@ export namespace UIFactory {
       ],
       config,
     );
+  }
+
+  export function buildMusoraUI(player: PlayerAPI, config: UIConfig = {}): UIManager {
+    const manager = new UIManager(
+      player,
+      [
+        {
+          ui: musoraSmallScreenUILayout(),
+          condition: (context: UIConditionContext) => {
+            return true;
+          },
+        },
+      ],
+      config,
+    );
+
+    if (window.bitmovin.customMessageHandler) {
+      window.bitmovin.customMessageHandler.on('setChapterMarkers', (data?: string) => {
+        const markers = JSON.parse(data) as TimelineMarker[];
+        manager.getConfig().metadata.markers = [];
+
+        markers.forEach((marker: TimelineMarker) => {
+          manager.addTimelineMarker(marker);
+        });
+      });
+    }
+
+    return manager;
   }
 
   /**
@@ -466,6 +510,112 @@ function smallScreenAdsUILayout() {
       PlayerUtils.PlayerState.Finished,
     ],
     cssClasses: ['ui-smallscreen', 'ui-ads'],
+  });
+}
+
+export function musoraSmallScreenUILayout() {
+  const subtitleOverlay = new SubtitleOverlay();
+
+  // const mainSettingsPanelPage = new SettingsPanelPage({
+  //   components: [
+  //     new SettingsPanelItem({ label: i18n.getLocalizer('settings.video.quality'), settingComponent: new VideoQualitySelectBox() }),
+  //     new SettingsPanelItem({ label: i18n.getLocalizer('speed'), settingComponent: new PlaybackSpeedSelectBox() }),
+  //     new SettingsPanelItem({ label: i18n.getLocalizer('settings.audio.track'), settingComponent: new AudioTrackSelectBox() }),
+  //     new SettingsPanelItem({ label: i18n.getLocalizer('settings.audio.quality'), settingComponent: new AudioQualitySelectBox() }),
+  //   ],
+  // });
+
+  // const settingsPanel = new SettingsPanel({
+  //   components: [mainSettingsPanelPage],
+  //   hidden: true,
+  //   pageTransitionAnimation: false,
+  //   hideDelay: -1,
+  // });
+
+  const settingsPanel = buildDefaultSettingsPanel(subtitleOverlay, -1);
+
+  // const subtitleSettingsPanelPage = new SubtitleSettingsPanelPage({
+  //   settingsPanel: settingsPanel,
+  //   overlay: subtitleOverlay,
+  // });
+
+  // const subtitleSettingsOpenButton = new SettingsPanelPageOpenButton({
+  //   targetPage: subtitleSettingsPanelPage,
+  //   container: settingsPanel,
+  //   ariaLabel: i18n.getLocalizer('settings.subtitles'),
+  //   text: i18n.getLocalizer('open'),
+  // });
+
+  // const subtitleSelectBox = new SubtitleSelectBox();
+
+  // mainSettingsPanelPage.addComponent(
+  //   new SettingsPanelItem(
+  //     new SubtitleSettingsLabel({
+  //       text: i18n.getLocalizer('settings.subtitles'),
+  //       opener: subtitleSettingsOpenButton,
+  //     }),
+  //     subtitleSelectBox,
+  //     {
+  //       role: 'menubar',
+  //     },
+  //   ),
+  // );
+
+  // settingsPanel.addComponent(subtitleSettingsPanelPage);
+
+  settingsPanel.addComponent(new CloseButton({ target: settingsPanel }));
+  // subtitleSettingsPanelPage.addComponent(new CloseButton({ target: settingsPanel }));
+
+  const titleBar = new TitleBar({
+    components: [
+      new CastToggleButton(),
+      new VRToggleButton(),
+      new PictureInPictureToggleButton(),
+      new AirPlayToggleButton(),
+      new VolumeToggleButton(),
+      new SettingsToggleButton({ settingsPanel: settingsPanel }),
+      new FullscreenToggleButton(),
+    ],
+  });
+
+  const controlBar = new ControlBar({
+    components: [
+      new Container({
+        components: [
+          new PlaybackTimeLabel({
+            timeLabelMode: PlaybackTimeLabelMode.CurrentTime,
+            hideInLivePlayback: true,
+          }),
+          new SeekBar({ label: new SeekBarLabel() }),
+          new PlaybackTimeLabel({
+            timeLabelMode: PlaybackTimeLabelMode.TotalTime,
+            cssClasses: ['text-right'],
+          }),
+        ],
+        cssClasses: ['controlbar-top'],
+      }),
+    ],
+  });
+
+  return new UIContainer({
+    components: [
+      subtitleOverlay,
+      new BufferingOverlay(),
+      new CastStatusOverlay(),
+      new PlaybackToggleOverlay(),
+      new MusoraStandardEndScreen(),
+      controlBar,
+      titleBar,
+      settingsPanel,
+      new ErrorMessageOverlay(),
+    ],
+    cssClasses: ['ui-skin-musora', 'ui-skin-smallscreen'],
+    hideDelay: 2000,
+    hidePlayerStateExceptions: [
+      PlayerUtils.PlayerState.Prepared,
+      PlayerUtils.PlayerState.Paused,
+      PlayerUtils.PlayerState.Finished,
+    ],
   });
 }
 

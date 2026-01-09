@@ -18,7 +18,7 @@
 
   .#{$prefix}-container-wrapper {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     // sass-lint:disable no-misspelled-properties
     row-gap: 0.5em;
   }
