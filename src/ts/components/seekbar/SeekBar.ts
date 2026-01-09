@@ -896,6 +896,13 @@ export class SeekBar extends Component<SeekBarConfig> {
 
       this.setSeekPosition(0);
 
+      // Update active marker based on current playback position when leaving seekbar
+      const handler = this.timelineMarkersHandler;
+      if (handler && this.player) {
+        const currentTime = this.getRelativeCurrentTime();
+        handler.updateActiveMarkerForPlayback(currentTime);
+      }
+
       if (this.hasLabel()) {
         this.getLabel().hide();
       }
@@ -997,6 +1004,12 @@ export class SeekBar extends Component<SeekBarConfig> {
 
     // Set position of the bar
     this.setPosition(this.seekBarPlaybackPosition, percent);
+
+    // Update active marker based on current playback time (only when not seeking)
+    if (this.timelineMarkersHandler && this.player && !this.isSeeking()) {
+      const currentTime = this.getRelativeCurrentTime();
+      this.timelineMarkersHandler.updateActiveMarkerForPlayback(currentTime);
+    }
 
     // Set position of the marker
     const totalSize = this.config.vertical
@@ -1183,6 +1196,14 @@ export class SeekBar extends Component<SeekBarConfig> {
 
   protected onSeekedEvent(percentage: number) {
     this.clearAllThickenedMarkers();
+
+    // Update active marker based on new playback position after seek
+    const handler = this.timelineMarkersHandler;
+    if (handler && this.player) {
+      const currentTime = this.getRelativeCurrentTime();
+      handler.updateActiveMarkerForPlayback(currentTime);
+    }
+
     this.seekBarEvents.onSeeked.dispatch(this, percentage);
   }
 
