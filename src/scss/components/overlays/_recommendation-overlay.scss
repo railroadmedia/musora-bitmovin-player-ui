@@ -7,7 +7,7 @@
   @include layout-cover;
   @include hidden-animated($animation-duration * 2);
 
-  background-color: $color-background-dimmed;
+  height: 75%;
 
   .#{$prefix}-container-wrapper {
     display: flex;
