@@ -32,7 +32,7 @@ export interface HTMLElementWithComponent extends HTMLElement {
  *
  * Built with the help of: http://youmightnotneedjquery.com/
  */
-export class DOM {
+export class DOM<Config extends ComponentConfig = ComponentConfig> {
   private readonly documentOrShadowRoot: Document | ShadowRoot;
 
   /**
@@ -47,7 +47,7 @@ export class DOM {
    * @param attributes a list of attributes of the element
    * @param component the {@link Component} the DOM element is associated with
    */
-  constructor(tagName: string, attributes: { [name: string]: string }, component?: Component<ComponentConfig>);
+  constructor(tagName: string, attributes: { [name: string]: string }, component?: Component<Config>);
   /**
    * Selects all elements from the DOM that match the specified selector.
    * @param selector the selector to match DOM elements with

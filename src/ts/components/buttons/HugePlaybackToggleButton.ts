@@ -125,6 +125,16 @@ export class HugePlaybackToggleButton extends PlaybackToggleButton {
       }
     });
 
+    player.on(player.exports.PlayerEvent.PlaybackFinished, () => {
+      player.seek(0);
+      setTimeout(() => {
+        player.play('ui');
+      }, 100);
+      setTimeout(() => {
+        player.pause('ui');
+      }, 200);
+    });
+
     const suppressPlayButtonTransitionAnimation = () => {
       // Disable the current animation
       this.setTransitionAnimationsEnabled(false);

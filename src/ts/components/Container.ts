@@ -68,7 +68,7 @@ export class Container<Config extends ContainerConfig> extends Component<Config>
    * Adds a child component to the container.
    * @param component the component to add
    */
-  addComponent(component: Component<ComponentConfig>) {
+  addComponent<SubConfig extends ComponentConfig>(component: Component<SubConfig>) {
     this.config.components.push(component);
     this.componentsToAppend.push(component);
   }
@@ -87,7 +87,7 @@ export class Container<Config extends ContainerConfig> extends Component<Config>
    * @param component the component to remove
    * @returns {boolean} true if the component has been removed, false if it is not contained in this container
    */
-  removeComponent(component: Component<ComponentConfig>): boolean {
+  removeComponent<SubConfig extends ComponentConfig>(component: Component<SubConfig>): boolean {
     if (ArrayUtils.remove(this.config.components, component) != null) {
       this.componentsToRemove.push(component);
       return true;
