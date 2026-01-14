@@ -158,6 +158,14 @@ export class MusoraStandardEndScreen extends Container<ContainerConfig> {
         this.hide();
       });
 
+      window.bitmovin.customMessageHandler.on('stopCountdown', () => {
+        this.getComponents().forEach((component) => {
+          if (component instanceof MusoraStandardEndScreenItem) {
+            component.stopTimer();
+          }
+        });
+      });
+
       window.bitmovin.customMessageHandler.on('setTabletMode', (data?: string) => {
         const isTablet = data ? JSON.parse(data) : true;
         if (isTablet) {
@@ -212,6 +220,11 @@ class MusoraStandardEndScreenItem extends Component<MusoraStandardEndScreenItemC
     }
     this.countdownValue = duration;
     this.countdownTimer = setInterval(() => {
+      // Check if timer was cleared (stopCountdown was called)
+      if (!this.countdownTimer) {
+        return;
+      }
+      
       this.countdownValue--;
 
       const timerElement = document.querySelector(`.${this.prefixCss('timer')}`);
@@ -219,10 +232,32 @@ class MusoraStandardEndScreenItem extends Component<MusoraStandardEndScreenItemC
         timerElement.textContent = this.countdownValue.toString();
       }
       if (this.countdownValue <= 0) {
-        this.onAction();
-        clearInterval(this.countdownTimer);
+        if (this.countdownTimer && window.bitmovin.customMessageHandler) {
+          window.bitmovin.customMessageHandler.sendAsynchronous(
+            'onEndScreenAutoAction'
+          );
+        }
+        if (this.countdownTimer) {
+          clearInterval(this.countdownTimer);
+          this.countdownTimer = null;
+        }
       }
     }, 1000);
+  }
+
+  stopTimer(): void {
+    // Clear the timer first to prevent race conditions
+    if (this.countdownTimer) {
+      clearInterval(this.countdownTimer);
+      this.countdownTimer = null;
+    }
+    // Update the DOM immediately to reflect the stopped state
+    const timerElement = document.querySelector(`.${this.prefixCss('timer')}`);
+    if (timerElement) {
+      timerElement.textContent = '0';
+    }
+    // Set countdown to 0 to indicate stopped state
+    this.countdownValue = 0;
   }
 
   onClose(): void {
