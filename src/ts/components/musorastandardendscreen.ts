@@ -140,18 +140,115 @@ export class MusoraStandardEndScreen extends Container<ContainerConfig> {
 
     if (window.bitmovin.customMessageHandler) {
       window.bitmovin.customMessageHandler.on('showUpNextEndScreen', (data?: string) => {
-        setupUpNextScreen(JSON.parse(data));
-        this.show();
+
+        // Send confirmation back to React Native with data preview
+        if (window.bitmovin?.customMessageHandler) {
+          window.bitmovin.customMessageHandler.sendAsynchronous('endScreenMessageReceived', JSON.stringify({
+            type: 'upnext',
+            dataLength: data?.length,
+            dataPreview: data?.substring(0, 200),
+            dataEnd: data?.substring(Math.max(0, (data?.length || 0) - 100))
+          }));
+        }
+
+        try {
+          // Decode base64 data
+          const jsonString = atob(data);
+          const parsed = JSON.parse(jsonString);
+
+          setupUpNextScreen(parsed);
+          this.show();
+
+          // Send success confirmation
+          if (window.bitmovin?.customMessageHandler) {
+            window.bitmovin.customMessageHandler.sendAsynchronous('endScreenShown', JSON.stringify({
+              type: 'upnext',
+              isHidden: this.isHidden(),
+              hasClass: this.getDomElement().hasClass(this.prefixCss('recommendations'))
+            }));
+          }
+        } catch (error) {
+          // Send error back to React Native with better error details
+          if (window.bitmovin?.customMessageHandler) {
+            const errorDetails = {
+              type: 'upnext',
+              message: error instanceof Error ? error.message : String(error),
+              stack: error instanceof Error ? error.stack : undefined,
+              name: error instanceof Error ? error.name : undefined,
+              errorType: typeof error,
+              errorString: String(error)
+            };
+            window.bitmovin.customMessageHandler.sendAsynchronous('endScreenError', JSON.stringify(errorDetails));
+          }
+        }
       });
 
       window.bitmovin.customMessageHandler.on('showMethodSessionEndScreen', (data?: string) => {
-        setupMethodSessionScreen(JSON.parse(data));
-        this.show();
+        if (window.bitmovin?.customMessageHandler) {
+          window.bitmovin.customMessageHandler.sendAsynchronous('endScreenMessageReceived', 'method');
+        }
+
+        try {
+          // Decode base64 data
+          const jsonString = atob(data);
+          const parsed = JSON.parse(jsonString);
+          setupMethodSessionScreen(parsed);
+          this.show();
+
+          if (window.bitmovin?.customMessageHandler) {
+            window.bitmovin.customMessageHandler.sendAsynchronous('endScreenShown', JSON.stringify({
+              type: 'method',
+              isHidden: this.isHidden(),
+              hasClass: this.getDomElement().hasClass(this.prefixCss('recommendations'))
+            }));
+          }
+        } catch (error) {
+          if (window.bitmovin?.customMessageHandler) {
+            const errorDetails = {
+              type: 'method',
+              message: error instanceof Error ? error.message : String(error),
+              stack: error instanceof Error ? error.stack : undefined,
+              name: error instanceof Error ? error.name : undefined,
+              errorType: typeof error,
+              errorString: String(error)
+            };
+            window.bitmovin.customMessageHandler.sendAsynchronous('endScreenError', JSON.stringify(errorDetails));
+          }
+        }
       });
 
       window.bitmovin.customMessageHandler.on('showAwardEndScreen', (data?: string) => {
-        setupAwardEndScreen(JSON.parse(data));
-        this.show();
+        if (window.bitmovin?.customMessageHandler) {
+          window.bitmovin.customMessageHandler.sendAsynchronous('endScreenMessageReceived', 'award');
+        }
+
+        try {
+          // Decode base64 data
+          const jsonString = atob(data);
+          const parsed = JSON.parse(jsonString);
+          setupAwardEndScreen(parsed);
+          this.show();
+
+          if (window.bitmovin?.customMessageHandler) {
+            window.bitmovin.customMessageHandler.sendAsynchronous('endScreenShown', JSON.stringify({
+              type: 'award',
+              isHidden: this.isHidden(),
+              hasClass: this.getDomElement().hasClass(this.prefixCss('recommendations'))
+            }));
+          }
+        } catch (error) {
+          if (window.bitmovin?.customMessageHandler) {
+            const errorDetails = {
+              type: 'award',
+              message: error instanceof Error ? error.message : String(error),
+              stack: error instanceof Error ? error.stack : undefined,
+              name: error instanceof Error ? error.name : undefined,
+              errorType: typeof error,
+              errorString: String(error)
+            };
+            window.bitmovin.customMessageHandler.sendAsynchronous('endScreenError', JSON.stringify(errorDetails));
+          }
+        }
       });
 
       window.bitmovin.customMessageHandler.on('hideEndScreen', (data?: string) => {
