@@ -140,21 +140,18 @@ export class MusoraStandardEndScreen extends Container<ContainerConfig> {
 
     if (window.bitmovin.customMessageHandler) {
       window.bitmovin.customMessageHandler.on('showUpNextEndScreen', (data?: string) => {
-
-        // Send confirmation back to React Native with data preview
-        if (window.bitmovin?.customMessageHandler) {
-          window.bitmovin.customMessageHandler.sendAsynchronous('endScreenMessageReceived', JSON.stringify({
-            type: 'upnext',
-            dataLength: data?.length,
-            dataPreview: data?.substring(0, 200),
-            dataEnd: data?.substring(Math.max(0, (data?.length || 0) - 100))
-          }));
-        }
-
         try {
           // Decode base64 data
           const jsonString = atob(data);
           const parsed = JSON.parse(jsonString);
+
+          // Send confirmation back to React Native with decoded data
+          if (window.bitmovin?.customMessageHandler) {
+            window.bitmovin.customMessageHandler.sendAsynchronous('endScreenMessageReceived', JSON.stringify({
+              type: 'upnext',
+              data: parsed
+            }));
+          }
 
           setupUpNextScreen(parsed);
           this.show();
@@ -163,8 +160,7 @@ export class MusoraStandardEndScreen extends Container<ContainerConfig> {
           if (window.bitmovin?.customMessageHandler) {
             window.bitmovin.customMessageHandler.sendAsynchronous('endScreenShown', JSON.stringify({
               type: 'upnext',
-              isHidden: this.isHidden(),
-              hasClass: this.getDomElement().hasClass(this.prefixCss('recommendations'))
+              isHidden: this.isHidden()
             }));
           }
         } catch (error) {
@@ -184,22 +180,25 @@ export class MusoraStandardEndScreen extends Container<ContainerConfig> {
       });
 
       window.bitmovin.customMessageHandler.on('showMethodSessionEndScreen', (data?: string) => {
-        if (window.bitmovin?.customMessageHandler) {
-          window.bitmovin.customMessageHandler.sendAsynchronous('endScreenMessageReceived', 'method');
-        }
-
         try {
           // Decode base64 data
           const jsonString = atob(data);
           const parsed = JSON.parse(jsonString);
+
+          if (window.bitmovin?.customMessageHandler) {
+            window.bitmovin.customMessageHandler.sendAsynchronous('endScreenMessageReceived', JSON.stringify({
+              type: 'method',
+              data: parsed
+            }));
+          }
+
           setupMethodSessionScreen(parsed);
           this.show();
 
           if (window.bitmovin?.customMessageHandler) {
             window.bitmovin.customMessageHandler.sendAsynchronous('endScreenShown', JSON.stringify({
               type: 'method',
-              isHidden: this.isHidden(),
-              hasClass: this.getDomElement().hasClass(this.prefixCss('recommendations'))
+              isHidden: this.isHidden()
             }));
           }
         } catch (error) {
@@ -218,22 +217,25 @@ export class MusoraStandardEndScreen extends Container<ContainerConfig> {
       });
 
       window.bitmovin.customMessageHandler.on('showAwardEndScreen', (data?: string) => {
-        if (window.bitmovin?.customMessageHandler) {
-          window.bitmovin.customMessageHandler.sendAsynchronous('endScreenMessageReceived', 'award');
-        }
-
         try {
           // Decode base64 data
           const jsonString = atob(data);
           const parsed = JSON.parse(jsonString);
+
+          if (window.bitmovin?.customMessageHandler) {
+            window.bitmovin.customMessageHandler.sendAsynchronous('endScreenMessageReceived', JSON.stringify({
+              type: 'award',
+              data: parsed
+            }));
+          }
+
           setupAwardEndScreen(parsed);
           this.show();
 
           if (window.bitmovin?.customMessageHandler) {
             window.bitmovin.customMessageHandler.sendAsynchronous('endScreenShown', JSON.stringify({
               type: 'award',
-              isHidden: this.isHidden(),
-              hasClass: this.getDomElement().hasClass(this.prefixCss('recommendations'))
+              isHidden: this.isHidden()
             }));
           }
         } catch (error) {
