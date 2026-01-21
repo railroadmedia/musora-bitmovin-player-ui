@@ -119,42 +119,42 @@ export class MusoraStandardEndScreen extends Container<ContainerConfig> {
     // uimanager.getConfig().events.onUpdated.subscribe(setupRecommendations);
     // Remove recommendations and hide overlay when source is unloaded
 
-    player.on(PlayerEvent.SourceLoaded, () => {
-      console.log('showing end screen');
-      setupUpNextScreen({
-        title: 'Chorus & Outro',
-        subtitle: 'Dreamfall',
-        thumbnail:
-          'https://i.vimeocdn.com/video/2024105170-4d38d750f3deeb57b3e03d5f5df160e40032bd4d5c1b30d2ade46ff1e14f2cd8-d?mw=1100&mh=620',
-        delay: 5,
-      });
-      // setupMethodSessionScreen({
-      //   lessons: [
-      //     {
-      //       thumbnail: 'https://i.vimeocdn.com/video/2024105170-4d38d750f3deeb57b3e03d5f5df160e40032bd4d5c1b30d2ade46ff1e14f2cd8-d?mw=1100&mh=620',
-      //       status: 'completed',
-      //     },
-      //     {
-      //       thumbnail: 'https://i.vimeocdn.com/video/2024105170-4d38d750f3deeb57b3e03d5f5df160e40032bd4d5c1b30d2ade46ff1e14f2cd8-d?mw=1100&mh=620',
-      //       status: 'next',
-      //     },
-      //     {
-      //       thumbnail: 'https://i.vimeocdn.com/video/2024105170-4d38d750f3deeb57b3e03d5f5df160e40032bd4d5c1b30d2ade46ff1e14f2cd8-d?mw=1100&mh=620',
-      //       status: 'locked',
-      //     },
-      //   ],
-      //   sessionCompleted: true,
-      //   completedText: 'Great job! Today’s Method session has been completed.',
-      //   nextLessonDelay: 5,
-      // });
-      // setupAwardEndScreen({
-      //   award: 'https://cdn.sanity.io/files/4032r8py/staging/9470587f03479b7c1f8019c3cbcbdfe12aa267f3.png',
-      //   lessons: 52,
-      //   minutes: 345,
-      //   skills: 5,
-      // });
-      this.show();
-    });
+    // player.on(PlayerEvent.SourceLoaded, () => {
+    //   console.log('showing end screen');
+    // setupUpNextScreen({
+    //   title: 'Chorus & Outro',
+    //   subtitle: 'Dreamfall',
+    //   thumbnail:
+    //     'https://i.vimeocdn.com/video/2024105170-4d38d750f3deeb57b3e03d5f5df160e40032bd4d5c1b30d2ade46ff1e14f2cd8-d?mw=1100&mh=620',
+    //   delay: 5,
+    // });
+    // setupMethodSessionScreen({
+    //   lessons: [
+    //     {
+    //       thumbnail: 'https://i.vimeocdn.com/video/2024105170-4d38d750f3deeb57b3e03d5f5df160e40032bd4d5c1b30d2ade46ff1e14f2cd8-d?mw=1100&mh=620',
+    //       status: 'completed',
+    //     },
+    //     {
+    //       thumbnail: 'https://i.vimeocdn.com/video/2024105170-4d38d750f3deeb57b3e03d5f5df160e40032bd4d5c1b30d2ade46ff1e14f2cd8-d?mw=1100&mh=620',
+    //       status: 'next',
+    //     },
+    //     {
+    //       thumbnail: 'https://i.vimeocdn.com/video/2024105170-4d38d750f3deeb57b3e03d5f5df160e40032bd4d5c1b30d2ade46ff1e14f2cd8-d?mw=1100&mh=620',
+    //       status: 'locked',
+    //     },
+    //   ],
+    //   sessionCompleted: true,
+    //   completedText: 'Great job! Today’s Method session has been completed.',
+    //   nextLessonDelay: 5,
+    // });
+    // setupAwardEndScreen({
+    //   award: 'https://cdn.sanity.io/files/4032r8py/staging/9470587f03479b7c1f8019c3cbcbdfe12aa267f3.png',
+    //   lessons: 52,
+    //   minutes: 345,
+    //   skills: 5,
+    // });
+    // this.show();
+    // });
 
     if (window.bitmovin?.customMessageHandler) {
       window.bitmovin.customMessageHandler.on('showUpNextEndScreen', (data?: string) => {
@@ -180,6 +180,14 @@ export class MusoraStandardEndScreen extends Container<ContainerConfig> {
 
       window.bitmovin.customMessageHandler.on('hideEndScreen', (data?: string) => {
         this.hide();
+      });
+
+      window.bitmovin.customMessageHandler.on('stopCountdown', () => {
+        this.getComponents().forEach(component => {
+          if (component instanceof MusoraStandardEndScreenItem) {
+            component.stopTimer();
+          }
+        });
       });
 
       window.bitmovin.customMessageHandler.on('setTabletMode', (data?: string) => {
@@ -241,6 +249,11 @@ class MusoraStandardEndScreenItem extends Component<MusoraStandardEndScreenItemC
     }
     this.countdownValue = duration;
     this.countdownTimer = setInterval(() => {
+      // Check if timer was cleared (stopCountdown was called)
+      if (!this.countdownTimer) {
+        return;
+      }
+
       this.countdownValue--;
 
       const timerElement = document.querySelector(`.${this.prefixCss('timer')}`);
@@ -248,10 +261,30 @@ class MusoraStandardEndScreenItem extends Component<MusoraStandardEndScreenItemC
         timerElement.textContent = this.countdownValue.toString();
       }
       if (this.countdownValue <= 0) {
-        this.onAction();
-        clearInterval(this.countdownTimer);
+        if (this.countdownTimer && window.bitmovin.customMessageHandler) {
+          window.bitmovin.customMessageHandler.sendAsynchronous('onEndScreenAutoAction');
+        }
+        if (this.countdownTimer) {
+          clearInterval(this.countdownTimer);
+          this.countdownTimer = null;
+        }
       }
     }, 1000);
+  }
+
+  stopTimer(): void {
+    // Clear the timer first to prevent race conditions
+    if (this.countdownTimer) {
+      clearInterval(this.countdownTimer);
+      this.countdownTimer = null;
+    }
+    // Update the DOM immediately to reflect the stopped state
+    const timerElement = document.querySelector(`.${this.prefixCss('timer')}`);
+    if (timerElement) {
+      timerElement.textContent = '0';
+    }
+    // Set countdown to 0 to indicate stopped state
+    this.countdownValue = 0;
   }
 
   onClose(): void {
