@@ -48,3 +48,18 @@
 .#{$prefix}-container-wrapper > .#{$prefix}-ui-settings-panel {
   margin: 0;
 }
+
+// Product customization: close button in the settings panel (top-right "X")
+.#{$prefix}-ui-settings-panel {
+  // Ensure the close button doesn't overlap the first row of settings.
+  > .#{$prefix}-container-wrapper {
+    padding-top: 2.75em;
+  }
+
+  .#{$prefix}-ui-settings-panel-close {
+    position: absolute;
+    top: 0.5em;
+    right: max(0.5em, env(safe-area-inset-right, 0));
+    z-index: 2;
+  }
+}

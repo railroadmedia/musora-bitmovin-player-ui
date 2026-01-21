@@ -563,7 +563,8 @@ export function musoraSmallScreenUILayout() {
 
   // settingsPanel.addComponent(subtitleSettingsPanelPage);
 
-  settingsPanel.addComponent(new CloseButton({ target: settingsPanel }));
+  // Styled/positioned via SCSS to appear as a top-right "X" in the panel.
+  settingsPanel.prependComponent(new CloseButton({ target: settingsPanel, cssClasses: ['ui-settings-panel-close'] }));
   // subtitleSettingsPanelPage.addComponent(new CloseButton({ target: settingsPanel }));
 
   const titleBar = new TitleBar({
