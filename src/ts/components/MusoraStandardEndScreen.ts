@@ -45,6 +45,13 @@ export class MusoraStandardEndScreen extends Container<ContainerConfig> {
     super.configure(player, uimanager);
     const PlayerEvent = player.exports.PlayerEvent;
 
+    // Helper function to properly decode base64 with UTF-8 support
+    const decodeBase64UTF8 = (base64String: string): string => {
+      const binaryString = atob(base64String);
+      const bytes = Uint8Array.from(binaryString, char => char.charCodeAt(0));
+      return new TextDecoder('utf-8').decode(bytes);
+    };
+
     const clearRecommendations = () => {
       for (const component of this.getComponents().slice()) {
         if (component instanceof MusoraStandardEndScreenItem) {
@@ -159,22 +166,139 @@ export class MusoraStandardEndScreen extends Container<ContainerConfig> {
     if (window.bitmovin?.customMessageHandler) {
       window.bitmovin.customMessageHandler.on('showUpNextEndScreen', (data?: string) => {
         if (data) {
-          setupUpNextScreen(JSON.parse(data));
-          this.show();
+          try {
+            // Decode base64 data with proper UTF-8 handling
+            const jsonString = decodeBase64UTF8(data);
+            const parsed = JSON.parse(jsonString);
+
+            // Send confirmation back to React Native with decoded data
+            if (window.bitmovin?.customMessageHandler) {
+              window.bitmovin.customMessageHandler.sendAsynchronous(
+                'endScreenMessageReceived',
+                JSON.stringify({
+                  type: 'upnext',
+                  data: parsed,
+                }),
+              );
+            }
+
+            setupUpNextScreen(parsed);
+            this.show();
+
+            // Send success confirmation
+            if (window.bitmovin?.customMessageHandler) {
+              window.bitmovin.customMessageHandler.sendAsynchronous(
+                'endScreenShown',
+                JSON.stringify({
+                  type: 'upnext',
+                  isHidden: this.isHidden(),
+                }),
+              );
+            }
+          } catch (error) {
+            // Send error back to React Native with better error details
+            if (window.bitmovin?.customMessageHandler) {
+              const errorDetails = {
+                type: 'upnext',
+                message: error instanceof Error ? error.message : String(error),
+                stack: error instanceof Error ? error.stack : undefined,
+                name: error instanceof Error ? error.name : undefined,
+                errorType: typeof error,
+                errorString: String(error),
+              };
+              window.bitmovin.customMessageHandler.sendAsynchronous('endScreenError', JSON.stringify(errorDetails));
+            }
+          }
         }
       });
 
       window.bitmovin.customMessageHandler.on('showMethodSessionEndScreen', (data?: string) => {
         if (data) {
-          setupMethodSessionScreen(JSON.parse(data));
-          this.show();
+          try {
+            // Decode base64 data with proper UTF-8 handling
+            const jsonString = decodeBase64UTF8(data);
+            const parsed = JSON.parse(jsonString);
+
+            if (window.bitmovin?.customMessageHandler) {
+              window.bitmovin.customMessageHandler.sendAsynchronous(
+                'endScreenMessageReceived',
+                JSON.stringify({
+                  type: 'method',
+                  data: parsed,
+                }),
+              );
+            }
+
+            setupMethodSessionScreen(parsed);
+            this.show();
+
+            if (window.bitmovin?.customMessageHandler) {
+              window.bitmovin.customMessageHandler.sendAsynchronous(
+                'endScreenShown',
+                JSON.stringify({
+                  type: 'method',
+                  isHidden: this.isHidden(),
+                }),
+              );
+            }
+          } catch (error) {
+            if (window.bitmovin?.customMessageHandler) {
+              const errorDetails = {
+                type: 'method',
+                message: error instanceof Error ? error.message : String(error),
+                stack: error instanceof Error ? error.stack : undefined,
+                name: error instanceof Error ? error.name : undefined,
+                errorType: typeof error,
+                errorString: String(error),
+              };
+              window.bitmovin.customMessageHandler.sendAsynchronous('endScreenError', JSON.stringify(errorDetails));
+            }
+          }
         }
       });
 
       window.bitmovin.customMessageHandler.on('showAwardEndScreen', (data?: string) => {
         if (data) {
-          setupAwardEndScreen(JSON.parse(data));
-          this.show();
+          try {
+            // Decode base64 data with proper UTF-8 handling
+            const jsonString = decodeBase64UTF8(data);
+            const parsed = JSON.parse(jsonString);
+
+            if (window.bitmovin?.customMessageHandler) {
+              window.bitmovin.customMessageHandler.sendAsynchronous(
+                'endScreenMessageReceived',
+                JSON.stringify({
+                  type: 'award',
+                  data: parsed,
+                }),
+              );
+            }
+
+            setupAwardEndScreen(parsed);
+            this.show();
+
+            if (window.bitmovin?.customMessageHandler) {
+              window.bitmovin.customMessageHandler.sendAsynchronous(
+                'endScreenShown',
+                JSON.stringify({
+                  type: 'award',
+                  isHidden: this.isHidden(),
+                }),
+              );
+            }
+          } catch (error) {
+            if (window.bitmovin?.customMessageHandler) {
+              const errorDetails = {
+                type: 'award',
+                message: error instanceof Error ? error.message : String(error),
+                stack: error instanceof Error ? error.stack : undefined,
+                name: error instanceof Error ? error.name : undefined,
+                errorType: typeof error,
+                errorString: String(error),
+              };
+              window.bitmovin.customMessageHandler.sendAsynchronous('endScreenError', JSON.stringify(errorDetails));
+            }
+          }
         }
       });
 
