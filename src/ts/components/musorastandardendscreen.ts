@@ -140,18 +140,117 @@ export class MusoraStandardEndScreen extends Container<ContainerConfig> {
 
     if (window.bitmovin.customMessageHandler) {
       window.bitmovin.customMessageHandler.on('showUpNextEndScreen', (data?: string) => {
-        setupUpNextScreen(JSON.parse(data));
-        this.show();
+        try {
+          // Decode base64 data
+          const jsonString = atob(data);
+          const parsed = JSON.parse(jsonString);
+
+          // Send confirmation back to React Native with decoded data
+          if (window.bitmovin?.customMessageHandler) {
+            window.bitmovin.customMessageHandler.sendAsynchronous('endScreenMessageReceived', JSON.stringify({
+              type: 'upnext',
+              data: parsed
+            }));
+          }
+
+          setupUpNextScreen(parsed);
+          this.show();
+
+          // Send success confirmation
+          if (window.bitmovin?.customMessageHandler) {
+            window.bitmovin.customMessageHandler.sendAsynchronous('endScreenShown', JSON.stringify({
+              type: 'upnext',
+              isHidden: this.isHidden()
+            }));
+          }
+        } catch (error) {
+          // Send error back to React Native with better error details
+          if (window.bitmovin?.customMessageHandler) {
+            const errorDetails = {
+              type: 'upnext',
+              message: error instanceof Error ? error.message : String(error),
+              stack: error instanceof Error ? error.stack : undefined,
+              name: error instanceof Error ? error.name : undefined,
+              errorType: typeof error,
+              errorString: String(error)
+            };
+            window.bitmovin.customMessageHandler.sendAsynchronous('endScreenError', JSON.stringify(errorDetails));
+          }
+        }
       });
 
       window.bitmovin.customMessageHandler.on('showMethodSessionEndScreen', (data?: string) => {
-        setupMethodSessionScreen(JSON.parse(data));
-        this.show();
+        try {
+          // Decode base64 data
+          const jsonString = atob(data);
+          const parsed = JSON.parse(jsonString);
+
+          if (window.bitmovin?.customMessageHandler) {
+            window.bitmovin.customMessageHandler.sendAsynchronous('endScreenMessageReceived', JSON.stringify({
+              type: 'method',
+              data: parsed
+            }));
+          }
+
+          setupMethodSessionScreen(parsed);
+          this.show();
+
+          if (window.bitmovin?.customMessageHandler) {
+            window.bitmovin.customMessageHandler.sendAsynchronous('endScreenShown', JSON.stringify({
+              type: 'method',
+              isHidden: this.isHidden()
+            }));
+          }
+        } catch (error) {
+          if (window.bitmovin?.customMessageHandler) {
+            const errorDetails = {
+              type: 'method',
+              message: error instanceof Error ? error.message : String(error),
+              stack: error instanceof Error ? error.stack : undefined,
+              name: error instanceof Error ? error.name : undefined,
+              errorType: typeof error,
+              errorString: String(error)
+            };
+            window.bitmovin.customMessageHandler.sendAsynchronous('endScreenError', JSON.stringify(errorDetails));
+          }
+        }
       });
 
       window.bitmovin.customMessageHandler.on('showAwardEndScreen', (data?: string) => {
-        setupAwardEndScreen(JSON.parse(data));
-        this.show();
+        try {
+          // Decode base64 data
+          const jsonString = atob(data);
+          const parsed = JSON.parse(jsonString);
+
+          if (window.bitmovin?.customMessageHandler) {
+            window.bitmovin.customMessageHandler.sendAsynchronous('endScreenMessageReceived', JSON.stringify({
+              type: 'award',
+              data: parsed
+            }));
+          }
+
+          setupAwardEndScreen(parsed);
+          this.show();
+
+          if (window.bitmovin?.customMessageHandler) {
+            window.bitmovin.customMessageHandler.sendAsynchronous('endScreenShown', JSON.stringify({
+              type: 'award',
+              isHidden: this.isHidden()
+            }));
+          }
+        } catch (error) {
+          if (window.bitmovin?.customMessageHandler) {
+            const errorDetails = {
+              type: 'award',
+              message: error instanceof Error ? error.message : String(error),
+              stack: error instanceof Error ? error.stack : undefined,
+              name: error instanceof Error ? error.name : undefined,
+              errorType: typeof error,
+              errorString: String(error)
+            };
+            window.bitmovin.customMessageHandler.sendAsynchronous('endScreenError', JSON.stringify(errorDetails));
+          }
+        }
       });
 
       window.bitmovin.customMessageHandler.on('hideEndScreen', (data?: string) => {
