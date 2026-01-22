@@ -44,6 +44,13 @@ export class MusoraStandardEndScreen extends Container<ContainerConfig> {
     super.configure(player, uimanager);
     const PlayerEvent = player.exports.PlayerEvent;
 
+    // Helper function to properly decode base64 with UTF-8 support
+    const decodeBase64UTF8 = (base64String: string): string => {
+      const binaryString = atob(base64String);
+      const bytes = Uint8Array.from(binaryString, char => char.charCodeAt(0));
+      return new TextDecoder('utf-8').decode(bytes);
+    };
+
     let clearRecommendations = () => {
       for (let component of this.getComponents().slice()) {
         if (component instanceof MusoraStandardEndScreenItem) {
@@ -141,8 +148,8 @@ export class MusoraStandardEndScreen extends Container<ContainerConfig> {
     if (window.bitmovin.customMessageHandler) {
       window.bitmovin.customMessageHandler.on('showUpNextEndScreen', (data?: string) => {
         try {
-          // Decode base64 data
-          const jsonString = atob(data);
+          // Decode base64 data with proper UTF-8 handling
+          const jsonString = decodeBase64UTF8(data);
           const parsed = JSON.parse(jsonString);
 
           // Send confirmation back to React Native with decoded data
@@ -181,8 +188,8 @@ export class MusoraStandardEndScreen extends Container<ContainerConfig> {
 
       window.bitmovin.customMessageHandler.on('showMethodSessionEndScreen', (data?: string) => {
         try {
-          // Decode base64 data
-          const jsonString = atob(data);
+          // Decode base64 data with proper UTF-8 handling
+          const jsonString = decodeBase64UTF8(data);
           const parsed = JSON.parse(jsonString);
 
           if (window.bitmovin?.customMessageHandler) {
@@ -218,8 +225,8 @@ export class MusoraStandardEndScreen extends Container<ContainerConfig> {
 
       window.bitmovin.customMessageHandler.on('showAwardEndScreen', (data?: string) => {
         try {
-          // Decode base64 data
-          const jsonString = atob(data);
+          // Decode base64 data with proper UTF-8 handling
+          const jsonString = decodeBase64UTF8(data);
           const parsed = JSON.parse(jsonString);
 
           if (window.bitmovin?.customMessageHandler) {
