@@ -417,6 +417,8 @@ interface UpNextData {
   subtitle: string;
   thumbnail: string;
   delay: number;
+  variant?: 'unreleased';
+  unreleasedText?: string;
 }
 
 class MusoraUpNextEndScreenItem extends MusoraStandardEndScreenItem {
@@ -428,7 +430,10 @@ class MusoraUpNextEndScreenItem extends MusoraStandardEndScreenItem {
   constructor(config: MusoraStandardEndScreenItemConfig, data: UpNextData) {
     super(config);
     this.data = data;
-    this.setupTimer(data.delay);
+    // Only setup timer for non-unreleased variants
+    if (data.variant !== 'unreleased') {
+      this.setupTimer(data.delay);
+    }
   }
 
   protected toDomElement(): DOM {
@@ -450,13 +455,20 @@ class MusoraUpNextEndScreenItem extends MusoraStandardEndScreenItem {
 
     let upNextText = new DOM('div', {
       'class': this.prefixCss('up-next-text'),
-    }).html('Up Next in ');
+    });
 
-    let timer = new DOM('span', {
-      'class': this.prefixCss('timer'),
-    }).html(this.countdownValue.toString());
+    if (this.data.variant === 'unreleased') {
+      // For unreleased variant, just show "Up Next" without timer
+      upNextText.html('Up Next');
+    } else {
+      // For standard variant, show countdown timer
+      upNextText.html('Up Next in ');
+      let timer = new DOM('span', {
+        'class': this.prefixCss('timer'),
+      }).html(this.countdownValue.toString());
+      upNextText.append(timer);
+    }
 
-    upNextText.append(timer);
     this.upNextTextElement = upNextText;
 
     let closeButton = new DOM('button', {
@@ -504,6 +516,15 @@ class MusoraUpNextEndScreenItem extends MusoraStandardEndScreenItem {
 
     contentText.append(title);
     contentText.append(subtitle);
+
+    // Add unreleased text for unreleased variant
+    if (this.data.variant === 'unreleased' && this.data.unreleasedText) {
+      let unreleasedText = new DOM('div', {
+        'class': this.prefixCss('unreleased-text'),
+      }).html(this.data.unreleasedText);
+      contentText.append(unreleasedText);
+    }
+
     textArea.append(contentText);
 
     // Button row inside text area
@@ -511,22 +532,33 @@ class MusoraUpNextEndScreenItem extends MusoraStandardEndScreenItem {
       'class': this.prefixCss('button-row'),
     });
 
-    let cancelButton = new DOM('button', {
-      'class': this.prefixCss('cancel-button'),
-    }).html('Cancel');
+    if (this.data.variant === 'unreleased') {
+      // Unreleased variant: show single "Go Home" button
+      let goHomeButton = new DOM('button', {
+        'class': this.prefixCss('go-home-button'),
+      }).html('Go Home');
 
-    this.cancelButtonHandler = this.onCancel.bind(this);
-    cancelButton.on('click', this.cancelButtonHandler);
-    this.cancelButtonElement = cancelButton;
+      goHomeButton.on('click', this.onAction.bind(this));
+      buttonRow.append(goHomeButton);
+    } else {
+      // Standard variant: show Cancel and Play Now buttons
+      let cancelButton = new DOM('button', {
+        'class': this.prefixCss('cancel-button'),
+      }).html('Cancel');
 
-    let playNowButton = new DOM('button', {
-      'class': this.prefixCss('play-now-button'),
-    }).html('Play Now');
+      this.cancelButtonHandler = this.onCancel.bind(this);
+      cancelButton.on('click', this.cancelButtonHandler);
+      this.cancelButtonElement = cancelButton;
 
-    playNowButton.on('click', this.onAction.bind(this));
+      let playNowButton = new DOM('button', {
+        'class': this.prefixCss('play-now-button'),
+      }).html('Play Now');
 
-    buttonRow.append(cancelButton);
-    buttonRow.append(playNowButton);
+      playNowButton.on('click', this.onAction.bind(this));
+
+      buttonRow.append(cancelButton);
+      buttonRow.append(playNowButton);
+    }
 
     contentRow.append(textArea);
     itemElement.append(contentRow);
