@@ -131,6 +131,13 @@
             color: $color-secondary;
             line-height: 1.4;
           }
+
+          .#{$prefix}-unreleased-text {
+            color: #f00;
+            font-size: clamp(12px, 2.5vw, 14px);
+            line-height: 1.4;
+            font-weight: bold;
+          }
         }
       }
 
@@ -149,6 +156,7 @@
         width: 100%;
 
         .#{$prefix}-cancel-button,
+        .#{$prefix}-go-home-button,
         .#{$prefix}-play-now-button {
           flex: 1;
           max-width: 320px;
@@ -175,6 +183,12 @@
           background-color: #fff;
           color: #333;
           border: none;
+        }
+
+        .#{$prefix}-go-home-button {
+          background-color: $color-musora-button;
+          color: white;
+          border: 1px solid white;
         }
       }
     }
