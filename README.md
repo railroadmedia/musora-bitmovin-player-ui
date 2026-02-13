@@ -134,6 +134,40 @@ const playerViewConfig = {
 };
 ```
 
+#### Back button (top-left arrow)
+
+The back arrow uses the **CustomMessageHandler**. The back button is **shown by default** when you pass `customMessageHandler`; when the user taps it, the UI sends the message `onBackPress` to React Native. Hide it only when needed by sending `setBackButtonVisible` with payload `'false'`.
+
+**React Native:** pass the handler and handle the back tap:
+
+```typescript
+import { BACK_BUTTON_MESSAGE, SET_BACK_BUTTON_VISIBLE_MESSAGE } from 'bitmovin-player-ui';
+
+const customMessageHandler = new CustomMessageHandler({
+  onReceivedAsynchronousMessage: (message: string, _data: string | undefined) => {
+    if (message === 'onBackPress') {
+      navigation.goBack(); // or close player, etc.
+    }
+  },
+});
+
+<PlayerView player={player} customMessageHandler={customMessageHandler} />
+```
+
+If you do not pass `customMessageHandler`, the back button is hidden.
+
+**Hide or show the back button when needed:** send a message to the UI with payload `'false'` to hide, `'true'` to show:
+
+```typescript
+import { SET_BACK_BUTTON_VISIBLE_MESSAGE } from 'bitmovin-player-ui';
+
+// Hide the back button
+customMessageHandler.sendMessage(SET_BACK_BUTTON_VISIBLE_MESSAGE, 'false');
+
+// Show the back button again
+customMessageHandler.sendMessage(SET_BACK_BUTTON_VISIBLE_MESSAGE, 'true');
+```
+
 ### Bidirectional Communication Bridge
 
 #### CustomMessageHandler Setup
