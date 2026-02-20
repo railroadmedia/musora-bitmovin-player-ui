@@ -57,6 +57,7 @@ import { BrowserUtils } from './utils/BrowserUtils';
 import { RecommendationOverlayNavigationGroup } from './spatialnavigation/RecommendationOverlayNavigationGroup';
 import { MusoraStandardEndScreen } from './components/musorastandardendscreen';
 import { CloseButton } from './components/buttons/CloseButton';
+import { BackButton } from './components/buttons/BackButton';
 
 declare const window: {
   bitmovin: {
@@ -569,6 +570,8 @@ export function musoraSmallScreenUILayout() {
 
   const titleBar = new TitleBar({
     components: [
+      new BackButton(),
+      new Spacer(),
       new CastToggleButton(),
       new VRToggleButton(),
       new PictureInPictureToggleButton(),

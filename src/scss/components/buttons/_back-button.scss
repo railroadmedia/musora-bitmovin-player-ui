@@ -1,0 +1,14 @@
+@import '../../variables';
+@import '../../mixins';
+
+.#{$prefix}-ui-backbutton {
+  @extend %ui-button;
+
+  .#{$prefix}-ui-icon {
+    background-image: svg-load('../../assets/images/angle-left.svg', stroke=$color-icon);
+  }
+
+  &:hover {
+    @include svg-icon-shadow;
+  }
+}
