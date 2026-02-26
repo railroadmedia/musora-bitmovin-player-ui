@@ -462,8 +462,14 @@ interface UpNextData {
   subtitle: string;
   thumbnail: string;
   delay: number;
-  variant?: 'unreleased';
+  /**
+   * Optional UI variant hint.
+   * - 'unreleased' – shows unreleased styling & messaging (no countdown, single Go Home CTA)
+   * - 'course-complete' – shows Course Complete styling with BACK TO HOME / PLAY NOW CTAs and no countdown
+   */
+  variant?: 'unreleased' | 'course-complete';
   unreleasedText?: string;
+  disableCountdown?: boolean;
 }
 
 class MusoraUpNextEndScreenItem extends MusoraStandardEndScreenItem {
@@ -475,8 +481,10 @@ class MusoraUpNextEndScreenItem extends MusoraStandardEndScreenItem {
   constructor(config: MusoraStandardEndScreenItemConfig, data: UpNextData) {
     super(config);
     this.data = data;
-    // Only setup timer for non-unreleased variants
-    if (data.variant !== 'unreleased') {
+    // Only setup timer when countdown is enabled and variant supports it
+    const shouldUseCountdown =
+      !data.disableCountdown && data.variant !== 'unreleased' && data.variant !== 'course-complete';
+    if (shouldUseCountdown) {
       this.setupTimer(data.delay);
     }
   }
@@ -509,6 +517,8 @@ class MusoraUpNextEndScreenItem extends MusoraStandardEndScreenItem {
     if (this.data.variant === 'unreleased') {
       // For unreleased variant, just show "Up Next" without timer
       upNextText.html('Up Next');
+    } else if (this.data.variant === 'course-complete') {
+      upNextText.html('Course Complete');
     } else {
       // For standard variant, show countdown timer
       upNextText.html('Up Next in ');
@@ -590,10 +600,13 @@ class MusoraUpNextEndScreenItem extends MusoraStandardEndScreenItem {
       goHomeButton.on('click', this.onAction.bind(this));
       buttonRow.append(goHomeButton);
     } else {
-      // Standard variant: show Cancel and Play Now buttons
+      // Standard / course-complete variants: same behavior, different labels
+      const cancelLabel = this.data?.variant === 'course-complete' ? 'Back To Home' : 'Cancel';
+      const playNowLabel = 'Play Now';
+
       const cancelButton = new DOM('button', {
         class: this.prefixCss('cancel-button'),
-      }).html('Cancel');
+      }).html(cancelLabel);
 
       this.cancelButtonHandler = this.onCancel.bind(this);
       cancelButton.on('click', this.cancelButtonHandler!);
@@ -601,7 +614,7 @@ class MusoraUpNextEndScreenItem extends MusoraStandardEndScreenItem {
 
       const playNowButton = new DOM('button', {
         class: this.prefixCss('play-now-button'),
-      }).html('Play Now');
+      }).html(playNowLabel);
 
       playNowButton.on('click', this.onAction.bind(this));
 
