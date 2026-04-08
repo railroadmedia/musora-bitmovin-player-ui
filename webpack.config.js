@@ -20,11 +20,20 @@ const outputnames = {
 const globalNamespaceArray = outputnames.globalNamespace.split('.');
 
 module.exports = (env, { mode }) => {
+  /** Production emits `OUTPUT_FILENAME.min.js` / `.min.css` (e.g. bitmovinplayer-ui.min.js). */
+  const assetSuffix = mode === 'production' ? '.min' : '';
+
+  const htmlTemplateParameters = {
+    uiScript: `js/${outputnames.filename}${assetSuffix}.js`,
+    uiStylesheet: `css/${outputnames.filename}${assetSuffix}.css`,
+    demoStylesheet: `css/demo${assetSuffix}.css`,
+  };
+
   return {
     entry: {
       [outputnames.filename]: {
         import: ['./src/scss/bitmovinplayer-ui.scss', './src/ts/main.ts'],
-        filename: './js/[name].js',
+        filename: `./js/[name]${assetSuffix}.js`,
         library: {
           type: 'umd',
           name: {
@@ -102,7 +111,7 @@ module.exports = (env, { mode }) => {
     },
     plugins: [
       new MiniCssExtractPlugin({
-        filename: './css/[name].css',
+        filename: `./css/[name]${assetSuffix}.css`,
         runtime: false,
       }),
       new HtmlWebpackPlugin({
@@ -110,12 +119,21 @@ module.exports = (env, { mode }) => {
         filename: './index.html',
         inject: false,
         minify: false,
+        templateParameters: htmlTemplateParameters,
       }),
       new HtmlWebpackPlugin({
         template: './src/html/simple.html',
         filename: './simple.html',
         inject: false,
         minify: false,
+        templateParameters: htmlTemplateParameters,
+      }),
+      new HtmlWebpackPlugin({
+        template: './src/html/tts-testing.html',
+        filename: './tts-testing.html',
+        inject: false,
+        minify: false,
+        templateParameters: htmlTemplateParameters,
       }),
       {
         apply: compiler => {

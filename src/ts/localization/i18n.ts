@@ -81,6 +81,7 @@ export interface Vocabulary {
   reset: string;
   replay: string;
   normal: string;
+  'settings.playbackSpeed.normal': string;
   default: string;
   open: string;
   close: string;

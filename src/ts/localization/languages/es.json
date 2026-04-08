@@ -63,6 +63,7 @@
   "reset": "Reiniciar",
   "replay": "Rebobinar",
   "normal": "normal",
+  "settings.playbackSpeed.normal": "Normal (1,0x)",
   "default": "predeterminado",
   "live": "Directo",
   "subtitle.example": "Ejemplo de Subtítulo",

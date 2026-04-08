@@ -59,6 +59,7 @@
   "reset": "Reset",
   "replay": "Opnieuw afspelen",
   "normal": "normaal",
+  "settings.playbackSpeed.normal": "Normaal (1,0x)",
   "default": "standaard",
   "live": "Live",
   "subtitle.example": "voorbeeld ondertiteling",

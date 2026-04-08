@@ -59,6 +59,7 @@
   "seekBar.durationText": "aus",
   "quickseek.forward": "{seekSeconds} Sekunden Vor",
   "quickseek.rewind": "{seekSeconds} Sekunden Zurück",
+  "settings.playbackSpeed.normal": "Normal (1,0x)",
   "ecoMode": "ecoMode",
   "ecoMode.title": "Eco Mode"
 }
