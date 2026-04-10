@@ -1,12 +1,14 @@
 import { Container, ContainerConfig } from '../Container';
 import { SmallCenteredPlaybackToggleButton } from '../buttons/SmallCenteredPlaybackToggleButton';
+import { QuickSeekButton } from '../buttons/QuickSeekButton';
 import { PlayerAPI } from 'bitmovin-player';
 import { UIInstanceManager } from '../../UIManager';
 import { EventDispatcher, NoArgs, Event as EDEvent } from '../../EventDispatcher';
 import { Timeout } from '../../utils/Timeout';
+import { PlayerUtils } from '../../utils/PlayerUtils';
 import { HTMLElementWithComponent } from '../../DOM';
 import { Label, LabelConfig } from '../labels/Label';
-import { i18n } from '../../localization/i18n';
+// import { i18n } from '../../localization/i18n';
 
 export interface TouchControlOverlayConfig extends ContainerConfig {
   /**
@@ -65,6 +67,8 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
   };
 
   private playbackToggleButton: SmallCenteredPlaybackToggleButton;
+  private quickSeekBackwardButton: QuickSeekButton;
+  private quickSeekForwardButton: QuickSeekButton;
   private seekForwardLabel: Label<LabelConfig>;
   private seekBackwardLabel: Label<LabelConfig>;
 
@@ -80,6 +84,9 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
     this.playbackToggleButton = new SmallCenteredPlaybackToggleButton({
       enterFullscreenOnInitialPlayback: Boolean(config.enterFullscreenOnInitialPlayback),
     });
+
+    this.quickSeekBackwardButton = new QuickSeekButton({ seekSeconds: -10 });
+    this.quickSeekForwardButton = new QuickSeekButton({ seekSeconds: 10 });
 
     this.seekForwardLabel = new Label({
       text: '',
@@ -102,7 +109,13 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
         seekTime: 10,
         seekDoubleTapMargin: 15,
         seekDoubleTapTimeout: 200,
-        components: [this.seekBackwardLabel, this.playbackToggleButton, this.seekForwardLabel],
+        components: [
+          this.seekBackwardLabel,
+          this.quickSeekBackwardButton,
+          this.playbackToggleButton,
+          this.quickSeekForwardButton,
+          this.seekForwardLabel,
+        ],
       },
       this.config,
     );
@@ -112,11 +125,11 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
     super.configure(player, uimanager);
 
     let playerSeekTime = 0;
-    let startSeekTime = 0;
+    // let startSeekTime = 0;
 
     this.doubleTapTimeout = new Timeout(this.config.seekDoubleTapTimeout, () => {
       this.couldBeDoubleTapping = false;
-      startSeekTime = 0;
+      // startSeekTime = 0;
       setTimeout(() => this.hideSeekAnimationElements(), 150);
     });
 
@@ -125,10 +138,14 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
 
     const showPlaybackToggleButton = () => {
       this.playbackToggleButton.show();
+      this.quickSeekBackwardButton.show();
+      this.quickSeekForwardButton.show();
     };
 
     const hidePlaybackToggleButton = () => {
       this.playbackToggleButton.hide();
+      this.quickSeekBackwardButton.hide();
+      this.quickSeekForwardButton.hide();
     };
 
     uimanager.onBufferingShow.subscribe(() => {
@@ -155,46 +172,56 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
       }
     });
 
+    player.on(player.exports.PlayerEvent.PlaybackFinished, () => {
+      player.seek(0);
+      setTimeout(() => {
+        player.play('ui');
+      }, 100);
+      setTimeout(() => {
+        player.pause('ui');
+      }, 200);
+    });
+
     this.touchControlEvents.onSeekBackward.subscribe(() => {
-      playerSeekTime -= this.config.seekTime;
+      playerSeekTime = PlayerUtils.clampValueToRange(
+        playerSeekTime - this.config.seekTime,
+        0,
+        player.getDuration() ?? Infinity,
+      );
       player.seek(playerSeekTime);
 
-      this.seekBackwardLabel.setText(
-        Math.abs(Math.round(playerSeekTime - startSeekTime)) +
-          ' ' +
-          i18n.performLocalization(i18n.getLocalizer('settings.time.seconds')),
-      );
-      this.seekBackwardLabel.show();
-      this.getDomElement().addClass(this.prefixCss(this.SEEK_BACKWARD_CLASS));
-      this.seekForwardLabel.hide();
-      this.getDomElement().removeClass(this.prefixCss(this.SEEK_FORWARD_CLASS));
+      // this.seekBackwardLabel.setText(
+      //   Math.abs(Math.round(playerSeekTime - startSeekTime)) +
+      //     ' ' +
+      //     i18n.performLocalization(i18n.getLocalizer('settings.time.seconds')),
+      // );
+      // this.seekBackwardLabel.show();
+      // this.getDomElement().addClass(this.prefixCss(this.SEEK_BACKWARD_CLASS));
+      // this.seekForwardLabel.hide();
+      // this.getDomElement().removeClass(this.prefixCss(this.SEEK_FORWARD_CLASS));
     });
 
     this.touchControlEvents.onSeekForward.subscribe(() => {
-      playerSeekTime += this.config.seekTime;
+      playerSeekTime = PlayerUtils.clampValueToRange(
+        playerSeekTime + this.config.seekTime,
+        0,
+        player.getDuration() ?? Infinity,
+      );
       player.seek(playerSeekTime);
 
-      this.seekForwardLabel.setText(
-        Math.abs(Math.round(playerSeekTime - startSeekTime)) +
-          ' ' +
-          i18n.performLocalization(i18n.getLocalizer('settings.time.seconds')),
-      );
-      this.seekForwardLabel.show();
-      this.getDomElement().addClass(this.prefixCss(this.SEEK_FORWARD_CLASS));
-      this.seekBackwardLabel.hide();
-      this.getDomElement().removeClass(this.prefixCss(this.SEEK_BACKWARD_CLASS));
+      // this.seekForwardLabel.setText(
+      //   Math.abs(Math.round(playerSeekTime - startSeekTime)) +
+      //     ' ' +
+      //     i18n.performLocalization(i18n.getLocalizer('settings.time.seconds')),
+      // );
+      // this.seekForwardLabel.show();
+      // this.getDomElement().addClass(this.prefixCss(this.SEEK_FORWARD_CLASS));
+      // this.seekBackwardLabel.hide();
+      // this.getDomElement().removeClass(this.prefixCss(this.SEEK_BACKWARD_CLASS));
     });
 
-    this.touchControlEvents.onSingleClick.subscribe((_, e) => {
+    this.touchControlEvents.onSingleClick.subscribe(() => {
       uimanager.getUI().toggleUiShown();
-      playerSeekTime = player.getCurrentTime();
-      startSeekTime = playerSeekTime;
-
-      const eventTarget = (e as Event).target as HTMLElementWithComponent;
-      const rect = eventTarget.getBoundingClientRect();
-      const eventTapX = (<MouseEvent>e).clientX - rect.left;
-      const eventTapY = (<MouseEvent>e).clientY - rect.top;
-      this.latestTapPosition = { x: eventTapX, y: eventTapY };
     });
 
     this.touchControlEvents.onDoubleClick.subscribe((_, e) => {
@@ -206,21 +233,32 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
       }
 
       const width = eventTarget.clientWidth;
-      const tapMargin = width * 0.4;
       const rect = eventTarget.getBoundingClientRect();
       const eventTapX = (<MouseEvent>e).clientX - rect.left;
       const eventTapY = (<MouseEvent>e).clientY - rect.top;
+
+      const backwardRect = this.quickSeekBackwardButton.getDomElement().get(0).getBoundingClientRect();
+      const forwardRect = this.quickSeekForwardButton.getDomElement().get(0).getBoundingClientRect();
 
       const doubleTapMargin = this.config.seekDoubleTapMargin;
       if (
         Math.abs(this.latestTapPosition.x - eventTapX) <= doubleTapMargin &&
         Math.abs(this.latestTapPosition.y - eventTapY) <= doubleTapMargin
-      )
-        if (eventTapX < tapMargin) {
-          this.touchControlEvents.onSeekBackward.dispatch(this);
-        } else if (eventTapX > width - tapMargin) {
-          this.touchControlEvents.onSeekForward.dispatch(this);
+      ) {
+        if (backwardRect.width > 0 && forwardRect.width > 0) {
+          if (eventTapX < backwardRect.left - rect.left) {
+            this.touchControlEvents.onSeekBackward.dispatch(this);
+          } else if (eventTapX > forwardRect.right - rect.left) {
+            this.touchControlEvents.onSeekForward.dispatch(this);
+          }
+        } else {
+          if (eventTapX < width * 0.4) {
+            this.touchControlEvents.onSeekBackward.dispatch(this);
+          } else if (eventTapX > width * 0.6) {
+            this.touchControlEvents.onSeekForward.dispatch(this);
+          }
         }
+      }
       this.latestTapPosition = { x: eventTapX, y: eventTapY };
     });
 
@@ -230,11 +268,41 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
       }
     });
 
+    let pendingUiToggle: ReturnType<typeof setTimeout> | null = null;
+
     const clickEventDispatcher = (e: Event): void => {
+      const eventTarget = (e as Event).target as HTMLElementWithComponent;
+      const rect = eventTarget.getBoundingClientRect();
+      const eventTapX = (<MouseEvent>e).clientX - rect.left;
+      const eventTapY = (<MouseEvent>e).clientY - rect.top;
+      const width = eventTarget.clientWidth;
+      const backwardRect = this.quickSeekBackwardButton.getDomElement().get(0).getBoundingClientRect();
+      const forwardRect = this.quickSeekForwardButton.getDomElement().get(0).getBoundingClientRect();
+      const isInSeekZone =
+        backwardRect.width > 0 && forwardRect.width > 0
+          ? eventTapX < backwardRect.left - rect.left || eventTapX > forwardRect.right - rect.left
+          : eventTapX < width * 0.4 || eventTapX > width * 0.6;
+
       if (this.couldBeDoubleTapping) {
+        if (pendingUiToggle !== null) {
+          clearTimeout(pendingUiToggle);
+          pendingUiToggle = null;
+        }
         this.onDoubleClickEvent(e);
       } else {
-        this.onSingleClickEvent(e);
+        // Always record seek time and position on first tap — needed for double-tap seek
+        playerSeekTime = player.getCurrentTime();
+        this.latestTapPosition = { x: eventTapX, y: eventTapY };
+
+        if (isInSeekZone) {
+          // Delay the UI toggle: if a second tap follows, we cancel it to avoid a flash
+          pendingUiToggle = setTimeout(() => {
+            pendingUiToggle = null;
+            this.onSingleClickEvent(e);
+          }, this.config.seekDoubleTapTimeout);
+        } else {
+          this.onSingleClickEvent(e);
+        }
       }
       this.couldBeDoubleTapping = true;
       this.doubleTapTimeout.start();

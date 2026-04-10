@@ -78,7 +78,8 @@
   &.#{$prefix}-player-state-finished {
     .#{$prefix}-ui-titlebar,
     .#{$prefix}-ui-hugeplaybacktogglebutton,
-    .#{$prefix}-ui-smallcenteredplaybacktogglebutton {
+    .#{$prefix}-ui-smallcenteredplaybacktogglebutton,
+    .#{$prefix}-ui-quickseekbutton {
       display: none;
     }
   }

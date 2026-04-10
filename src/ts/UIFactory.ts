@@ -606,7 +606,7 @@ export function musoraSmallScreenUILayout() {
       subtitleOverlay,
       new BufferingOverlay(),
       new CastStatusOverlay(),
-      new PlaybackToggleOverlay(),
+      new TouchControlOverlay(),
       new MusoraStandardEndScreen(),
       controlBar,
       titleBar,

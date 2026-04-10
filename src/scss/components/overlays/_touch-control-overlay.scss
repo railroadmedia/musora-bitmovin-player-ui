@@ -12,6 +12,7 @@
   content: '';
   height: 200%;
   opacity: 0;
+  pointer-events: none;
   position: absolute;
   width: 100%;
 }
@@ -72,6 +73,36 @@
   &.#{$prefix}-seek-backward {
     &::before {
       opacity: 1;
+    }
+  }
+}
+
+// Musora-specific sizing and spacing for center playback controls
+.#{$prefix}-ui-skin-musora {
+  .#{$prefix}-ui-touch-control-overlay {
+    > .#{$prefix}-container-wrapper {
+      gap: 32px;
+    }
+
+    .#{$prefix}-ui-smallcenteredplaybacktogglebutton {
+      height: 50px;
+      width: 50px;
+
+      .#{$prefix}-ui-icon {
+        background-size: 50px;
+      }
+    }
+
+    .#{$prefix}-ui-quickseekbutton {
+      height: 35px;
+      min-width: 35px;
+      padding: 0;
+
+      .#{$prefix}-ui-icon {
+        background-size: 35px;
+        height: 35px;
+        width: 35px;
+      }
     }
   }
 }

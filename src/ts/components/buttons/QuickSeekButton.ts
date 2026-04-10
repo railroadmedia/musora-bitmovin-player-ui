@@ -1,6 +1,6 @@
 import { Button, ButtonConfig } from './Button';
 import { i18n } from '../../localization/i18n';
-import { PlayerAPI, SeekEvent, TimeShiftEvent } from 'bitmovin-player';
+import { PlayerAPI, TimeShiftEvent } from 'bitmovin-player';
 import { UIInstanceManager } from '../../UIManager';
 import { PlayerUtils } from '../../utils/PlayerUtils';
 
@@ -98,6 +98,8 @@ export class QuickSeekButton extends Button<QuickSeekButtonConfig> {
         return;
       }
 
+      // Use our locally-tracked target so rapid taps always accumulate from a known-valid
+      // position rather than calling getCurrentTime() mid-seek (which can return NaN on some platforms).
       const currentPosition =
         this.currentSeekTarget !== null
           ? this.currentSeekTarget
@@ -109,22 +111,19 @@ export class QuickSeekButton extends Button<QuickSeekButtonConfig> {
 
       if (isLive) {
         const clampedValue = PlayerUtils.clampValueToRange(newSeekTime, player.getMaxTimeShift(), 0);
+        this.currentSeekTarget = clampedValue;
         player.timeShift(clampedValue);
       } else {
-        const clampedValue = PlayerUtils.clampValueToRange(newSeekTime, 0, player.getDuration());
+        const clampedValue = PlayerUtils.clampValueToRange(newSeekTime, 0, player.getDuration() ?? Infinity);
+        this.currentSeekTarget = clampedValue;
         player.seek(clampedValue);
       }
     });
 
-    this.player.on(this.player.exports.PlayerEvent.Seek, this.onSeek);
     this.player.on(this.player.exports.PlayerEvent.Seeked, this.onSeekedOrTimeShifted);
     this.player.on(this.player.exports.PlayerEvent.TimeShift, this.onTimeShift);
     this.player.on(this.player.exports.PlayerEvent.TimeShifted, this.onSeekedOrTimeShifted);
   }
-
-  private onSeek = (event: SeekEvent): void => {
-    this.currentSeekTarget = event.seekTarget;
-  };
 
   private onSeekedOrTimeShifted = () => {
     this.currentSeekTarget = null;
@@ -135,7 +134,6 @@ export class QuickSeekButton extends Button<QuickSeekButtonConfig> {
   };
 
   release(): void {
-    this.player.off(this.player.exports.PlayerEvent.Seek, this.onSeek);
     this.player.off(this.player.exports.PlayerEvent.Seeked, this.onSeekedOrTimeShifted);
     this.player.off(this.player.exports.PlayerEvent.TimeShift, this.onTimeShift);
     this.player.off(this.player.exports.PlayerEvent.TimeShifted, this.onSeekedOrTimeShifted);
