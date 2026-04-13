@@ -8,6 +8,7 @@ import { Timeout } from '../../utils/Timeout';
 import { PlayerUtils } from '../../utils/PlayerUtils';
 import { HTMLElementWithComponent } from '../../DOM';
 import { Label, LabelConfig } from '../labels/Label';
+// NOTE: uncomment to re-enable double tap visuals
 // import { i18n } from '../../localization/i18n';
 
 export interface TouchControlOverlayConfig extends ContainerConfig {
@@ -125,10 +126,12 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
     super.configure(player, uimanager);
 
     let playerSeekTime = 0;
+    // NOTE: uncomment to re-enable double tap visuals
     // let startSeekTime = 0;
 
     this.doubleTapTimeout = new Timeout(this.config.seekDoubleTapTimeout, () => {
       this.couldBeDoubleTapping = false;
+      // NOTE: uncomment to re-enable double tap visuals
       // startSeekTime = 0;
       setTimeout(() => this.hideSeekAnimationElements(), 150);
     });
@@ -190,6 +193,7 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
       );
       player.seek(playerSeekTime);
 
+      // NOTE: uncomment to re-enable double tap visuals
       // this.seekBackwardLabel.setText(
       //   Math.abs(Math.round(playerSeekTime - startSeekTime)) +
       //     ' ' +
@@ -209,6 +213,7 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
       );
       player.seek(playerSeekTime);
 
+      // NOTE: uncomment to re-enable double tap visuals
       // this.seekForwardLabel.setText(
       //   Math.abs(Math.round(playerSeekTime - startSeekTime)) +
       //     ' ' +
