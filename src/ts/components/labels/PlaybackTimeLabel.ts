@@ -1,5 +1,5 @@
 import { LabelConfig, Label } from './Label';
-import { UIInstanceManager } from '../../UIManager';
+import { SeekPreviewArgs, UIInstanceManager } from '../../UIManager';
 import LiveStreamDetectorEventArgs = PlayerUtils.LiveStreamDetectorEventArgs;
 import { PlayerUtils } from '../../utils/PlayerUtils';
 import { StringUtils } from '../../utils/StringUtils';
@@ -91,6 +91,8 @@ export class PlaybackTimeLabel extends Label<PlaybackTimeLabelConfig> {
     const liveCssClass = this.prefixCss('ui-playbacktimelabel-live');
     const liveEdgeCssClass = this.prefixCss('ui-playbacktimelabel-live-edge');
     let minWidth = 0;
+    let useSeekPreviewTime = false;
+    const syncSeekPreview = config.syncTimeWithSeekPreview === true;
 
     const liveClickHandler = () => {
       player.timeShift(0);
@@ -137,6 +139,10 @@ export class PlaybackTimeLabel extends Label<PlaybackTimeLabelConfig> {
     };
 
     const playbackTimeHandler = () => {
+      if (syncSeekPreview && useSeekPreviewTime) {
+        return;
+      }
+
       if (!live && player.getDuration() !== Infinity) {
         this.setTime(PlayerUtils.getCurrentTimeRelativeToSeekableRange(player), player.getDuration());
       }
@@ -174,7 +180,10 @@ export class PlaybackTimeLabel extends Label<PlaybackTimeLabelConfig> {
 
     player.on(player.exports.PlayerEvent.TimeChanged, playbackTimeHandler);
     player.on(player.exports.PlayerEvent.Ready, updateTimeFormatBasedOnDuration);
-    player.on(player.exports.PlayerEvent.Seeked, playbackTimeHandler);
+    player.on(player.exports.PlayerEvent.Seeked, () => {
+      useSeekPreviewTime = false;
+      playbackTimeHandler();
+    });
 
     player.on(player.exports.PlayerEvent.TimeShift, updateLiveTimeshiftState);
     player.on(player.exports.PlayerEvent.TimeShifted, updateLiveTimeshiftState);
@@ -208,6 +217,23 @@ export class PlaybackTimeLabel extends Label<PlaybackTimeLabelConfig> {
       updateTimeFormatBasedOnDuration();
     };
     uimanager.getConfig().events.onUpdated.subscribe(init);
+
+    if (syncSeekPreview) {
+      uimanager.onSeekPreview.subscribe((sender, args: SeekPreviewArgs & { scrubbing?: boolean }) => {
+        if (!args.scrubbing || player.isLive()) {
+          return;
+        }
+
+        const duration = player.getDuration();
+        if (!isFinite(duration) || duration <= 0 || duration === Infinity) {
+          return;
+        }
+
+        useSeekPreviewTime = true;
+        const previewRelative = duration * (args.position / 100);
+        this.setTime(previewRelative, duration);
+      });
+    }
 
     init();
   }
