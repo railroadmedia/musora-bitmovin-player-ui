@@ -1,0 +1,64 @@
+@import '../variables';
+
+// Musora small-screen: time (left) stacked above full-width seek bar at bottom of player
+.#{$prefix}-ui-skin-musora.#{$prefix}-ui-skin-smallscreen .#{$prefix}-ui-controlbar {
+  .#{$prefix}-musora-controlbar-timeline {
+    width: 100%;
+
+    > .#{$prefix}-container-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      row-gap: 0.35em;
+      width: 100%;
+    }
+  }
+
+  .#{$prefix}-musora-controlbar-time-row {
+    width: 100%;
+
+    > .#{$prefix}-container-wrapper {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: center;
+      width: 100%;
+    }
+
+    .#{$prefix}-ui-spacer {
+      flex: 1;
+      min-width: 0;
+      height: auto;
+      width: auto;
+    }
+
+    .#{$prefix}-musora-controlbar-fullscreen {
+      flex-shrink: 0;
+    }
+  }
+
+  .#{$prefix}-musora-controlbar-seek-row {
+    width: 100%;
+
+    > .#{$prefix}-container-wrapper {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      width: 100%;
+    }
+
+    .#{$prefix}-ui-seekbar {
+      flex: 1;
+      min-width: 0;
+    }
+  }
+
+  .#{$prefix}-musora-playback-time-pill {
+    border-radius: 999px;
+    padding: 0.4em 0.85em;
+    background-color: transparentize($color: #000, $amount: 0.45);
+    backdrop-filter: blur(10px);
+    line-height: 1.25;
+    white-space: nowrap;
+  }
+}
