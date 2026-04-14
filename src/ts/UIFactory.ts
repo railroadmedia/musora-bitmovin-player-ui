@@ -58,6 +58,7 @@ import { RecommendationOverlayNavigationGroup } from './spatialnavigation/Recomm
 import { MusoraStandardEndScreen } from './components/musorastandardendscreen';
 import { CloseButton } from './components/buttons/CloseButton';
 import { BackButton } from './components/buttons/BackButton';
+import { MUSORA_LESSON_NEXT_MESSAGE, MUSORA_LESSON_PREVIOUS_MESSAGE } from './utils/MusoraLessonNavigation';
 
 declare const window: {
   bitmovin: {
@@ -606,7 +607,12 @@ export function musoraSmallScreenUILayout() {
       subtitleOverlay,
       new BufferingOverlay(),
       new CastStatusOverlay(),
-      new TouchControlOverlay(),
+      new TouchControlOverlay({
+        lessonNavigation: {
+          previousMessage: MUSORA_LESSON_PREVIOUS_MESSAGE,
+          nextMessage: MUSORA_LESSON_NEXT_MESSAGE,
+        },
+      }),
       new MusoraStandardEndScreen(),
       controlBar,
       titleBar,

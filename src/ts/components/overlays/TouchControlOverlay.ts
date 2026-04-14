@@ -11,6 +11,14 @@ import { Label, LabelConfig } from '../labels/Label';
 // NOTE: uncomment to re-enable double tap visuals
 // import { i18n } from '../../localization/i18n';
 
+/**
+ * Messages for lesson prev/next on the side buttons only. Double-tap on the overlay edges still quick-seeks.
+ */
+export interface LessonNavigationMessages {
+  previousMessage: string;
+  nextMessage: string;
+}
+
 export interface TouchControlOverlayConfig extends ContainerConfig {
   /**
    * Specify whether the player should be set to enter fullscreen by clicking on the playback toggle button
@@ -46,6 +54,12 @@ export interface TouchControlOverlayConfig extends ContainerConfig {
    * Default: 200ms
    */
   seekDoubleTapTimeout?: number;
+
+  /**
+   * When set, left/right overlay buttons use lesson prev/next icons and send CustomMessageHandler messages.
+   * Double-tap on the left/right thirds still seeks by {@link TouchControlOverlayConfig.seekTime} (default 10s).
+   */
+  lessonNavigation?: LessonNavigationMessages;
 }
 
 interface ClickPosition {
@@ -86,8 +100,20 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
       enterFullscreenOnInitialPlayback: Boolean(config.enterFullscreenOnInitialPlayback),
     });
 
-    this.quickSeekBackwardButton = new QuickSeekButton({ seekSeconds: -10 });
-    this.quickSeekForwardButton = new QuickSeekButton({ seekSeconds: 10 });
+    const lessonNav = config.lessonNavigation;
+    if (lessonNav) {
+      this.quickSeekBackwardButton = new QuickSeekButton({
+        customMessage: lessonNav.previousMessage,
+        lessonNavigationRole: 'previous',
+      });
+      this.quickSeekForwardButton = new QuickSeekButton({
+        customMessage: lessonNav.nextMessage,
+        lessonNavigationRole: 'next',
+      });
+    } else {
+      this.quickSeekBackwardButton = new QuickSeekButton({ seekSeconds: -10 });
+      this.quickSeekForwardButton = new QuickSeekButton({ seekSeconds: 10 });
+    }
 
     this.seekForwardLabel = new Label({
       text: '',
@@ -186,6 +212,7 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
     });
 
     this.touchControlEvents.onSeekBackward.subscribe(() => {
+      // Double-tap edges always quick-seek by seekTime (e.g. 10s). Lesson prev/next is only on the side buttons.
       playerSeekTime = PlayerUtils.clampValueToRange(
         playerSeekTime - this.config.seekTime,
         0,
@@ -206,6 +233,7 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
     });
 
     this.touchControlEvents.onSeekForward.subscribe(() => {
+      // Double-tap edges always quick-seek by seekTime (e.g. 10s). Lesson prev/next is only on the side buttons.
       playerSeekTime = PlayerUtils.clampValueToRange(
         playerSeekTime + this.config.seekTime,
         0,
