@@ -190,7 +190,8 @@ export class PlaybackTimeLabel extends Label<PlaybackTimeLabelConfig> {
         // uimanager.onSeekPreview always dispatches SeekPreviewEventArgs at runtime.
         const seekArgs = args as unknown as SeekPreviewEventArgs;
         if (seekArgs.scrubbing && !live && player.getDuration() !== Infinity) {
-          const scrubSeconds = seekArgs.position * player.getDuration();
+          // position is 0–100 (see SeekPreviewArgs / SeekBarLabel.handleSeekPreview), not 0–1
+          const scrubSeconds = player.getDuration() * (seekArgs.position / 100);
           this.setTime(scrubSeconds, player.getDuration());
         }
       });

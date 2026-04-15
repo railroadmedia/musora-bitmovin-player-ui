@@ -2,6 +2,10 @@
 
 // Musora small-screen: time pill + fullscreen above full-width seek bar at bottom.
 .#{$prefix}-ui-skin-musora.#{$prefix}-ui-skin-smallscreen .#{$prefix}-ui-controlbar {
+  // Default control bar uses a transparent→dark gradient that reads as a black veil over the seek bar.
+  // Remove it so the bar sits cleanly on the video; the time pill has its own background.
+  background: none;
+
   // Strip bottom/side padding so the seek bar sits flush with the player edges.
   // Horizontal padding lives only on the time row (pill + fullscreen button).
   padding-bottom: 0;
@@ -50,47 +54,64 @@
   .#{$prefix}-musora-controlbar-seek-row {
     width: 100%;
 
-    > .#{$prefix}-container-wrapper {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      width: 100%;
-      // No horizontal padding — bar spans the full player width.
-      // The position dot at 0 % is clipped ~4 px on the left edge; this is
-      // imperceptible on a thin 3 px bar at normal viewing distance.
-    }
-
     .#{$prefix}-ui-seekbar {
       flex: 1;
-      min-width: 0;
+      min-height: 16px;
+      display: flex;
+      align-items: center;
 
-      // Dot: brand color, above the track
+      // ── The Red Circle (Thumb) ──────────────────────────────────────────
       .#{$prefix}-seekbar-playbackposition-marker {
-        background-color: var(--musora-brand-color, #{$color-red});
+        width: 13px;
+        height: 13px;
+        background-color: #ff0000; // YouTube Red
+        border-radius: 50%;
         box-shadow: none;
-        z-index: 30;
+        z-index: 40; // Ensure it stays above the gaps
+        left: -6.5px;
       }
 
       .#{$prefix}-seekbar {
         height: 3px;
-        // Keep the default calc(100% - 0.5rem) width so the dot has room at 0% and 100%
-        // (the seekbar-position-marker mixin offsets by -size/2; without this the dot clips)
+        position: relative;
 
         .#{$prefix}-seekbar-bars {
-          height: 3px;
+          height: 100%;
+          border-radius: 0; // Flat edges like YT
         }
 
-        // Played fill — brand color
+        // ── Colors ────────────────────────────────────────────────────────
+        .#{$prefix}-seekbar-backdrop {
+          background-color: rgba(255, 255, 255, 0.2); // Unplayed grey
+        }
+
+        .#{$prefix}-seekbar-bufferlevel {
+          background-color: rgba(255, 255, 255, 0.4); // Buffered white
+        }
+
         .#{$prefix}-seekbar-playbackposition {
-          background-color: var(--musora-brand-color, #{$color-red});
+          background-color: #ff0000; // Played Red
           z-index: 10;
         }
 
-        // Chapter markers — dark opaque notch above played + unplayed fill
+        // ── Chapter Gaps (The "Doodle" Fix) ────────────────────────────────
+        // We use transparent borders to create the visual "gap" between segments.
         .#{$prefix}-seekbar-markers > .#{$prefix}-seekbar-marker {
-          background-color: rgba(0, 0, 0, 0.9);
-          width: 4px;
+          background-color: transparent;
+          width: 4px; // Total gap width
           z-index: 30;
+          height: 100%;
+
+          // This is the trick: we create a vertical line that matches the
+          // player's background (usually black) to act as the "cut"
+          &::after {
+            content: '';
+            display: block;
+            width: 2px; // The actual visible gap width
+            height: 100%;
+            background-color: white; // Match this to your player background color
+            margin: 0 auto;
+          }
 
           > .#{$prefix}-seekbar-marker-indicator {
             display: none;
@@ -99,14 +120,6 @@
       }
     }
   }
-
-  // ── SeekBar hover label — hidden in Musora skin ──────────────────────────
-  // The bottom pill already shows the current time; the floating hover label
-  // would be redundant and visually cluttered.
-  .#{$prefix}-ui-seekbar-label {
-    display: none !important;
-  }
-
   // ── Time pill ─────────────────────────────────────────────────────────────
   .#{$prefix}-musora-playback-time-pill {
     border-radius: 999px;
