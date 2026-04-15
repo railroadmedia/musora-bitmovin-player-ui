@@ -64,7 +64,7 @@
       flex: 1;
       min-width: 0;
 
-      // Dot: brand color, no shadow, above the track (z-index 30)
+      // Dot: brand color, above the track
       .#{$prefix}-seekbar-playbackposition-marker {
         background-color: var(--musora-brand-color, #{$color-red});
         box-shadow: none;
@@ -73,8 +73,8 @@
 
       .#{$prefix}-seekbar {
         height: 3px;
-        margin: 0;
-        width: 100%;
+        // Keep the default calc(100% - 0.5rem) width so the dot has room at 0% and 100%
+        // (the seekbar-position-marker mixin offsets by -size/2; without this the dot clips)
 
         .#{$prefix}-seekbar-bars {
           height: 3px;
@@ -83,18 +83,10 @@
         // Played fill — brand color
         .#{$prefix}-seekbar-playbackposition {
           background-color: var(--musora-brand-color, #{$color-red});
+          z-index: 10;
         }
 
-        // Buffer + unplayed backdrop — muted white
-        .#{$prefix}-seekbar-bufferlevel {
-          background-color: transparentize($color-primary, 0.7);
-        }
-
-        .#{$prefix}-seekbar-backdrop {
-          background-color: transparentize($color-primary, 0.7);
-        }
-
-        // Chapter markers — dark opaque notch rendered above everything
+        // Chapter markers — dark opaque notch above played + unplayed fill
         .#{$prefix}-seekbar-markers > .#{$prefix}-seekbar-marker {
           background-color: rgba(0, 0, 0, 0.9);
           width: 4px;

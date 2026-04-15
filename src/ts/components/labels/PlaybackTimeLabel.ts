@@ -5,6 +5,7 @@ import { PlayerUtils } from '../../utils/PlayerUtils';
 import { StringUtils } from '../../utils/StringUtils';
 import { PlayerAPI } from 'bitmovin-player';
 import { i18n } from '../../localization/i18n';
+import { SeekPreviewEventArgs } from '../seekbar/SeekBar';
 
 export enum PlaybackTimeLabelMode {
   /**
@@ -182,11 +183,14 @@ export class PlaybackTimeLabel extends Label<PlaybackTimeLabelConfig> {
     player.on(player.exports.PlayerEvent.StallStarted, updateLiveTimeshiftState);
     player.on(player.exports.PlayerEvent.StallEnded, updateLiveTimeshiftState);
 
-    // Sync pill text with scrub position during seek preview
+    // Sync pill text with scrub position — only while the user is actively dragging
     if (config.syncTimeWithSeekPreview) {
       uimanager.onSeekPreview.subscribe((_sender, args) => {
-        if (!live && player.getDuration() !== Infinity) {
-          const scrubSeconds = args.position * player.getDuration();
+        // Cast to SeekPreviewEventArgs to access the scrubbing flag.
+        // uimanager.onSeekPreview always dispatches SeekPreviewEventArgs at runtime.
+        const seekArgs = args as unknown as SeekPreviewEventArgs;
+        if (seekArgs.scrubbing && !live && player.getDuration() !== Infinity) {
+          const scrubSeconds = seekArgs.position * player.getDuration();
           this.setTime(scrubSeconds, player.getDuration());
         }
       });

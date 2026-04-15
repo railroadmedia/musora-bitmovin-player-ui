@@ -583,7 +583,8 @@ export function musoraSmallScreenUILayout() {
   });
 
   // No SeekBarLabel — hover preview would duplicate the bottom time pill.
-  const seekBar = new SeekBar();
+  // snappingEnabled: false — prevent the dot from jumping to chapter marker positions on drag.
+  const seekBar = new SeekBar({ snappingEnabled: false });
 
   const controlBar = new ControlBar({
     components: [
