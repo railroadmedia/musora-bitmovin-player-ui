@@ -1,0 +1,131 @@
+@import '../variables';
+
+// Musora small-screen: time pill + fullscreen above full-width seek bar at bottom.
+.#{$prefix}-ui-skin-musora.#{$prefix}-ui-skin-smallscreen .#{$prefix}-ui-controlbar {
+  // Strip bottom/side padding so the seek bar sits flush with the player edges.
+  // Horizontal padding lives only on the time row (pill + fullscreen button).
+  padding-bottom: 0;
+  padding-left: 0;
+  padding-right: 0;
+
+  // ── Outer timeline column ────────────────────────────────────────────────
+  .#{$prefix}-musora-controlbar-timeline {
+    width: 100%;
+
+    > .#{$prefix}-container-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      row-gap: 0.35em;
+      width: 100%;
+    }
+  }
+
+  // ── Row 1: pill (left) + fullscreen (right) ──────────────────────────────
+  .#{$prefix}-musora-controlbar-time-row {
+    width: 100%;
+    padding: 0 0.75em;
+
+    > .#{$prefix}-container-wrapper {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: center;
+      width: 100%;
+    }
+
+    .#{$prefix}-ui-spacer {
+      flex: 1;
+      min-width: 0;
+      height: auto;
+      width: auto;
+    }
+
+    .#{$prefix}-musora-controlbar-fullscreen {
+      flex-shrink: 0;
+    }
+  }
+
+  // ── Row 2: seek bar — edge-to-edge ───────────────────────────────────────
+  .#{$prefix}-musora-controlbar-seek-row {
+    width: 100%;
+
+    > .#{$prefix}-container-wrapper {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      width: 100%;
+      // No horizontal padding — bar spans the full player width.
+      // The position dot at 0 % is clipped ~4 px on the left edge; this is
+      // imperceptible on a thin 3 px bar at normal viewing distance.
+    }
+
+    .#{$prefix}-ui-seekbar {
+      flex: 1;
+      min-width: 0;
+
+      // Dot: brand color, no shadow, above the track (z-index 30)
+      .#{$prefix}-seekbar-playbackposition-marker {
+        background-color: var(--musora-brand-color, #{$color-red});
+        box-shadow: none;
+        z-index: 30;
+      }
+
+      .#{$prefix}-seekbar {
+        height: 3px;
+        margin: 0;
+        width: 100%;
+
+        .#{$prefix}-seekbar-bars {
+          height: 3px;
+        }
+
+        // Played fill — brand color
+        .#{$prefix}-seekbar-playbackposition {
+          background-color: var(--musora-brand-color, #{$color-red});
+        }
+
+        // Buffer + unplayed backdrop — muted white
+        .#{$prefix}-seekbar-bufferlevel {
+          background-color: transparentize($color-primary, 0.7);
+        }
+
+        .#{$prefix}-seekbar-backdrop {
+          background-color: transparentize($color-primary, 0.7);
+        }
+
+        // Chapter markers — dark opaque notch rendered above everything
+        .#{$prefix}-seekbar-markers > .#{$prefix}-seekbar-marker {
+          background-color: rgba(0, 0, 0, 0.9);
+          width: 4px;
+          z-index: 30;
+
+          > .#{$prefix}-seekbar-marker-indicator {
+            display: none;
+          }
+        }
+      }
+    }
+  }
+
+  // ── SeekBar hover label — hidden in Musora skin ──────────────────────────
+  // The bottom pill already shows the current time; the floating hover label
+  // would be redundant and visually cluttered.
+  .#{$prefix}-ui-seekbar-label {
+    display: none !important;
+  }
+
+  // ── Time pill ─────────────────────────────────────────────────────────────
+  .#{$prefix}-musora-playback-time-pill {
+    border-radius: 999px;
+    padding: 0.4em 0.85em;
+    background-color: transparentize($color: #000, $amount: 0.45);
+    backdrop-filter: blur(10px);
+    font-family: 'Open Sans', sans-serif;
+    font-size: 12px;
+    line-height: 16px;
+    color: #ffffff;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+}

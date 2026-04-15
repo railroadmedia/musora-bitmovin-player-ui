@@ -579,25 +579,40 @@ export function musoraSmallScreenUILayout() {
       new AirPlayToggleButton(),
       new VolumeToggleButton(),
       new SettingsToggleButton({ settingsPanel: settingsPanel }),
-      new FullscreenToggleButton(),
     ],
   });
+
+  // No SeekBarLabel — hover preview would duplicate the bottom time pill.
+  const seekBar = new SeekBar();
 
   const controlBar = new ControlBar({
     components: [
       new Container({
+        cssClasses: ['musora-controlbar-timeline'],
         components: [
-          new PlaybackTimeLabel({
-            timeLabelMode: PlaybackTimeLabelMode.CurrentTime,
-            hideInLivePlayback: true,
+          // ── Row 1: time pill (left) + fullscreen (right) ──────────────────
+          new Container({
+            cssClasses: ['musora-controlbar-time-row'],
+            components: [
+              new PlaybackTimeLabel({
+                timeLabelMode: PlaybackTimeLabelMode.CurrentAndTotalTime,
+                hideInLivePlayback: false,
+                timeSeparator: ' / ',
+                // Mirror scrub position in the pill while dragging
+                syncTimeWithSeekPreview: true,
+                disableAdaptiveMinWidth: true,
+                cssClasses: ['musora-playback-time-pill'],
+              }),
+              new Spacer(),
+              new FullscreenToggleButton({ cssClasses: ['musora-controlbar-fullscreen'] }),
+            ],
           }),
-          new SeekBar({ label: new SeekBarLabel() }),
-          new PlaybackTimeLabel({
-            timeLabelMode: PlaybackTimeLabelMode.TotalTime,
-            cssClasses: ['text-right'],
+          // ── Row 2: seek bar — edge-to-edge, no hover label ───────────────
+          new Container({
+            cssClasses: ['musora-controlbar-seek-row'],
+            components: [seekBar],
           }),
         ],
-        cssClasses: ['controlbar-top'],
       }),
     ],
   });

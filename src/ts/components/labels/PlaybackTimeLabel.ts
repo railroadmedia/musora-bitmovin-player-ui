@@ -39,6 +39,21 @@ export interface PlaybackTimeLabelConfig extends LabelConfig {
    * Boolean if the label should be hidden in live playback
    */
   hideInLivePlayback?: boolean;
+  /**
+   * Separator string between current time and total time when using CurrentAndTotalTime mode.
+   * Default: ' / '
+   */
+  timeSeparator?: string;
+  /**
+   * When true, the label updates during seek preview (scrubbing) to show the scrubbed position.
+   * Default: false
+   */
+  syncTimeWithSeekPreview?: boolean;
+  /**
+   * When true, disables the adaptive min-width tracking that prevents UI layout shifts.
+   * Default: false
+   */
+  disableAdaptiveMinWidth?: boolean;
 }
 
 /**
@@ -59,6 +74,9 @@ export class PlaybackTimeLabel extends Label<PlaybackTimeLabelConfig> {
         cssClass: 'ui-playbacktimelabel',
         timeLabelMode: PlaybackTimeLabelMode.CurrentAndTotalTime,
         hideInLivePlayback: false,
+        timeSeparator: ' / ',
+        syncTimeWithSeekPreview: false,
+        disableAdaptiveMinWidth: false,
       },
       this.config,
     );
@@ -122,14 +140,16 @@ export class PlaybackTimeLabel extends Label<PlaybackTimeLabelConfig> {
         this.setTime(PlayerUtils.getCurrentTimeRelativeToSeekableRange(player), player.getDuration());
       }
 
-      // To avoid 'jumping' in the UI by varying label sizes due to non-monospaced fonts,
-      // we gradually increase the min-width with the content to reach a stable size.
-      const width = this.getDomElement().width();
-      if (width > minWidth) {
-        minWidth = width;
-        this.getDomElement().css({
-          'min-width': minWidth + 'px',
-        });
+      if (!config.disableAdaptiveMinWidth) {
+        // To avoid 'jumping' in the UI by varying label sizes due to non-monospaced fonts,
+        // we gradually increase the min-width with the content to reach a stable size.
+        const width = this.getDomElement().width();
+        if (width > minWidth) {
+          minWidth = width;
+          this.getDomElement().css({
+            'min-width': minWidth + 'px',
+          });
+        }
       }
     };
 
@@ -162,6 +182,16 @@ export class PlaybackTimeLabel extends Label<PlaybackTimeLabelConfig> {
     player.on(player.exports.PlayerEvent.StallStarted, updateLiveTimeshiftState);
     player.on(player.exports.PlayerEvent.StallEnded, updateLiveTimeshiftState);
 
+    // Sync pill text with scrub position during seek preview
+    if (config.syncTimeWithSeekPreview) {
+      uimanager.onSeekPreview.subscribe((_sender, args) => {
+        if (!live && player.getDuration() !== Infinity) {
+          const scrubSeconds = args.position * player.getDuration();
+          this.setTime(scrubSeconds, player.getDuration());
+        }
+      });
+    }
+
     const init = () => {
       // Reset min-width when a new source is ready (especially for switching VOD/Live modes where the label content
       // changes)
@@ -193,9 +223,11 @@ export class PlaybackTimeLabel extends Label<PlaybackTimeLabelConfig> {
       case PlaybackTimeLabelMode.TotalTime:
         this.setText(`${totalTime}`);
         break;
-      case PlaybackTimeLabelMode.CurrentAndTotalTime:
-        this.setText(`${currentTime} / ${totalTime}`);
+      case PlaybackTimeLabelMode.CurrentAndTotalTime: {
+        const separator = (<PlaybackTimeLabelConfig>this.config).timeSeparator ?? ' / ';
+        this.setText(`${currentTime}${separator}${totalTime}`);
         break;
+      }
       case PlaybackTimeLabelMode.RemainingTime:
         this.setText(`${StringUtils.secondsToTime(durationSeconds - playbackSeconds, this.timeFormat)}`);
         break;
