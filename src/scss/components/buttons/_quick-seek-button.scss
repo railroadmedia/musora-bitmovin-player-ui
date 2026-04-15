@@ -40,7 +40,7 @@
 
   // Lesson previous / next (Musora CustomMessageHandler); overrides quick-seek icons above
   &.#{$prefix}-ui-lesson-nav-previous .#{$prefix}-ui-icon {
-    background-image: svg-load('../../assets/images/chev-left.svg', fill=$color-icon);
+    background-image: svg-load('../../assets/images/prev.svg', fill=$color-icon);
   }
 
   &.#{$prefix}-ui-lesson-nav-next .#{$prefix}-ui-icon {
