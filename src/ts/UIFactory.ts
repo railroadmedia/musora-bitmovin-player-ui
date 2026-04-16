@@ -61,8 +61,8 @@ import { BackButton } from './components/buttons/BackButton';
 import { MUSORA_LESSON_NEXT_MESSAGE, MUSORA_LESSON_PREVIOUS_MESSAGE } from './utils/MusoraLessonNavigation';
 
 declare const window: {
-  bitmovin: {
-    customMessageHandler: {
+  bitmovin?: {
+    customMessageHandler?: {
       on: (event: string, callback: (data?: string) => void) => void;
     };
   };
@@ -89,6 +89,16 @@ export namespace UIFactory {
    */
   export function buildUI(player: PlayerAPI, config: UIConfig = {}): UIManager {
     const smallScreenSwitchWidth = 800;
+
+    // Subscribe to brand-color messages from the React Native host.
+    // The RN side sends BitmovinCustomEvents.setMusoraBrandColor with a hex string.
+    if (window.bitmovin?.customMessageHandler) {
+      window.bitmovin.customMessageHandler.on('setMusoraBrandColor', (data?: string) => {
+        if (data) {
+          document.documentElement.style.setProperty('--musora-brand-color', data);
+        }
+      });
+    }
 
     return new UIManager(
       player,
@@ -192,7 +202,7 @@ export namespace UIFactory {
       config,
     );
 
-    if (window.bitmovin.customMessageHandler) {
+    if (window.bitmovin?.customMessageHandler) {
       window.bitmovin.customMessageHandler.on('setChapterMarkers', (data?: string) => {
         const markers = JSON.parse(data) as TimelineMarker[];
         manager.getConfig().metadata.markers = [];
@@ -200,6 +210,13 @@ export namespace UIFactory {
         markers.forEach((marker: TimelineMarker) => {
           manager.addTimelineMarker(marker);
         });
+      });
+
+      // Subscribe to brand-color messages from the React Native host.
+      window.bitmovin.customMessageHandler.on('setMusoraBrandColor', (data?: string) => {
+        if (data) {
+          document.documentElement.style.setProperty('--musora-brand-color', data);
+        }
       });
     }
 

@@ -51,6 +51,8 @@
   }
 
   // ── Row 2: seek bar — edge-to-edge ───────────────────────────────────────
+  // Theme from MusoraApp (set on player root / WebView): --musora-brand-color: #rrggbb;
+  // Optional overrides: --musora-seek-buffer-color, --musora-seek-scrub-color
   .#{$prefix}-musora-controlbar-seek-row {
     width: 100%;
 
@@ -60,11 +62,12 @@
       display: flex;
       align-items: center;
 
-      // ── The Red Circle (Thumb) ──────────────────────────────────────────
+      // Brand color: MusoraApp sets --musora-brand-color on the player / WebView host (e.g. from theme).
+      // Falls back to $color-red when unset. Buffer uses color-mix so it tracks the same hue.
       .#{$prefix}-seekbar-playbackposition-marker {
         width: 13px;
         height: 13px;
-        background-color: #ff0000; // YouTube Red
+        background-color: var(--musora-brand-color, #{$color-red});
         border-radius: 50%;
         box-shadow: none;
         z-index: 40; // Ensure it stays above the gaps
@@ -90,7 +93,7 @@
         }
 
         .#{$prefix}-seekbar-playbackposition {
-          background-color: #ff0000; // Played Red
+          background-color: var(--musora-brand-color, #{$color-red});
           z-index: 10;
         }
 
