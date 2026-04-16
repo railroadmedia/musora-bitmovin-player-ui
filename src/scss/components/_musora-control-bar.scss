@@ -14,21 +14,19 @@
 
   // ── Outer timeline column ────────────────────────────────────────────────
   .#{$prefix}-musora-controlbar-timeline {
-    width: 100%;
-
     > .#{$prefix}-container-wrapper {
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      row-gap: 0.35em;
-      width: 100%;
+      // This keeps the time row and seek bar tightly packed
+      // which looks better when vertical space is limited in landscape.
+      row-gap: 0;
     }
   }
 
   // ── Row 1: pill (left) + fullscreen (right) ──────────────────────────────
+  // Right padding matches the title-bar ($titlebar-padding: 1.5em) so the
+  // fullscreen icon sits directly below the settings gear.
   .#{$prefix}-musora-controlbar-time-row {
     width: 100%;
-    padding: 0 0.75em;
+    padding: 0 1.5em 0 0.75em;
 
     > .#{$prefix}-container-wrapper {
       display: flex;
@@ -50,46 +48,125 @@
     }
   }
 
-  // ── Row 2: seek bar — edge-to-edge ───────────────────────────────────────
+  // ── Row 2: seek bar ─────────────────────────────────────────────────────
+  // Symmetric horizontal padding = half the dot diameter so the dot is fully
+  // visible at 0 % and 100 %. The dot is 13 px → pad 7 px (≈ 0.45em).
   // Theme from MusoraApp (set on player root / WebView): --musora-brand-color: #rrggbb;
-  // Optional overrides: --musora-seek-buffer-color, --musora-seek-scrub-color
   .#{$prefix}-musora-controlbar-seek-row {
     width: 100%;
+    // Standardizing padding for both sides
+    padding: 0 12px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+
+    // This target ensures the internal wrapper doesn't ignore the parent padding
+    > .#{$prefix}-container-wrapper {
+      // width: 100%;
+      // display: flex;
+      // flex-direction: row;
+      // align-items: center;
+      flex: 1;
+      min-width: 0; // Essential for preventing flex children from overflowing in landscape
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
 
     .#{$prefix}-ui-seekbar {
-      flex: 1;
       min-height: 16px;
       display: flex;
       align-items: center;
+      position: relative;
+      flex: 1;
+      min-width: 0; // Ensures the seekbar component can shrink/fit correctly
 
-      // Brand color: MusoraApp sets --musora-brand-color on the player / WebView host (e.g. from theme).
-      // Falls back to $color-red when unset. Buffer uses color-mix so it tracks the same hue.
       .#{$prefix}-seekbar-playbackposition-marker {
         width: 13px;
         height: 13px;
         background-color: var(--musora-brand-color, #{$color-red});
         border-radius: 50%;
         box-shadow: none;
-        z-index: 40; // Ensure it stays above the gaps
-        left: -6.5px;
+        z-index: 40;
+
+        /* FIX: Removed 'margin-left: -6.5px' and 'transform: translateX(0)'.
+           'left: 0' keeps the element at the logic-driven percentage.
+           'translateX(-50%)' shifts the dot so its center stays on that percentage.
+        */
+        left: 0;
+        transform: translateX(-50%);
+        margin-left: 0;
       }
 
       .#{$prefix}-seekbar {
         height: 3px;
+        width: 100%; // Force the rail to respect the flex-grow
         position: relative;
+        overflow: visible;
 
         .#{$prefix}-seekbar-bars {
           height: 100%;
-          border-radius: 0; // Flat edges like YT
+          border-radius: 0;
         }
+
+        ///
+        /// #{$prefix}-musora-controlbar-seek-row {
+        // width: 100%;
+        // padding: 0 12px;
+        // box-sizing: border-box;
+        // display: flex;
+        // justify-content: center;
+
+        // > .#{$prefix}-container-wrapper {
+        //   // FIX: Changed from width: 100% to flex: 1
+        //   // This ensures it fills the space but respects the parent's padding boundaries
+        //   flex: 1;
+        //   min-width: 0; // Essential for preventing flex children from overflowing in landscape
+        //   display: flex;
+        //   flex-direction: row;
+        //   align-items: center;
+        // }
+
+        // .#{$prefix}-ui-seekbar {
+        //   flex: 1;
+        //   min-width: 0; // Ensures the seekbar component can shrink/fit correctly
+        //   min-height: 16px;
+        //   display: flex;
+        //   align-items: center;
+        //   position: relative;
+
+        //   .#{$prefix}-seekbar-playbackposition-marker {
+        //     width: 13px;
+        //     height: 13px;
+        //     background-color: var(--musora-brand-color, #{$color-red});
+        //     border-radius: 50%;
+        //     box-shadow: none;
+        //     z-index: 40;
+        //     // Perfect centering logic
+        //     left: 0;
+        //     transform: translateX(-50%);
+        //     margin-left: 0;
+        //   }
+
+        //   .#{$prefix}-seekbar {
+        //     height: 3px;
+        //     // FIX: Ensure the rail fills the seekbar container but never exceeds it
+        //     width: 100%;
+        //     position: relative;
+        //     overflow: visible;
+
+        //     .#{$prefix}-seekbar-bars {
+        //       height: 100%;
+        //       border-radius: 0;
+        //     }
 
         // ── Colors ────────────────────────────────────────────────────────
         .#{$prefix}-seekbar-backdrop {
-          background-color: rgba(255, 255, 255, 0.2); // Unplayed grey
+          background-color: rgba(255, 255, 255, 0.2);
         }
 
         .#{$prefix}-seekbar-bufferlevel {
-          background-color: rgba(255, 255, 255, 0.4); // Buffered white
+          background-color: rgba(255, 255, 255, 0.4);
         }
 
         .#{$prefix}-seekbar-playbackposition {
@@ -97,22 +174,19 @@
           z-index: 10;
         }
 
-        // ── Chapter Gaps (The "Doodle" Fix) ────────────────────────────────
-        // We use transparent borders to create the visual "gap" between segments.
+        // ── Chapter Gaps ──────────────────────────────────────────────────
         .#{$prefix}-seekbar-markers > .#{$prefix}-seekbar-marker {
           background-color: transparent;
-          width: 4px; // Total gap width
+          width: 4px;
           z-index: 30;
           height: 100%;
 
-          // This is the trick: we create a vertical line that matches the
-          // player's background (usually black) to act as the "cut"
           &::after {
             content: '';
             display: block;
-            width: 2px; // The actual visible gap width
+            width: 2px;
             height: 100%;
-            background-color: white; // Match this to your player background color
+            background-color: white; // Changed to black to "cut" through the bar like YouTube
             margin: 0 auto;
           }
 
@@ -123,6 +197,11 @@
       }
     }
   }
+  // ── SeekBar hover label — hidden in Musora skin ──────────────────────────
+  .#{$prefix}-ui-seekbar-label {
+    display: none !important;
+  }
+
   // ── Time pill ─────────────────────────────────────────────────────────────
   .#{$prefix}-musora-playback-time-pill {
     border-radius: 999px;
