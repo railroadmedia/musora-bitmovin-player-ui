@@ -1,32 +1,40 @@
 @import '../variables';
 
-// Musora small-screen: time pill + fullscreen above full-width seek bar at bottom.
+// ────────────────────────────────────────────────────────────────────────────
+// Musora small-screen control bar
+// Layout: time-pill + fullscreen above a full-width seek bar at the bottom.
+// ────────────────────────────────────────────────────────────────────────────
 .#{$prefix}-ui-skin-musora.#{$prefix}-ui-skin-smallscreen .#{$prefix}-ui-controlbar {
-  // Default control bar uses a transparent→dark gradient that reads as a black veil over the seek bar.
-  // Remove it so the bar sits cleanly on the video; the time pill has its own background.
+  // Remove the default gradient backdrop — the time pill has its own.
   background: none;
 
-  // Strip bottom/side padding so the seek bar sits flush with the player edges.
-  // Horizontal padding lives only on the time row (pill + fullscreen button).
-  padding-bottom: 0;
+  // Horizontal insets live on each row. Restore bottom safe-area here — the base
+  // control bar normally uses max(1em, safe-area-inset-bottom); padding: 0 removed
+  // that and in landscape the bar could sit under the home indicator / get clipped
+  // by the full-screen UI container (overflow: hidden).
+  padding-top: 0;
   padding-left: 0;
   padding-right: 0;
+  padding-bottom: max(0.5em, env(safe-area-inset-bottom, 0));
 
-  // ── Outer timeline column ────────────────────────────────────────────────
+  // ── Outer column ─────────────────────────────────────────────────────────
   .#{$prefix}-musora-controlbar-timeline {
     > .#{$prefix}-container-wrapper {
-      // This keeps the time row and seek bar tightly packed
-      // which looks better when vertical space is limited in landscape.
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
       row-gap: 0;
+      width: 100%;
     }
   }
 
-  // ── Row 1: pill (left) + fullscreen (right) ──────────────────────────────
-  // Right padding matches the title-bar ($titlebar-padding: 1.5em) so the
-  // fullscreen icon sits directly below the settings gear.
+  // ── Row 1 — pill (left) + fullscreen (right) ────────────────────────────
+  // Horizontal padding = max(1em, safe-area) — identical to the small-screen
+  // title bar so the fullscreen icon lines up with the settings gear above it.
   .#{$prefix}-musora-controlbar-time-row {
     width: 100%;
-    padding: 0 1.5em 0 0.75em;
+    box-sizing: border-box;
+    padding: 0.35em max(1em, env(safe-area-inset-right, 0)) 0.35em max(1em, env(safe-area-inset-left, 0));
 
     > .#{$prefix}-container-wrapper {
       display: flex;
@@ -34,6 +42,7 @@
       justify-content: flex-start;
       align-items: center;
       width: 100%;
+      min-width: 0; // allow row to respect parent width when safe-area + pill compete
     }
 
     .#{$prefix}-ui-spacer {
@@ -43,44 +52,54 @@
       width: auto;
     }
 
+    // Prevent the nowrap time string from forcing the fullscreen control off-screen
+    // (parent UI container uses overflow: hidden — common in landscape with notch insets).
+    .#{$prefix}-ui-playbacktimelabel.#{$prefix}-musora-playback-time-pill {
+      flex: 0 1 auto;
+      min-width: 0;
+      max-width: 100%;
+      overflow: hidden;
+
+      .#{$prefix}-ui-label-text {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+
     .#{$prefix}-musora-controlbar-fullscreen {
       flex-shrink: 0;
+      position: relative;
+      z-index: 1;
     }
   }
 
-  // ── Row 2: seek bar ─────────────────────────────────────────────────────
-  // Symmetric horizontal padding = half the dot diameter so the dot is fully
-  // visible at 0 % and 100 %. The dot is 13 px → pad 7 px (≈ 0.45em).
-  // Theme from MusoraApp (set on player root / WebView): --musora-brand-color: #rrggbb;
+  // ── Row 2 — seek bar ────────────────────────────────────────────────────
+  // 12 px symmetric padding gives the 13 px dot enough room at 0 % and 100 %
+  // without pushing the bar noticeably away from the edges.
   .#{$prefix}-musora-controlbar-seek-row {
     width: 100%;
-    // Standardizing padding for both sides
     padding: 0 12px;
     box-sizing: border-box;
     display: flex;
-    justify-content: center;
 
-    // This target ensures the internal wrapper doesn't ignore the parent padding
     > .#{$prefix}-container-wrapper {
-      // width: 100%;
-      // display: flex;
-      // flex-direction: row;
-      // align-items: center;
       flex: 1;
-      min-width: 0; // Essential for preventing flex children from overflowing in landscape
+      min-width: 0;
       display: flex;
       flex-direction: row;
       align-items: center;
     }
 
     .#{$prefix}-ui-seekbar {
+      flex: 1;
+      min-width: 0;
       min-height: 16px;
       display: flex;
       align-items: center;
       position: relative;
-      flex: 1;
-      min-width: 0; // Ensures the seekbar component can shrink/fit correctly
 
+      // ── Dot ──────────────────────────────────────────────────────────
       .#{$prefix}-seekbar-playbackposition-marker {
         width: 13px;
         height: 13px;
@@ -88,19 +107,17 @@
         border-radius: 50%;
         box-shadow: none;
         z-index: 40;
-
-        /* FIX: Removed 'margin-left: -6.5px' and 'transform: translateX(0)'.
-           'left: 0' keeps the element at the logic-driven percentage.
-           'translateX(-50%)' shifts the dot so its center stays on that percentage.
-        */
+        // The JS positions via transform: translateX(…%). We centre the dot
+        // on that percentage by shifting it left by half its width.
         left: 0;
         transform: translateX(-50%);
         margin-left: 0;
       }
 
+      // ── Track ────────────────────────────────────────────────────────
       .#{$prefix}-seekbar {
         height: 3px;
-        width: 100%; // Force the rail to respect the flex-grow
+        width: 100%;
         position: relative;
         overflow: visible;
 
@@ -109,58 +126,7 @@
           border-radius: 0;
         }
 
-        ///
-        /// #{$prefix}-musora-controlbar-seek-row {
-        // width: 100%;
-        // padding: 0 12px;
-        // box-sizing: border-box;
-        // display: flex;
-        // justify-content: center;
-
-        // > .#{$prefix}-container-wrapper {
-        //   // FIX: Changed from width: 100% to flex: 1
-        //   // This ensures it fills the space but respects the parent's padding boundaries
-        //   flex: 1;
-        //   min-width: 0; // Essential for preventing flex children from overflowing in landscape
-        //   display: flex;
-        //   flex-direction: row;
-        //   align-items: center;
-        // }
-
-        // .#{$prefix}-ui-seekbar {
-        //   flex: 1;
-        //   min-width: 0; // Ensures the seekbar component can shrink/fit correctly
-        //   min-height: 16px;
-        //   display: flex;
-        //   align-items: center;
-        //   position: relative;
-
-        //   .#{$prefix}-seekbar-playbackposition-marker {
-        //     width: 13px;
-        //     height: 13px;
-        //     background-color: var(--musora-brand-color, #{$color-red});
-        //     border-radius: 50%;
-        //     box-shadow: none;
-        //     z-index: 40;
-        //     // Perfect centering logic
-        //     left: 0;
-        //     transform: translateX(-50%);
-        //     margin-left: 0;
-        //   }
-
-        //   .#{$prefix}-seekbar {
-        //     height: 3px;
-        //     // FIX: Ensure the rail fills the seekbar container but never exceeds it
-        //     width: 100%;
-        //     position: relative;
-        //     overflow: visible;
-
-        //     .#{$prefix}-seekbar-bars {
-        //       height: 100%;
-        //       border-radius: 0;
-        //     }
-
-        // ── Colors ────────────────────────────────────────────────────────
+        // Colours
         .#{$prefix}-seekbar-backdrop {
           background-color: rgba(255, 255, 255, 0.2);
         }
@@ -174,7 +140,7 @@
           z-index: 10;
         }
 
-        // ── Chapter Gaps ──────────────────────────────────────────────────
+        // Chapter gaps — thin white lines that punch through the bar
         .#{$prefix}-seekbar-markers > .#{$prefix}-seekbar-marker {
           background-color: transparent;
           width: 4px;
@@ -186,7 +152,7 @@
             display: block;
             width: 2px;
             height: 100%;
-            background-color: white; // Changed to black to "cut" through the bar like YouTube
+            background-color: white;
             margin: 0 auto;
           }
 
@@ -197,12 +163,13 @@
       }
     }
   }
+
   // ── SeekBar hover label — hidden in Musora skin ──────────────────────────
   .#{$prefix}-ui-seekbar-label {
     display: none !important;
   }
 
-  // ── Time pill ─────────────────────────────────────────────────────────────
+  // ── Time pill ────────────────────────────────────────────────────────────
   .#{$prefix}-musora-playback-time-pill {
     border-radius: 999px;
     padding: 0.4em 0.85em;
