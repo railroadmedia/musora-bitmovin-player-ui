@@ -93,6 +93,13 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
 
   private latestTapPosition: ClickPosition;
 
+  // Lesson-navigation visibility/disabled state set by the native host
+  private lessonNavVisible: boolean = true;
+  private lessonNavPrevDisabled: boolean = false;
+  private lessonNavNextDisabled: boolean = false;
+
+  private readonly LESSON_NAV_DISABLED_CLASS = 'lesson-nav-disabled';
+
   constructor(config: TouchControlOverlayConfig = {}) {
     super(config);
 
@@ -167,8 +174,11 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
 
     const showPlaybackToggleButton = () => {
       this.playbackToggleButton.show();
-      this.quickSeekBackwardButton.show();
-      this.quickSeekForwardButton.show();
+      // Only show nav buttons if the native host hasn't hidden them
+      if (this.lessonNavVisible) {
+        this.quickSeekBackwardButton.show();
+        this.quickSeekForwardButton.show();
+      }
     };
 
     const hidePlaybackToggleButton = () => {
@@ -359,5 +369,45 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
 
   get onClick(): EDEvent<TouchControlOverlay, NoArgs> {
     return this.touchControlEvents.onSingleClick.getEvent();
+  }
+
+  /**
+   * Called by the native host via the `setLessonNavigationState` CustomMessageHandler event.
+   * Controls whether the prev/next lesson buttons are shown and whether they appear disabled.
+   *
+   * @param show          Whether to render the lesson-nav buttons at all.
+   * @param prevDisabled  Disable (grey out) the previous button — used on the first lesson.
+   * @param nextDisabled  Disable (grey out) the next button — used on the last lesson.
+   * @param disabledColor CSS colour string applied when a button is disabled (e.g. "#666E7D").
+   */
+  public setLessonNavState(show: boolean, prevDisabled: boolean, nextDisabled: boolean, disabledColor: string): void {
+    this.lessonNavVisible = show;
+
+    if (show) {
+      this.quickSeekBackwardButton.show();
+      this.quickSeekForwardButton.show();
+    } else {
+      this.quickSeekBackwardButton.hide();
+      this.quickSeekForwardButton.hide();
+    }
+
+    // Apply/remove disabled class and colour variable on each button
+    this.applyNavButtonDisabledState(this.quickSeekBackwardButton, prevDisabled, disabledColor);
+    this.applyNavButtonDisabledState(this.quickSeekForwardButton, nextDisabled, disabledColor);
+
+    this.lessonNavPrevDisabled = prevDisabled;
+    this.lessonNavNextDisabled = nextDisabled;
+  }
+
+  private applyNavButtonDisabledState(button: QuickSeekButton, disabled: boolean, color: string): void {
+    const el = button.getDomElement();
+    const cls = this.prefixCss(this.LESSON_NAV_DISABLED_CLASS);
+    if (disabled) {
+      el.addClass(cls);
+      el.css({ '--musora-nav-disabled-color': color });
+    } else {
+      el.removeClass(cls);
+      el.css({ '--musora-nav-disabled-color': '' });
+    }
   }
 }

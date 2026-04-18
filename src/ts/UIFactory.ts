@@ -92,10 +92,27 @@ export namespace UIFactory {
 
     // Subscribe to brand-color messages from the React Native host.
     // The RN side sends BitmovinCustomEvents.setMusoraBrandColor with a hex string.
+    let navOverlay: TouchControlOverlay | null = null;
+
     if (window.bitmovin?.customMessageHandler) {
       window.bitmovin.customMessageHandler.on('setMusoraBrandColor', (data?: string) => {
         if (data) {
           document.documentElement.style.setProperty('--musora-brand-color', data);
+        }
+      });
+
+      window.bitmovin.customMessageHandler.on('setLessonNavigationState', (data?: string) => {
+        if (!data || !navOverlay) return;
+        try {
+          const { show, previousDisabled, nextDisabled, disabledColor } = JSON.parse(data) as {
+            show: boolean;
+            previousDisabled: boolean;
+            nextDisabled: boolean;
+            disabledColor: string;
+          };
+          navOverlay.setLessonNavState(show, previousDisabled, nextDisabled, disabledColor);
+        } catch (_) {
+          // Ignore malformed payloads
         }
       });
     }
@@ -104,7 +121,9 @@ export namespace UIFactory {
       player,
       [
         {
-          ui: musoraSmallScreenUILayout(),
+          ui: musoraSmallScreenUILayout(overlay => {
+            navOverlay = overlay;
+          }),
           condition: (context: UIConditionContext) => {
             return true;
           },
@@ -189,11 +208,15 @@ export namespace UIFactory {
   }
 
   export function buildMusoraUI(player: PlayerAPI, config: UIConfig = {}): UIManager {
+    let navOverlay: TouchControlOverlay | null = null;
+
     const manager = new UIManager(
       player,
       [
         {
-          ui: musoraSmallScreenUILayout(),
+          ui: musoraSmallScreenUILayout(overlay => {
+            navOverlay = overlay;
+          }),
           condition: (context: UIConditionContext) => {
             return true;
           },
@@ -216,6 +239,21 @@ export namespace UIFactory {
       window.bitmovin.customMessageHandler.on('setMusoraBrandColor', (data?: string) => {
         if (data) {
           document.documentElement.style.setProperty('--musora-brand-color', data);
+        }
+      });
+
+      window.bitmovin.customMessageHandler.on('setLessonNavigationState', (data?: string) => {
+        if (!data || !navOverlay) return;
+        try {
+          const { show, previousDisabled, nextDisabled, disabledColor } = JSON.parse(data) as {
+            show: boolean;
+            previousDisabled: boolean;
+            nextDisabled: boolean;
+            disabledColor: string;
+          };
+          navOverlay.setLessonNavState(show, previousDisabled, nextDisabled, disabledColor);
+        } catch (_) {
+          // Ignore malformed payloads
         }
       });
     }
@@ -532,7 +570,7 @@ function smallScreenAdsUILayout() {
   });
 }
 
-export function musoraSmallScreenUILayout() {
+export function musoraSmallScreenUILayout(onOverlayReady?: (overlay: TouchControlOverlay) => void) {
   const subtitleOverlay = new SubtitleOverlay();
 
   // const mainSettingsPanelPage = new SettingsPanelPage({
@@ -640,12 +678,16 @@ export function musoraSmallScreenUILayout() {
       subtitleOverlay,
       new BufferingOverlay(),
       new CastStatusOverlay(),
-      new TouchControlOverlay({
-        lessonNavigation: {
-          previousMessage: MUSORA_LESSON_PREVIOUS_MESSAGE,
-          nextMessage: MUSORA_LESSON_NEXT_MESSAGE,
-        },
-      }),
+      (() => {
+        const touchOverlay = new TouchControlOverlay({
+          lessonNavigation: {
+            previousMessage: MUSORA_LESSON_PREVIOUS_MESSAGE,
+            nextMessage: MUSORA_LESSON_NEXT_MESSAGE,
+          },
+        });
+        onOverlayReady?.(touchOverlay);
+        return touchOverlay;
+      })(),
       new MusoraStandardEndScreen(),
       controlBar,
       titleBar,
