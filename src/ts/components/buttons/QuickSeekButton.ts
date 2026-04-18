@@ -4,6 +4,14 @@ import { PlayerAPI, TimeShiftEvent } from 'bitmovin-player';
 import { UIInstanceManager } from '../../UIManager';
 import { PlayerUtils } from '../../utils/PlayerUtils';
 
+declare const window: {
+  bitmovin?: {
+    customMessageHandler?: {
+      sendAsynchronous: (message: string) => void;
+    };
+  };
+};
+
 /**
  * @category Configs
  */
@@ -18,6 +26,15 @@ export interface QuickSeekButtonConfig extends ButtonConfig {
    * Default is -10.
    */
   seekSeconds?: number;
+  /**
+   * When set, each activation sends this string via `window.bitmovin.customMessageHandler.sendAsynchronous`
+   * instead of seeking. Used for lesson previous/next (see {@link TouchControlOverlayConfig.lessonNavigation}).
+   */
+  customMessage?: string;
+  /**
+   * Required when using {@link QuickSeekButtonConfig.customMessage} for default accessibility copy and styling hooks.
+   */
+  lessonNavigationRole?: 'previous' | 'next';
 }
 
 /**
@@ -40,18 +57,29 @@ export class QuickSeekButton extends Button<QuickSeekButtonConfig> {
       this.config,
     );
 
-    const seekDirection = this.config.seekSeconds < 0 ? 'rewind' : 'forward';
+    const cfg = <QuickSeekButtonConfig>this.config;
 
-    this.config.text = this.config.text || i18n.getLocalizer(`quickseek.${seekDirection}`);
-    this.config.ariaLabel =
-      this.config.ariaLabel ||
-      i18n.getLocalizer(`quickseek.${seekDirection}`, {
-        seekSeconds: Math.abs(this.config.seekSeconds),
-      });
+    if (cfg.customMessage) {
+      const role = cfg.lessonNavigationRole ?? 'previous';
+      cfg.text = cfg.text ?? '';
+      cfg.ariaLabel = cfg.ariaLabel ?? i18n.getLocalizer(role === 'previous' ? 'lesson.previous' : 'lesson.next');
+      cfg.cssClasses = (cfg.cssClasses ?? []).concat([
+        role === 'previous' ? 'ui-lesson-nav-previous' : 'ui-lesson-nav-next',
+      ]);
+    } else {
+      const seekDirection = cfg.seekSeconds < 0 ? 'rewind' : 'forward';
 
-    this.getDomElement()
-      .data(this.prefixCss('seek-direction'), seekDirection)
-      .data(this.prefixCss('seek-seconds'), Math.abs(this.config.seekSeconds).toString());
+      cfg.text = cfg.text || i18n.getLocalizer(`quickseek.${seekDirection}`);
+      cfg.ariaLabel =
+        cfg.ariaLabel ||
+        i18n.getLocalizer(`quickseek.${seekDirection}`, {
+          seekSeconds: Math.abs(cfg.seekSeconds),
+        });
+
+      this.getDomElement()
+        .data(this.prefixCss('seek-direction'), seekDirection)
+        .data(this.prefixCss('seek-seconds'), Math.abs(cfg.seekSeconds).toString());
+    }
   }
 
   configure(player: PlayerAPI, uimanager: UIInstanceManager): void {
@@ -86,6 +114,15 @@ export class QuickSeekButton extends Button<QuickSeekButtonConfig> {
     // Initial detection
     timeShiftDetector.detect();
     liveStreamDetector.detect();
+
+    const customMessage = (<QuickSeekButtonConfig>this.config).customMessage;
+
+    if (customMessage) {
+      this.onClick.subscribe(() => {
+        window.bitmovin?.customMessageHandler?.sendAsynchronous(customMessage);
+      });
+      return;
+    }
 
     this.onClick.subscribe(() => {
       if (isLive && !hasTimeShift) {
@@ -134,9 +171,11 @@ export class QuickSeekButton extends Button<QuickSeekButtonConfig> {
   };
 
   release(): void {
-    this.player.off(this.player.exports.PlayerEvent.Seeked, this.onSeekedOrTimeShifted);
-    this.player.off(this.player.exports.PlayerEvent.TimeShift, this.onTimeShift);
-    this.player.off(this.player.exports.PlayerEvent.TimeShifted, this.onSeekedOrTimeShifted);
+    if (!(<QuickSeekButtonConfig>this.config).customMessage && this.player != null) {
+      this.player.off(this.player.exports.PlayerEvent.Seeked, this.onSeekedOrTimeShifted);
+      this.player.off(this.player.exports.PlayerEvent.TimeShift, this.onTimeShift);
+      this.player.off(this.player.exports.PlayerEvent.TimeShifted, this.onSeekedOrTimeShifted);
+    }
     this.currentSeekTarget = null;
     this.player = null;
   }

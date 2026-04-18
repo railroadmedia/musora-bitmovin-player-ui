@@ -104,5 +104,17 @@
         width: 35px;
       }
     }
+
+    // Applied by setLessonNavState() when prevDisabled / nextDisabled is true.
+    // Greys out the button using the colour provided by the native host.
+    .#{$prefix}-lesson-nav-disabled {
+      opacity: 0.5;
+      pointer-events: none;
+      color: var(--musora-nav-disabled-color, #666e7d);
+
+      .#{$prefix}-ui-icon {
+        filter: grayscale(1);
+      }
+    }
   }
 }

@@ -3,6 +3,8 @@ import { ListSelectorConfig } from '../lists/ListSelector';
 import { UIInstanceManager } from '../../UIManager';
 import { PlayerAPI } from 'bitmovin-player';
 import { i18n } from '../../localization/i18n';
+import { StorageUtils } from '../../utils/StorageUtils';
+import { prefixCss } from '../DummyComponent';
 
 const SPEED_MATCH_EPSILON = 1e-4;
 
@@ -24,6 +26,9 @@ const PRESET_SPEEDS: readonly { key: string; value: number }[] = [
  */
 export class PlaybackSpeedSelectBox extends SelectBox {
   protected defaultPlaybackSpeeds: number[];
+
+  /** localStorage key for last user-chosen playback speed (persists across sources). */
+  private static readonly STORAGE_KEY = prefixCss('playback-speed-preference');
 
   private readonly speedDisplayLabels: Record<string, string> = {
     '0.5': '0.5x',
@@ -54,16 +59,31 @@ export class PlaybackSpeedSelectBox extends SelectBox {
 
     this.onItemSelected.subscribe((sender: PlaybackSpeedSelectBox, value: string) => {
       player.setPlaybackSpeed(parseFloat(value));
+      StorageUtils.setItem(PlaybackSpeedSelectBox.STORAGE_KEY, value);
       this.selectItem(value);
     });
 
-    const setDefaultValue = (): void => {
-      const playbackSpeed = player.getPlaybackSpeed();
-      this.setSpeed(playbackSpeed);
+    // Sync the select-box UI with the player's current speed (e.g. changed externally).
+    const syncUiWithPlayerSpeed = (): void => {
+      this.setSpeed(player.getPlaybackSpeed());
     };
 
-    player.on(player.exports.PlayerEvent.PlaybackSpeedChanged, setDefaultValue);
-    uimanager.getConfig().events.onUpdated.subscribe(setDefaultValue);
+    // On a new source / UI reconfigure, restore the persisted speed (or fall back to
+    // whatever the player reports). We also call setSpeed() directly here because
+    // PlaybackSpeedChanged is not guaranteed to fire synchronously, which would leave
+    // the select box showing "-" even though the player speed is correctly applied.
+    const applyPersistedOrCurrentSpeed = (): void => {
+      const persisted = StorageUtils.getItem(PlaybackSpeedSelectBox.STORAGE_KEY);
+      if (persisted !== null) {
+        player.setPlaybackSpeed(parseFloat(persisted));
+        this.setSpeed(parseFloat(persisted));
+      } else {
+        syncUiWithPlayerSpeed();
+      }
+    };
+
+    player.on(player.exports.PlayerEvent.PlaybackSpeedChanged, syncUiWithPlayerSpeed);
+    uimanager.getConfig().events.onUpdated.subscribe(applyPersistedOrCurrentSpeed);
   }
 
   setSpeed(speed: number): void {

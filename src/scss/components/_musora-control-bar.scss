@@ -1,0 +1,185 @@
+@import '../variables';
+
+// ────────────────────────────────────────────────────────────────────────────
+// Musora small-screen control bar
+// Layout: time-pill + fullscreen above a full-width seek bar at the bottom.
+// ────────────────────────────────────────────────────────────────────────────
+.#{$prefix}-ui-skin-musora.#{$prefix}-ui-skin-smallscreen .#{$prefix}-ui-controlbar {
+  // Remove the default gradient backdrop — the time pill has its own.
+  background: none;
+
+  // Horizontal insets live on each row. Restore bottom safe-area here — the base
+  // control bar normally uses max(1em, safe-area-inset-bottom); padding: 0 removed
+  // that and in landscape the bar could sit under the home indicator / get clipped
+  // by the full-screen UI container (overflow: hidden).
+  padding-top: 0;
+  padding-left: 0;
+  padding-right: 0;
+  padding-bottom: max(0.5em, env(safe-area-inset-bottom, 0));
+
+  // ── Outer column ─────────────────────────────────────────────────────────
+  .#{$prefix}-musora-controlbar-timeline {
+    > .#{$prefix}-container-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      row-gap: 0;
+      width: 100%;
+    }
+  }
+
+  // ── Row 1 — pill (left) + fullscreen (right) ────────────────────────────
+  // Horizontal padding = max(1em, safe-area) — identical to the small-screen
+  // title bar so the fullscreen icon lines up with the settings gear above it.
+  .#{$prefix}-musora-controlbar-time-row {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.35em max(1em, env(safe-area-inset-right, 0)) 0.35em max(1em, env(safe-area-inset-left, 0));
+
+    > .#{$prefix}-container-wrapper {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: center;
+      width: 100%;
+      min-width: 0; // allow row to respect parent width when safe-area + pill compete
+    }
+
+    .#{$prefix}-ui-spacer {
+      flex: 1;
+      min-width: 0;
+      height: auto;
+      width: auto;
+    }
+
+    // Prevent the nowrap time string from forcing the fullscreen control off-screen
+    // (parent UI container uses overflow: hidden — common in landscape with notch insets).
+    .#{$prefix}-ui-playbacktimelabel.#{$prefix}-musora-playback-time-pill {
+      flex: 0 1 auto;
+      min-width: 0;
+      max-width: 100%;
+      overflow: hidden;
+
+      .#{$prefix}-ui-label-text {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+
+    .#{$prefix}-musora-controlbar-fullscreen {
+      flex-shrink: 0;
+      position: relative;
+      z-index: 1;
+    }
+  }
+
+  // ── Row 2 — seek bar ────────────────────────────────────────────────────
+  // 12 px symmetric padding gives the 13 px dot enough room at 0 % and 100 %
+  // without pushing the bar noticeably away from the edges.
+  .#{$prefix}-musora-controlbar-seek-row {
+    width: 100%;
+    padding: 0 12px;
+    box-sizing: border-box;
+    display: flex;
+
+    > .#{$prefix}-container-wrapper {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+
+    .#{$prefix}-ui-seekbar {
+      flex: 1;
+      min-width: 0;
+      min-height: 16px;
+      display: flex;
+      align-items: center;
+      position: relative;
+
+      // ── Dot ──────────────────────────────────────────────────────────
+      .#{$prefix}-seekbar-playbackposition-marker {
+        width: 13px;
+        height: 13px;
+        background-color: var(--musora-brand-color, #{$color-red});
+        border-radius: 50%;
+        box-shadow: none;
+        z-index: 40;
+        // The JS positions via transform: translateX(…%). We centre the dot
+        // on that percentage by shifting it left by half its width.
+        left: 0;
+        transform: translateX(-50%);
+        margin-left: 0;
+      }
+
+      // ── Track ────────────────────────────────────────────────────────
+      .#{$prefix}-seekbar {
+        height: 3px;
+        width: 100%;
+        position: relative;
+        overflow: visible;
+
+        .#{$prefix}-seekbar-bars {
+          height: 100%;
+          border-radius: 0;
+        }
+
+        // Colours
+        .#{$prefix}-seekbar-backdrop {
+          background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .#{$prefix}-seekbar-bufferlevel {
+          background-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .#{$prefix}-seekbar-playbackposition {
+          background-color: var(--musora-brand-color, #{$color-red});
+          z-index: 10;
+        }
+
+        // Chapter gaps — thin white lines that punch through the bar
+        .#{$prefix}-seekbar-markers > .#{$prefix}-seekbar-marker {
+          background-color: transparent;
+          width: 4px;
+          z-index: 30;
+          height: 100%;
+
+          &::after {
+            content: '';
+            display: block;
+            width: 2px;
+            height: 100%;
+            background-color: white;
+            margin: 0 auto;
+          }
+
+          > .#{$prefix}-seekbar-marker-indicator {
+            display: none;
+          }
+        }
+      }
+    }
+  }
+
+  // ── SeekBar hover label — hidden in Musora skin ──────────────────────────
+  .#{$prefix}-ui-seekbar-label {
+    display: none !important;
+  }
+
+  // ── Time pill ────────────────────────────────────────────────────────────
+  .#{$prefix}-musora-playback-time-pill {
+    border-radius: 999px;
+    padding: 0.4em 0.85em;
+    background-color: transparentize($color: #000, $amount: 0.45);
+    backdrop-filter: blur(10px);
+    font-family: 'Open Sans', sans-serif;
+    font-size: 12px;
+    line-height: 16px;
+    color: #ffffff;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+}

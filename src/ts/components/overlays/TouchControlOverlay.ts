@@ -11,6 +11,14 @@ import { Label, LabelConfig } from '../labels/Label';
 // NOTE: uncomment to re-enable double tap visuals
 // import { i18n } from '../../localization/i18n';
 
+/**
+ * Messages for lesson prev/next on the side buttons only. Double-tap on the overlay edges still quick-seeks.
+ */
+export interface LessonNavigationMessages {
+  previousMessage: string;
+  nextMessage: string;
+}
+
 export interface TouchControlOverlayConfig extends ContainerConfig {
   /**
    * Specify whether the player should be set to enter fullscreen by clicking on the playback toggle button
@@ -46,6 +54,12 @@ export interface TouchControlOverlayConfig extends ContainerConfig {
    * Default: 200ms
    */
   seekDoubleTapTimeout?: number;
+
+  /**
+   * When set, left/right overlay buttons use lesson prev/next icons and send CustomMessageHandler messages.
+   * Double-tap on the left/right thirds still seeks by {@link TouchControlOverlayConfig.seekTime} (default 10s).
+   */
+  lessonNavigation?: LessonNavigationMessages;
 }
 
 interface ClickPosition {
@@ -79,6 +93,13 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
 
   private latestTapPosition: ClickPosition;
 
+  // Lesson-navigation visibility/disabled state set by the native host
+  private lessonNavVisible: boolean = true;
+  private lessonNavPrevDisabled: boolean = false;
+  private lessonNavNextDisabled: boolean = false;
+
+  private readonly LESSON_NAV_DISABLED_CLASS = 'lesson-nav-disabled';
+
   constructor(config: TouchControlOverlayConfig = {}) {
     super(config);
 
@@ -86,8 +107,20 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
       enterFullscreenOnInitialPlayback: Boolean(config.enterFullscreenOnInitialPlayback),
     });
 
-    this.quickSeekBackwardButton = new QuickSeekButton({ seekSeconds: -10 });
-    this.quickSeekForwardButton = new QuickSeekButton({ seekSeconds: 10 });
+    const lessonNav = config.lessonNavigation;
+    if (lessonNav) {
+      this.quickSeekBackwardButton = new QuickSeekButton({
+        customMessage: lessonNav.previousMessage,
+        lessonNavigationRole: 'previous',
+      });
+      this.quickSeekForwardButton = new QuickSeekButton({
+        customMessage: lessonNav.nextMessage,
+        lessonNavigationRole: 'next',
+      });
+    } else {
+      this.quickSeekBackwardButton = new QuickSeekButton({ seekSeconds: -10 });
+      this.quickSeekForwardButton = new QuickSeekButton({ seekSeconds: 10 });
+    }
 
     this.seekForwardLabel = new Label({
       text: '',
@@ -141,8 +174,11 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
 
     const showPlaybackToggleButton = () => {
       this.playbackToggleButton.show();
-      this.quickSeekBackwardButton.show();
-      this.quickSeekForwardButton.show();
+      // Only show nav buttons if the native host hasn't hidden them
+      if (this.lessonNavVisible) {
+        this.quickSeekBackwardButton.show();
+        this.quickSeekForwardButton.show();
+      }
     };
 
     const hidePlaybackToggleButton = () => {
@@ -186,6 +222,7 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
     });
 
     this.touchControlEvents.onSeekBackward.subscribe(() => {
+      // Double-tap edges always quick-seek by seekTime (e.g. 10s). Lesson prev/next is only on the side buttons.
       playerSeekTime = PlayerUtils.clampValueToRange(
         playerSeekTime - this.config.seekTime,
         0,
@@ -206,6 +243,7 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
     });
 
     this.touchControlEvents.onSeekForward.subscribe(() => {
+      // Double-tap edges always quick-seek by seekTime (e.g. 10s). Lesson prev/next is only on the side buttons.
       playerSeekTime = PlayerUtils.clampValueToRange(
         playerSeekTime + this.config.seekTime,
         0,
@@ -331,5 +369,45 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
 
   get onClick(): EDEvent<TouchControlOverlay, NoArgs> {
     return this.touchControlEvents.onSingleClick.getEvent();
+  }
+
+  /**
+   * Called by the native host via the `setLessonNavigationState` CustomMessageHandler event.
+   * Controls whether the prev/next lesson buttons are shown and whether they appear disabled.
+   *
+   * @param show          Whether to render the lesson-nav buttons at all.
+   * @param prevDisabled  Disable (grey out) the previous button — used on the first lesson.
+   * @param nextDisabled  Disable (grey out) the next button — used on the last lesson.
+   * @param disabledColor CSS colour string applied when a button is disabled (e.g. "#666E7D").
+   */
+  public setLessonNavState(show: boolean, prevDisabled: boolean, nextDisabled: boolean, disabledColor: string): void {
+    this.lessonNavVisible = show;
+
+    if (show) {
+      this.quickSeekBackwardButton.show();
+      this.quickSeekForwardButton.show();
+    } else {
+      this.quickSeekBackwardButton.hide();
+      this.quickSeekForwardButton.hide();
+    }
+
+    // Apply/remove disabled class and colour variable on each button
+    this.applyNavButtonDisabledState(this.quickSeekBackwardButton, prevDisabled, disabledColor);
+    this.applyNavButtonDisabledState(this.quickSeekForwardButton, nextDisabled, disabledColor);
+
+    this.lessonNavPrevDisabled = prevDisabled;
+    this.lessonNavNextDisabled = nextDisabled;
+  }
+
+  private applyNavButtonDisabledState(button: QuickSeekButton, disabled: boolean, color: string): void {
+    const el = button.getDomElement();
+    const cls = this.prefixCss(this.LESSON_NAV_DISABLED_CLASS);
+    if (disabled) {
+      el.addClass(cls);
+      el.css({ '--musora-nav-disabled-color': color });
+    } else {
+      el.removeClass(cls);
+      el.css({ '--musora-nav-disabled-color': '' });
+    }
   }
 }

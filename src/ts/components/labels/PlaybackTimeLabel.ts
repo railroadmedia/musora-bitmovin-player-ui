@@ -1,10 +1,11 @@
 import { LabelConfig, Label } from './Label';
-import { UIInstanceManager } from '../../UIManager';
+import { SeekPreviewArgs, UIInstanceManager } from '../../UIManager';
 import LiveStreamDetectorEventArgs = PlayerUtils.LiveStreamDetectorEventArgs;
 import { PlayerUtils } from '../../utils/PlayerUtils';
 import { StringUtils } from '../../utils/StringUtils';
 import { PlayerAPI } from 'bitmovin-player';
 import { i18n } from '../../localization/i18n';
+import { SeekPreviewEventArgs } from '../seekbar/SeekBar';
 
 export enum PlaybackTimeLabelMode {
   /**
@@ -39,6 +40,21 @@ export interface PlaybackTimeLabelConfig extends LabelConfig {
    * Boolean if the label should be hidden in live playback
    */
   hideInLivePlayback?: boolean;
+  /**
+   * Separator string between current time and total time when using CurrentAndTotalTime mode.
+   * Default: ' / '
+   */
+  timeSeparator?: string;
+  /**
+   * When true, the label updates during seek preview (scrubbing) to show the scrubbed position.
+   * Default: false
+   */
+  syncTimeWithSeekPreview?: boolean;
+  /**
+   * When true, disables the adaptive min-width tracking that prevents UI layout shifts.
+   * Default: false
+   */
+  disableAdaptiveMinWidth?: boolean;
 }
 
 /**
@@ -59,6 +75,9 @@ export class PlaybackTimeLabel extends Label<PlaybackTimeLabelConfig> {
         cssClass: 'ui-playbacktimelabel',
         timeLabelMode: PlaybackTimeLabelMode.CurrentAndTotalTime,
         hideInLivePlayback: false,
+        timeSeparator: ' / ',
+        syncTimeWithSeekPreview: false,
+        disableAdaptiveMinWidth: false,
       },
       this.config,
     );
@@ -72,6 +91,8 @@ export class PlaybackTimeLabel extends Label<PlaybackTimeLabelConfig> {
     const liveCssClass = this.prefixCss('ui-playbacktimelabel-live');
     const liveEdgeCssClass = this.prefixCss('ui-playbacktimelabel-live-edge');
     let minWidth = 0;
+    let useSeekPreviewTime = false;
+    const syncSeekPreview = config.syncTimeWithSeekPreview === true;
 
     const liveClickHandler = () => {
       player.timeShift(0);
@@ -118,18 +139,24 @@ export class PlaybackTimeLabel extends Label<PlaybackTimeLabelConfig> {
     };
 
     const playbackTimeHandler = () => {
+      if (syncSeekPreview && useSeekPreviewTime) {
+        return;
+      }
+
       if (!live && player.getDuration() !== Infinity) {
         this.setTime(PlayerUtils.getCurrentTimeRelativeToSeekableRange(player), player.getDuration());
       }
 
-      // To avoid 'jumping' in the UI by varying label sizes due to non-monospaced fonts,
-      // we gradually increase the min-width with the content to reach a stable size.
-      const width = this.getDomElement().width();
-      if (width > minWidth) {
-        minWidth = width;
-        this.getDomElement().css({
-          'min-width': minWidth + 'px',
-        });
+      if (!config.disableAdaptiveMinWidth) {
+        // To avoid 'jumping' in the UI by varying label sizes due to non-monospaced fonts,
+        // we gradually increase the min-width with the content to reach a stable size.
+        const width = this.getDomElement().width();
+        if (width > minWidth) {
+          minWidth = width;
+          this.getDomElement().css({
+            'min-width': minWidth + 'px',
+          });
+        }
       }
     };
 
@@ -153,7 +180,10 @@ export class PlaybackTimeLabel extends Label<PlaybackTimeLabelConfig> {
 
     player.on(player.exports.PlayerEvent.TimeChanged, playbackTimeHandler);
     player.on(player.exports.PlayerEvent.Ready, updateTimeFormatBasedOnDuration);
-    player.on(player.exports.PlayerEvent.Seeked, playbackTimeHandler);
+    player.on(player.exports.PlayerEvent.Seeked, () => {
+      useSeekPreviewTime = false;
+      playbackTimeHandler();
+    });
 
     player.on(player.exports.PlayerEvent.TimeShift, updateLiveTimeshiftState);
     player.on(player.exports.PlayerEvent.TimeShifted, updateLiveTimeshiftState);
@@ -161,6 +191,20 @@ export class PlaybackTimeLabel extends Label<PlaybackTimeLabelConfig> {
     player.on(player.exports.PlayerEvent.Paused, updateLiveTimeshiftState);
     player.on(player.exports.PlayerEvent.StallStarted, updateLiveTimeshiftState);
     player.on(player.exports.PlayerEvent.StallEnded, updateLiveTimeshiftState);
+
+    // Sync pill text with scrub position — only while the user is actively dragging
+    if (config.syncTimeWithSeekPreview) {
+      uimanager.onSeekPreview.subscribe((_sender, args) => {
+        // Cast to SeekPreviewEventArgs to access the scrubbing flag.
+        // uimanager.onSeekPreview always dispatches SeekPreviewEventArgs at runtime.
+        const seekArgs = args as unknown as SeekPreviewEventArgs;
+        if (seekArgs.scrubbing && !live && player.getDuration() !== Infinity) {
+          // position is 0–100 (see SeekPreviewArgs / SeekBarLabel.handleSeekPreview), not 0–1
+          const scrubSeconds = player.getDuration() * (seekArgs.position / 100);
+          this.setTime(scrubSeconds, player.getDuration());
+        }
+      });
+    }
 
     const init = () => {
       // Reset min-width when a new source is ready (especially for switching VOD/Live modes where the label content
@@ -173,6 +217,23 @@ export class PlaybackTimeLabel extends Label<PlaybackTimeLabelConfig> {
       updateTimeFormatBasedOnDuration();
     };
     uimanager.getConfig().events.onUpdated.subscribe(init);
+
+    if (syncSeekPreview) {
+      uimanager.onSeekPreview.subscribe((sender, args: SeekPreviewArgs & { scrubbing?: boolean }) => {
+        if (!args.scrubbing || player.isLive()) {
+          return;
+        }
+
+        const duration = player.getDuration();
+        if (!isFinite(duration) || duration <= 0 || duration === Infinity) {
+          return;
+        }
+
+        useSeekPreviewTime = true;
+        const previewRelative = duration * (args.position / 100);
+        this.setTime(previewRelative, duration);
+      });
+    }
 
     init();
   }
@@ -193,9 +254,11 @@ export class PlaybackTimeLabel extends Label<PlaybackTimeLabelConfig> {
       case PlaybackTimeLabelMode.TotalTime:
         this.setText(`${totalTime}`);
         break;
-      case PlaybackTimeLabelMode.CurrentAndTotalTime:
-        this.setText(`${currentTime} / ${totalTime}`);
+      case PlaybackTimeLabelMode.CurrentAndTotalTime: {
+        const separator = (<PlaybackTimeLabelConfig>this.config).timeSeparator ?? ' / ';
+        this.setText(`${currentTime}${separator}${totalTime}`);
         break;
+      }
       case PlaybackTimeLabelMode.RemainingTime:
         this.setText(`${StringUtils.secondsToTime(durationSeconds - playbackSeconds, this.timeFormat)}`);
         break;
