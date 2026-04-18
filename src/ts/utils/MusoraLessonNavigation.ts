@@ -1,6 +1,7 @@
 /**
  * CustomMessageHandler event names for lesson navigation (Musora touch overlay prev/next).
- * The host app (MusoraApp) should register handlers and load the previous/next lesson source.
+ * These match the BitmovinCustomEvents enum in the MusoraApp host and are handled in the
+ * customMessageHandler switch inside BitmovinVideo.tsx (onPreviousLesson / onNextLesson cases).
  */
-export const MUSORA_LESSON_PREVIOUS_MESSAGE = 'musoraLessonPrevious';
-export const MUSORA_LESSON_NEXT_MESSAGE = 'musoraLessonNext';
+export const MUSORA_LESSON_PREVIOUS_MESSAGE = 'onPreviousLesson';
+export const MUSORA_LESSON_NEXT_MESSAGE = 'onNextLesson';
