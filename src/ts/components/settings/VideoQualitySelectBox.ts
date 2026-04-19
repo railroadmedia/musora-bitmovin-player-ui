@@ -95,9 +95,19 @@ export class VideoQualitySelectBox extends SelectBox {
         this.addItem('auto', i18n.getLocalizer('auto'));
       }
 
-      // Add video qualities
+      // Add video qualities — display as "1080p" / "720p" etc. derived from the
+      // rendition height. If two renditions share the same height, append a bitrate
+      // hint (e.g. "1080p · 8 Mbps") so the user can tell them apart.
+      const heightCounts: Record<number, number> = {};
+      for (const q of videoQualities) {
+        if (q.height > 0) {
+          heightCounts[q.height] = (heightCounts[q.height] ?? 0) + 1;
+        }
+      }
+
       for (const videoQuality of videoQualities) {
-        this.addItem(videoQuality.id, videoQuality.label);
+        const label = VideoQualitySelectBox.qualityLabel(videoQuality, heightCounts);
+        this.addItem(videoQuality.id, label);
       }
 
       if (this.itemCount() === 0) {
@@ -137,5 +147,34 @@ export class VideoQualitySelectBox extends SelectBox {
    */
   hasAutoItem(): boolean {
     return this.hasAuto;
+  }
+
+  /**
+   * Derives a human-readable label for a video quality rendition.
+   *
+   * - Uses the rendition height to produce standard labels like "1080p", "720p", etc.
+   * - When multiple renditions share the same height (e.g. two 1080p streams at
+   *   different bitrates), a bitrate hint is appended: "1080p · 8 Mbps".
+   * - Falls back to the manifest-provided label when height is unavailable.
+   *
+   * @param quality The video quality object from the player API.
+   * @param heightCounts A map of height → number of renditions at that height.
+   */
+  private static qualityLabel(
+    quality: { height: number; bitrate: number; label?: string },
+    heightCounts: Record<number, number>,
+  ): string {
+    if (!quality.height || quality.height <= 0) {
+      return quality.label ?? '';
+    }
+
+    const base = `${quality.height}p`;
+
+    if (heightCounts[quality.height] > 1 && quality.bitrate > 0) {
+      const mbps = (quality.bitrate / 1_000_000).toFixed(1).replace(/\.0$/, '');
+      return `${base} · ${mbps} Mbps`;
+    }
+
+    return base;
   }
 }
