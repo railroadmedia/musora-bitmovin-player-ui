@@ -59,7 +59,11 @@ export class PlaybackSpeedSelectBox extends SelectBox {
 
     this.onItemSelected.subscribe((sender: PlaybackSpeedSelectBox, value: string) => {
       player.setPlaybackSpeed(parseFloat(value));
-      StorageUtils.setItem(PlaybackSpeedSelectBox.STORAGE_KEY, value);
+      // Do not persist speed changes made during a livestream — the preference
+      // is VOD-only and should not carry over to future live sessions.
+      if (!player.isLive()) {
+        StorageUtils.setItem(PlaybackSpeedSelectBox.STORAGE_KEY, value);
+      }
       this.selectItem(value);
     });
 
@@ -72,7 +76,13 @@ export class PlaybackSpeedSelectBox extends SelectBox {
     // whatever the player reports). We also call setSpeed() directly here because
     // PlaybackSpeedChanged is not guaranteed to fire synchronously, which would leave
     // the select box showing "-" even though the player speed is correctly applied.
+    // Livestreams always start at 1.0x regardless of any saved VOD preference.
     const applyPersistedOrCurrentSpeed = (): void => {
+      if (player.isLive()) {
+        player.setPlaybackSpeed(1);
+        this.setSpeed(1);
+        return;
+      }
       const persisted = StorageUtils.getItem(PlaybackSpeedSelectBox.STORAGE_KEY);
       if (persisted !== null) {
         player.setPlaybackSpeed(parseFloat(persisted));
