@@ -46,6 +46,32 @@
           muted: true,
           autoplay: true,
         },
+        adaptation: {
+          desktop: {
+            maxStartupBitrate: 1800000,
+            limitToPlayerSize: true,
+            bitrates: {
+              maxSelectableVideoBitrate: 8000000,
+            },
+          },
+          mobile: {
+            maxStartupBitrate: 900000,
+            limitToPlayerSize: true,
+            bitrates: {
+              maxSelectableVideoBitrate: 3500000,
+            },
+          },
+        },
+        buffer: {
+          video: {
+            forwardduration: 10,
+            backwardduration: 15,
+          },
+          audio: {
+            forwardduration: 12,
+            backwardduration: 15,
+          },
+        },
       };
 
       var source = {
