@@ -98,6 +98,8 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
   private lessonNavPrevDisabled: boolean = false;
   private lessonNavNextDisabled: boolean = false;
 
+  private areControlsVisible: boolean = false;
+
   private readonly LESSON_NAV_DISABLED_CLASS = 'lesson-nav-disabled';
 
   constructor(config: TouchControlOverlayConfig = {}) {
@@ -170,7 +172,6 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
     });
 
     let isBufferingOverlayVisible = false;
-    let areControlsVisible = false;
 
     const showPlaybackToggleButton = () => {
       this.playbackToggleButton.show();
@@ -194,18 +195,18 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
 
     uimanager.onBufferingHide.subscribe(() => {
       isBufferingOverlayVisible = false;
-      if (areControlsVisible) {
+      if (this.areControlsVisible) {
         showPlaybackToggleButton();
       }
     });
 
     uimanager.onControlsHide.subscribe(() => {
-      areControlsVisible = false;
+      this.areControlsVisible = false;
       hidePlaybackToggleButton();
     });
 
     uimanager.onControlsShow.subscribe(() => {
-      areControlsVisible = true;
+      this.areControlsVisible = true;
       if (!isBufferingOverlayVisible) {
         showPlaybackToggleButton();
       }
@@ -383,7 +384,7 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
   public setLessonNavState(show: boolean, prevDisabled: boolean, nextDisabled: boolean, disabledColor: string): void {
     this.lessonNavVisible = show;
 
-    if (show) {
+    if (show && this.areControlsVisible) {
       this.quickSeekBackwardButton.show();
       this.quickSeekForwardButton.show();
     } else {
