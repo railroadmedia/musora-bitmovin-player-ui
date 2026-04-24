@@ -314,3 +314,23 @@
     pointer-events: none !important;
   }
 }
+
+// Tapping empty space in the visible ControlBar should fall through to the TouchControlOverlay
+// so the single-tap handler can toggle the UI off. The UIContainer base sets
+// "* { pointer-events: auto }" with specificity (0,1,0); using 3 class selectors here
+// wins without !important. The fullscreen container is re-enabled specifically because
+// Button subclasses overwrite cssClass (so bmpui-ui-button is absent from rendered elements).
+.#{$prefix}-ui-skin-musora.#{$prefix}-ui-skin-smallscreen .#{$prefix}-ui-controlbar,
+.#{$prefix}-ui-skin-musora.#{$prefix}-ui-skin-smallscreen .#{$prefix}-ui-controlbar * {
+  pointer-events: none;
+}
+
+.#{$prefix}-ui-skin-musora.#{$prefix}-ui-skin-smallscreen
+  .#{$prefix}-ui-controlbar
+  .#{$prefix}-musora-controlbar-fullscreen,
+.#{$prefix}-ui-skin-musora.#{$prefix}-ui-skin-smallscreen
+  .#{$prefix}-ui-controlbar
+  .#{$prefix}-musora-controlbar-fullscreen
+  * {
+  pointer-events: auto;
+}
