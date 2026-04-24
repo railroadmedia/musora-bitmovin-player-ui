@@ -11,9 +11,7 @@
   padding-top: 0;
   padding-left: 0;
   padding-right: 0;
-  // Extra 16px lifts the time row above the always-visible seek bar (track height)
-  // before the safe-area inset.
-  padding-bottom: calc(16px + max(0.5em, env(safe-area-inset-bottom, 0)));
+  padding-bottom: calc(12px + max(0px, env(safe-area-inset-bottom, 0)));
 
   // ── Outer column ─────────────────────────────────────────────────────────
   .#{$prefix}-musora-controlbar-timeline {
@@ -27,12 +25,10 @@
   }
 
   // ── Row 1 — pill (left) + fullscreen (right) ────────────────────────────
-  // Horizontal padding = max(1em, safe-area) — identical to the small-screen
-  // title bar so the fullscreen icon lines up with the settings gear above it.
   .#{$prefix}-musora-controlbar-time-row {
     width: 100%;
     box-sizing: border-box;
-    padding: 0.35em max(1em, env(safe-area-inset-right, 0)) 0.35em max(1em, env(safe-area-inset-left, 0));
+    padding: 0.35em max(16px, env(safe-area-inset-right, 0)) 0.35em max(16px, env(safe-area-inset-left, 0));
 
     > .#{$prefix}-container-wrapper {
       display: flex;
@@ -208,8 +204,8 @@
 // same x-position. The seek bar remains full-width.
 // ────────────────────────────────────────────────────────────────────────────
 .#{$prefix}-ui-skin-musora.#{$prefix}-ui-skin-smallscreen .#{$prefix}-ui-titlebar {
-  padding-left: max(1em, env(safe-area-inset-left, 0));
-  padding-right: max(1em, env(safe-area-inset-right, 0));
+  padding-left: max(16px, env(safe-area-inset-left, 0));
+  padding-right: max(16px, env(safe-area-inset-right, 0));
 }
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -220,6 +216,12 @@
 // - Title bar: back button hidden, video title shown.
 // ────────────────────────────────────────────────────────────────────────────
 .#{$prefix}-ui-skin-musora.#{$prefix}-ui-skin-smallscreen.#{$prefix}-fullscreen {
+  // Lift the controlbar to sit just above the fullscreen seekbar, which itself
+  // has max(16px, safe-area) bottom padding. 12px adds clearance above the dot.
+  .#{$prefix}-ui-controlbar {
+    padding-bottom: calc(12px + max(16px, env(safe-area-inset-bottom, 0)));
+  }
+
   .#{$prefix}-musora-always-seekbar {
     padding: 0 40px max(16px, env(safe-area-inset-bottom, 0));
 
