@@ -65,6 +65,8 @@
       flex-shrink: 0;
       position: relative;
       z-index: 1;
+      background-color: rgba(12, 21, 36, 0.4);
+      border-radius: 50%;
     }
   }
 
@@ -72,8 +74,7 @@
   .#{$prefix}-musora-playback-time-pill {
     border-radius: 999px;
     padding: 0.4em 0.85em;
-    background-color: transparentize($color: #000, $amount: 0.45);
-    backdrop-filter: blur(10px);
+    background-color: rgba(12, 21, 36, 0.4);
     font-family: 'Open Sans', sans-serif;
     font-size: 12px;
     line-height: 16px;
@@ -115,22 +116,23 @@
     .#{$prefix}-ui-seekbar {
       flex: 1;
       min-width: 0;
-      height: 4px;
+      height: 20px;
       display: flex;
-      align-items: center;
+      align-items: flex-end;
       position: relative;
+      bottom: -5px; // nudge the track down so the dot is flush with the bottom edge of the player
 
       // ── Dot ────────────────────────────────────────────────────────────
       .#{$prefix}-seekbar-playbackposition-marker {
-        width: 13px;
-        height: 13px;
+        width: 8px;
+        height: 15px;
         background-color: var(--musora-brand-color, #{$color-red});
-        border-radius: 50%;
+        border-radius: 2px;
         box-shadow: none;
         z-index: 40;
         // The JS positions via transform: translateX(…%). We centre the dot
         // on that percentage by shifting it left by half its width.
-        left: -6.5px;
+        left: -4px;
         margin-left: 0;
       }
 
@@ -188,6 +190,14 @@
     .#{$prefix}-seekbar-playbackposition-marker {
       opacity: 0;
     }
+
+    .#{$prefix}-seekbar {
+      height: 2px;
+    }
+
+    .#{$prefix}-seekbar-backdrop {
+      background-color: #969fae99;
+    }
   }
 }
 
@@ -224,10 +234,23 @@
 
   .#{$prefix}-musora-always-seekbar {
     padding: 0 40px max(16px, env(safe-area-inset-bottom, 0));
-
-    .#{$prefix}-ui-seekbar .#{$prefix}-seekbar .#{$prefix}-seekbar-bars {
+    .#{$prefix}-ui-seekbar {
+      bottom: 0px; // nudge the track down so the dot is flush with the bottom edge of the player
+    }
+    .#{$prefix}-seekbar .#{$prefix}-seekbar-bars {
+      height: 5px;
       border-radius: 2px;
     }
+    .#{$prefix}-seekbar-playbackposition-marker {
+      height: 11px;
+    }
+  }
+
+  // When the ControlBar is hidden (controls not visible), hide the seek dot
+  // and block all pointer events on the seek bar so it isn't accidentally dragged.
+  .#{$prefix}-ui-controlbar.#{$prefix}-hidden ~ .#{$prefix}-musora-always-seekbar {
+    pointer-events: none;
+    opacity: 0; // hide seek bar when controls are hidden in fullscreen
   }
 
   .#{$prefix}-musora-controlbar-time-row {
@@ -270,6 +293,14 @@
       text-overflow: ellipsis;
       white-space: nowrap;
     }
+  }
+}
+
+// Ensure the settings panel floats above control bar elements (the fullscreen button has
+// z-index: 1 which would otherwise render above it).
+.#{$prefix}-ui-skin-musora {
+  .#{$prefix}-ui-settings-panel {
+    z-index: 2;
   }
 }
 
