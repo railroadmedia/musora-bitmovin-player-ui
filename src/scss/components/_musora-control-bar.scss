@@ -93,7 +93,7 @@
 .#{$prefix}-ui-skin-musora.#{$prefix}-ui-skin-smallscreen {
   .#{$prefix}-musora-always-seekbar {
     position: absolute;
-    bottom: 0;
+    bottom: -5px; // nudge the seek bar down so the dot is flush with the bottom edge of the player
     left: 0;
     right: 0;
     padding: 0 0px max(0em, env(safe-area-inset-bottom, 0));
@@ -120,7 +120,6 @@
       display: flex;
       align-items: flex-end;
       position: relative;
-      bottom: -5px; // nudge the track down so the dot is flush with the bottom edge of the player
 
       // ── Dot ────────────────────────────────────────────────────────────
       .#{$prefix}-seekbar-playbackposition-marker {
