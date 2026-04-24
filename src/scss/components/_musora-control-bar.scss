@@ -11,7 +11,7 @@
   padding-top: 0;
   padding-left: 0;
   padding-right: 0;
-  padding-bottom: calc(12px + max(0px, env(safe-area-inset-bottom, 0)));
+  padding-bottom: 12px;
 
   // ── Outer column ─────────────────────────────────────────────────────────
   .#{$prefix}-musora-controlbar-timeline {
@@ -96,7 +96,7 @@
     bottom: -5px; // nudge the seek bar down so the dot is flush with the bottom edge of the player
     left: 0;
     right: 0;
-    padding: 0 0px max(0em, env(safe-area-inset-bottom, 0));
+    padding: 0;
     box-sizing: border-box;
     display: flex;
 
@@ -213,8 +213,8 @@
 // same x-position. The seek bar remains full-width.
 // ────────────────────────────────────────────────────────────────────────────
 .#{$prefix}-ui-skin-musora.#{$prefix}-ui-skin-smallscreen .#{$prefix}-ui-titlebar {
-  padding-left: max(16px, env(safe-area-inset-left, 0));
-  padding-right: max(16px, env(safe-area-inset-right, 0));
+  padding-left: 16px;
+  padding-right: 16px;
 }
 
 // ────────────────────────────────────────────────────────────────────────────

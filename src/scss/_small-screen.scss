@@ -38,9 +38,8 @@
 
   .#{$prefix}-ui-titlebar {
     // Adjust title bar padding for small screens to better align text with button elements
-    $titlebar-padding: 1em;
-    padding: max($titlebar-padding, env(safe-area-inset-top, 0)) max($titlebar-padding, env(safe-area-inset-right, 0))
-      $titlebar-padding max($titlebar-padding, env(safe-area-inset-left, 0));
+    $titlebar-padding: 16px;
+    padding: $titlebar-padding;
 
     .#{$prefix}-label-metadata {
       margin: 0 0.25em;
