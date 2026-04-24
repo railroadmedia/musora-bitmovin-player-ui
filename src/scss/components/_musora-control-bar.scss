@@ -2,20 +2,18 @@
 
 // ────────────────────────────────────────────────────────────────────────────
 // Musora small-screen control bar
-// Layout: time-pill + fullscreen above a full-width seek bar at the bottom.
+// Layout: time-pill + fullscreen row, floating above the always-visible seek bar.
 // ────────────────────────────────────────────────────────────────────────────
 .#{$prefix}-ui-skin-musora.#{$prefix}-ui-skin-smallscreen .#{$prefix}-ui-controlbar {
   // Remove the default gradient backdrop — the time pill has its own.
   background: none;
 
-  // Horizontal insets live on each row. Restore bottom safe-area here — the base
-  // control bar normally uses max(1em, safe-area-inset-bottom); padding: 0 removed
-  // that and in landscape the bar could sit under the home indicator / get clipped
-  // by the full-screen UI container (overflow: hidden).
   padding-top: 0;
   padding-left: 0;
   padding-right: 0;
-  padding-bottom: max(0.5em, env(safe-area-inset-bottom, 0));
+  // Extra 16px lifts the time row above the always-visible seek bar (track height)
+  // before the safe-area inset.
+  padding-bottom: calc(16px + max(0.5em, env(safe-area-inset-bottom, 0)));
 
   // ── Outer column ─────────────────────────────────────────────────────────
   .#{$prefix}-musora-controlbar-timeline {
@@ -74,101 +72,6 @@
     }
   }
 
-  // ── Row 2 — seek bar ────────────────────────────────────────────────────
-  // 12 px symmetric padding gives the 13 px dot enough room at 0 % and 100 %
-  // without pushing the bar noticeably away from the edges.
-  .#{$prefix}-musora-controlbar-seek-row {
-    width: 100%;
-    padding: 0 12px;
-    box-sizing: border-box;
-    display: flex;
-
-    > .#{$prefix}-container-wrapper {
-      flex: 1;
-      min-width: 0;
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-    }
-
-    .#{$prefix}-ui-seekbar {
-      flex: 1;
-      min-width: 0;
-      min-height: 16px;
-      display: flex;
-      align-items: center;
-      position: relative;
-
-      // ── Dot ──────────────────────────────────────────────────────────
-      .#{$prefix}-seekbar-playbackposition-marker {
-        width: 13px;
-        height: 13px;
-        background-color: var(--musora-brand-color, #{$color-red});
-        border-radius: 50%;
-        box-shadow: none;
-        z-index: 40;
-        // The JS positions via transform: translateX(…%). We centre the dot
-        // on that percentage by shifting it left by half its width.
-        left: 0;
-        transform: translateX(-50%);
-        margin-left: 0;
-      }
-
-      // ── Track ────────────────────────────────────────────────────────
-      .#{$prefix}-seekbar {
-        height: 3px;
-        width: 100%;
-        position: relative;
-        overflow: visible;
-
-        .#{$prefix}-seekbar-bars {
-          height: 100%;
-          border-radius: 0;
-        }
-
-        // Colours
-        .#{$prefix}-seekbar-backdrop {
-          background-color: rgba(255, 255, 255, 0.2);
-        }
-
-        .#{$prefix}-seekbar-bufferlevel {
-          background-color: rgba(255, 255, 255, 0.4);
-        }
-
-        .#{$prefix}-seekbar-playbackposition {
-          background-color: var(--musora-brand-color, #{$color-red});
-          z-index: 10;
-        }
-
-        // Chapter gaps — thin white lines that punch through the bar
-        .#{$prefix}-seekbar-markers > .#{$prefix}-seekbar-marker {
-          background-color: transparent;
-          width: 4px;
-          z-index: 30;
-          height: 100%;
-
-          &::after {
-            content: '';
-            display: block;
-            width: 2px;
-            height: 100%;
-            background-color: white;
-            margin: 0 auto;
-          }
-
-          > .#{$prefix}-seekbar-marker-indicator {
-            display: none;
-          }
-        }
-      }
-    }
-  }
-
-  // ── SeekBar hover label — hidden in Musora skin ──────────────────────────
-  .#{$prefix}-ui-seekbar-label {
-    display: none !important;
-  }
-
   // ── Time pill ────────────────────────────────────────────────────────────
   .#{$prefix}-musora-playback-time-pill {
     border-radius: 999px;
@@ -181,6 +84,190 @@
     color: #ffffff;
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
+  }
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// Always-visible seek bar
+// Sits outside the ControlBar so it is never affected by the UI hide cycle.
+// Positioned at the very bottom, flush with edges.
+// 12 px symmetric padding gives the 13 px dot enough room at 0 % and 100 %.
+// ────────────────────────────────────────────────────────────────────────────
+.#{$prefix}-ui-skin-musora.#{$prefix}-ui-skin-smallscreen {
+  .#{$prefix}-musora-always-seekbar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 0 0px max(0em, env(safe-area-inset-bottom, 0));
+    box-sizing: border-box;
+    display: flex;
+
+    > .#{$prefix}-container-wrapper {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+
+    // ── SeekBar hover label — hidden in Musora skin ────────────────────────
+    .#{$prefix}-ui-seekbar-label {
+      display: none !important;
+    }
+
+    .#{$prefix}-ui-seekbar {
+      flex: 1;
+      min-width: 0;
+      height: 4px;
+      display: flex;
+      align-items: center;
+      position: relative;
+
+      // ── Dot ────────────────────────────────────────────────────────────
+      .#{$prefix}-seekbar-playbackposition-marker {
+        width: 13px;
+        height: 13px;
+        background-color: var(--musora-brand-color, #{$color-red});
+        border-radius: 50%;
+        box-shadow: none;
+        z-index: 40;
+        // The JS positions via transform: translateX(…%). We centre the dot
+        // on that percentage by shifting it left by half its width.
+        left: -6.5px;
+        margin-left: 0;
+      }
+
+      // ── Track ──────────────────────────────────────────────────────────
+      .#{$prefix}-seekbar {
+        height: 4px;
+        width: 100%;
+        position: relative;
+        overflow: visible;
+
+        .#{$prefix}-seekbar-bars {
+          height: 100%;
+          border-radius: 0;
+        }
+
+        // Colours
+        .#{$prefix}-seekbar-backdrop {
+          background-color: #969faecc;
+        }
+
+        .#{$prefix}-seekbar-bufferlevel {
+          background-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .#{$prefix}-seekbar-playbackposition {
+          background-color: var(--musora-brand-color, #{$color-red});
+          z-index: 10;
+        }
+
+        // Chapter gaps — mask-image on .seekbar-bars is computed by SeekBar.ts
+        // via MutationObserver; markers are invisible position anchors only.
+        .#{$prefix}-seekbar-markers > .#{$prefix}-seekbar-marker {
+          background-color: transparent;
+          width: 3px;
+          z-index: 30;
+          height: 100%;
+
+          &::after {
+            display: none;
+          }
+
+          > .#{$prefix}-seekbar-marker-indicator {
+            display: none;
+          }
+        }
+      }
+    }
+  }
+
+  // When the ControlBar is hidden (controls not visible), hide the seek dot
+  // and block all pointer events on the seek bar so it isn't accidentally dragged.
+  .#{$prefix}-ui-controlbar.#{$prefix}-hidden ~ .#{$prefix}-musora-always-seekbar {
+    pointer-events: none;
+
+    .#{$prefix}-seekbar-playbackposition-marker {
+      opacity: 0;
+    }
+  }
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// Video title in the title bar — hidden by default, visible in fullscreen only.
+// ────────────────────────────────────────────────────────────────────────────
+.#{$prefix}-ui-skin-musora .#{$prefix}-musora-titlebar-video-title {
+  display: none;
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// Non-fullscreen: align TitleBar horizontal padding to the ControlBar time-row
+// (both max(1em, safe-area-inset)) so the gear and fullscreen icons sit at the
+// same x-position. The seek bar remains full-width.
+// ────────────────────────────────────────────────────────────────────────────
+.#{$prefix}-ui-skin-musora.#{$prefix}-ui-skin-smallscreen .#{$prefix}-ui-titlebar {
+  padding-left: max(1em, env(safe-area-inset-left, 0));
+  padding-right: max(1em, env(safe-area-inset-right, 0));
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// Fullscreen overrides
+// - TitleBar, ControlBar time-row, and SeekBar all get 40 px horizontal padding
+//   so their content edges line up vertically.
+// - Seek bar also gets extra bottom breathing room and rounded track ends.
+// - Title bar: back button hidden, video title shown.
+// ────────────────────────────────────────────────────────────────────────────
+.#{$prefix}-ui-skin-musora.#{$prefix}-ui-skin-smallscreen.#{$prefix}-fullscreen {
+  .#{$prefix}-musora-always-seekbar {
+    padding: 0 40px max(16px, env(safe-area-inset-bottom, 0));
+
+    .#{$prefix}-ui-seekbar .#{$prefix}-seekbar .#{$prefix}-seekbar-bars {
+      border-radius: 2px;
+    }
+  }
+
+  .#{$prefix}-musora-controlbar-time-row {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+
+  .#{$prefix}-ui-titlebar {
+    padding-left: 40px;
+    padding-right: 40px;
+
+    // Align all title bar children to the vertical midpoint.
+    > .#{$prefix}-container-wrapper {
+      align-items: center;
+    }
+
+    .#{$prefix}-ui-backbutton {
+      display: none;
+    }
+
+    // Collapse the spacer so the title can claim all remaining width.
+    .#{$prefix}-ui-spacer {
+      flex: 0;
+      width: 0;
+      min-width: 0;
+    }
+
+    .#{$prefix}-musora-titlebar-video-title {
+      display: block;
+      flex: 1;
+      min-width: 0;
+      align-self: center;
+      color: #fff;
+      font-family: 'Open Sans', sans-serif;
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 700;
+      line-height: 129%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
   }
 }
 

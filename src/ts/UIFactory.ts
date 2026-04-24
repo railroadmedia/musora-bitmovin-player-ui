@@ -627,12 +627,12 @@ export function musoraSmallScreenUILayout(onOverlayReady?: (overlay: TouchContro
   const titleBar = new TitleBar({
     components: [
       new BackButton(),
+      new MetadataLabel({ content: MetadataLabelContent.Title, cssClasses: ['musora-titlebar-video-title'] }),
       new Spacer(),
       new CastToggleButton(),
       new VRToggleButton(),
       new PictureInPictureToggleButton(),
       new AirPlayToggleButton(),
-      new VolumeToggleButton(),
       new SettingsToggleButton({ settingsPanel: settingsPanel }),
     ],
   });
@@ -663,14 +663,17 @@ export function musoraSmallScreenUILayout(onOverlayReady?: (overlay: TouchContro
               new FullscreenToggleButton({ cssClasses: ['musora-controlbar-fullscreen'] }),
             ],
           }),
-          // ── Row 2: seek bar — edge-to-edge, no hover label ───────────────
-          new Container({
-            cssClasses: ['musora-controlbar-seek-row'],
-            components: [seekBar],
-          }),
         ],
       }),
     ],
+  });
+
+  // Always-visible seek bar — sits outside the ControlBar so it is never
+  // hidden by the UI hide/show cycle. The dot and pointer events are suppressed
+  // via a CSS sibling selector when the ControlBar is hidden.
+  const alwaysVisibleSeekBar = new Container({
+    cssClasses: ['musora-always-seekbar'],
+    components: [seekBar],
   });
 
   return new UIContainer({
@@ -690,6 +693,7 @@ export function musoraSmallScreenUILayout(onOverlayReady?: (overlay: TouchContro
       })(),
       new MusoraStandardEndScreen(),
       controlBar,
+      alwaysVisibleSeekBar,
       titleBar,
       settingsPanel,
       new ErrorMessageOverlay(),

@@ -122,6 +122,7 @@ export class SeekBar extends Component<SeekBarConfig> {
   private label: SeekBarLabel;
 
   private seekBarMarkersContainer: DOM;
+  private seekBarBarsContainer: DOM;
   private timelineMarkersHandler: TimelineMarkersHandler;
 
   private uiBoundingRect: DOMRect;
@@ -304,9 +305,6 @@ export class SeekBar extends Component<SeekBarConfig> {
       }
 
       this.isUiShown = false;
-      if (this.smoothPlaybackPositionUpdater && this.smoothPlaybackPositionUpdater.isActive()) {
-        this.smoothPlaybackPositionUpdater.clear();
-      }
     });
 
     let isPlaying = false;
@@ -560,6 +558,7 @@ export class SeekBar extends Component<SeekBarConfig> {
       timelineMarkerConfig,
       () => this.seekBar.width(),
       this.seekBarMarkersContainer,
+      this.seekBarBarsContainer,
     );
     this.timelineMarkersHandler.initialize(player, uimanager);
   }
@@ -753,6 +752,7 @@ export class SeekBar extends Component<SeekBarConfig> {
     const seekBarBarsContainer = new DOM('div', {
       class: this.prefixCss('seekbar-bars'),
     });
+    this.seekBarBarsContainer = seekBarBarsContainer;
 
     // Indicator that shows the buffer fill level
     const seekBarBufferLevel = new DOM('div', {
