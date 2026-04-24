@@ -36,7 +36,7 @@ export interface TouchControlOverlayConfig extends ContainerConfig {
 
   /**
    * Specifies how many seconds are seeked incase user seeks through double-tapping
-   * Default: 10sec
+   * Default: 5sec
    */
   seekTime?: number;
 
@@ -51,7 +51,7 @@ export interface TouchControlOverlayConfig extends ContainerConfig {
 
   /**
    * Time in milliseconds within which two consecutive taps are considered a double tap.
-   * Default: 200ms
+   * Default: 300ms
    */
   seekDoubleTapTimeout?: number;
 
@@ -66,6 +66,8 @@ interface ClickPosition {
   x: number;
   y: number;
 }
+
+const DEFAULT_SEEK_TIME = 5;
 
 /**
  * Overlays the player and detects touch input
@@ -120,8 +122,8 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
         lessonNavigationRole: 'next',
       });
     } else {
-      this.quickSeekBackwardButton = new QuickSeekButton({ seekSeconds: -10 });
-      this.quickSeekForwardButton = new QuickSeekButton({ seekSeconds: 10 });
+      this.quickSeekBackwardButton = new QuickSeekButton({ seekSeconds: -DEFAULT_SEEK_TIME });
+      this.quickSeekForwardButton = new QuickSeekButton({ seekSeconds: DEFAULT_SEEK_TIME });
     }
 
     this.seekForwardLabel = new Label({
@@ -142,9 +144,9 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
       {
         cssClass: 'ui-touch-control-overlay',
         acceptsTouchWithUiHidden: true,
-        seekTime: 10,
+        seekTime: DEFAULT_SEEK_TIME,
         seekDoubleTapMargin: 15,
-        seekDoubleTapTimeout: 200,
+        seekDoubleTapTimeout: 300,
         components: [
           this.seekBackwardLabel,
           this.quickSeekBackwardButton,
@@ -161,14 +163,28 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
     super.configure(player, uimanager);
 
     let playerSeekTime = 0;
-    // NOTE: uncomment to re-enable double tap visuals
-    // let startSeekTime = 0;
+    let seekDisplayTimeout: ReturnType<typeof setTimeout> | null = null;
+
+    const showSeekIndicator = (label: Label<LabelConfig>, otherLabel: Label<LabelConfig>, text: string): void => {
+      otherLabel.getDomElement().removeClass(this.prefixCss('seek-animating'));
+      otherLabel.hide();
+      label.setText(text);
+      label.show();
+      const el = label.getDomElement();
+      el.removeClass(this.prefixCss('seek-animating'));
+      void (el.get(0) as HTMLElement).offsetWidth;
+      el.addClass(this.prefixCss('seek-animating'));
+      if (seekDisplayTimeout !== null) {
+        clearTimeout(seekDisplayTimeout);
+      }
+      seekDisplayTimeout = setTimeout(() => {
+        label.hide();
+        seekDisplayTimeout = null;
+      }, 500);
+    };
 
     this.doubleTapTimeout = new Timeout(this.config.seekDoubleTapTimeout, () => {
       this.couldBeDoubleTapping = false;
-      // NOTE: uncomment to re-enable double tap visuals
-      // startSeekTime = 0;
-      setTimeout(() => this.hideSeekAnimationElements(), 150);
     });
 
     let isBufferingOverlayVisible = false;
@@ -223,45 +239,23 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
     });
 
     this.touchControlEvents.onSeekBackward.subscribe(() => {
-      // Double-tap edges always quick-seek by seekTime (e.g. 10s). Lesson prev/next is only on the side buttons.
       playerSeekTime = PlayerUtils.clampValueToRange(
         playerSeekTime - this.config.seekTime,
         0,
         player.getDuration() ?? Infinity,
       );
       player.seek(playerSeekTime);
-
-      // NOTE: uncomment to re-enable double tap visuals
-      // this.seekBackwardLabel.setText(
-      //   Math.abs(Math.round(playerSeekTime - startSeekTime)) +
-      //     ' ' +
-      //     i18n.performLocalization(i18n.getLocalizer('settings.time.seconds')),
-      // );
-      // this.seekBackwardLabel.show();
-      // this.getDomElement().addClass(this.prefixCss(this.SEEK_BACKWARD_CLASS));
-      // this.seekForwardLabel.hide();
-      // this.getDomElement().removeClass(this.prefixCss(this.SEEK_FORWARD_CLASS));
+      showSeekIndicator(this.seekBackwardLabel, this.seekForwardLabel, `- ${this.config.seekTime}`);
     });
 
     this.touchControlEvents.onSeekForward.subscribe(() => {
-      // Double-tap edges always quick-seek by seekTime (e.g. 10s). Lesson prev/next is only on the side buttons.
       playerSeekTime = PlayerUtils.clampValueToRange(
         playerSeekTime + this.config.seekTime,
         0,
         player.getDuration() ?? Infinity,
       );
       player.seek(playerSeekTime);
-
-      // NOTE: uncomment to re-enable double tap visuals
-      // this.seekForwardLabel.setText(
-      //   Math.abs(Math.round(playerSeekTime - startSeekTime)) +
-      //     ' ' +
-      //     i18n.performLocalization(i18n.getLocalizer('settings.time.seconds')),
-      // );
-      // this.seekForwardLabel.show();
-      // this.getDomElement().addClass(this.prefixCss(this.SEEK_FORWARD_CLASS));
-      // this.seekBackwardLabel.hide();
-      // this.getDomElement().removeClass(this.prefixCss(this.SEEK_BACKWARD_CLASS));
+      showSeekIndicator(this.seekForwardLabel, this.seekBackwardLabel, `+ ${this.config.seekTime}`);
     });
 
     this.touchControlEvents.onSingleClick.subscribe(() => {
@@ -272,12 +266,13 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
       uimanager.getUI().hideUi();
       const event = e as Event;
       const eventTarget = event.target as HTMLElementWithComponent;
-      if (!eventTarget || !(eventTarget.component instanceof TouchControlOverlay)) {
+      if (eventTarget?.component && !(eventTarget.component instanceof TouchControlOverlay)) {
         return;
       }
 
-      const width = eventTarget.clientWidth;
-      const rect = eventTarget.getBoundingClientRect();
+      const overlayEl = this.getDomElement().get(0) as HTMLElement;
+      const width = overlayEl.clientWidth;
+      const rect = overlayEl.getBoundingClientRect();
       const eventTapX = (<MouseEvent>e).clientX - rect.left;
       const eventTapY = (<MouseEvent>e).clientY - rect.top;
 
@@ -307,7 +302,8 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
     });
 
     this.getDomElement().on('click', e => {
-      if ((e.target as HTMLElementWithComponent).component instanceof TouchControlOverlay) {
+      const target = (e.target as HTMLElementWithComponent).component;
+      if (!target || target instanceof TouchControlOverlay) {
         clickEventDispatcher(e);
       }
     });
@@ -315,11 +311,11 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
     let pendingUiToggle: ReturnType<typeof setTimeout> | null = null;
 
     const clickEventDispatcher = (e: Event): void => {
-      const eventTarget = (e as Event).target as HTMLElementWithComponent;
-      const rect = eventTarget.getBoundingClientRect();
+      const overlayEl = this.getDomElement().get(0) as HTMLElement;
+      const rect = overlayEl.getBoundingClientRect();
       const eventTapX = (<MouseEvent>e).clientX - rect.left;
       const eventTapY = (<MouseEvent>e).clientY - rect.top;
-      const width = eventTarget.clientWidth;
+      const width = overlayEl.clientWidth;
       const backwardRect = this.quickSeekBackwardButton.getDomElement().get(0).getBoundingClientRect();
       const forwardRect = this.quickSeekForwardButton.getDomElement().get(0).getBoundingClientRect();
       const isInSeekZone =

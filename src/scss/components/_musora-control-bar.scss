@@ -183,3 +183,15 @@
     white-space: nowrap;
   }
 }
+
+// TitleBar and ControlBar use hidden-animated-focusable (opacity-only hide), so they remain
+// interactive at opacity:0 unless we explicitly block pointer events. The UIContainer's
+// "* { pointer-events: auto }" rule means !important is required to override descendants.
+.#{$prefix}-ui-skin-musora {
+  .#{$prefix}-ui-titlebar.#{$prefix}-hidden,
+  .#{$prefix}-ui-titlebar.#{$prefix}-hidden *,
+  .#{$prefix}-ui-controlbar.#{$prefix}-hidden,
+  .#{$prefix}-ui-controlbar.#{$prefix}-hidden * {
+    pointer-events: none !important;
+  }
+}

@@ -116,5 +116,79 @@
         filter: grayscale(1);
       }
     }
+
+    .#{$prefix}-seek-forward-label,
+    .#{$prefix}-seek-backward-label {
+      align-items: center;
+      color: #fff;
+      pointer-events: none;
+      display: flex;
+      font-family: 'Open Sans', sans-serif;
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 700;
+      line-height: normal;
+      top: 50%;
+      transform: translateY(-50%);
+      white-space: nowrap;
+    }
+
+    .#{$prefix}-seek-forward-label::after,
+    .#{$prefix}-seek-backward-label::before {
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: contain;
+      content: '';
+      display: inline-block;
+      flex-shrink: 0;
+      height: 36px;
+      width: 36px;
+    }
+
+    .#{$prefix}-seek-forward-label {
+      right: 16px;
+    }
+
+    .#{$prefix}-seek-backward-label {
+      left: 16px;
+    }
+
+    .#{$prefix}-seek-forward-label::after {
+      background-image: svg-load('../../assets/images/angle-right.svg', stroke=$color-icon);
+      margin-left: -10px;
+    }
+
+    .#{$prefix}-seek-backward-label::before {
+      background-image: svg-load('../../assets/images/angle-left.svg', stroke=$color-icon);
+      margin-right: -10px;
+    }
+
+    .#{$prefix}-seek-forward-label.#{$prefix}-seek-animating::after {
+      animation: #{$prefix}-seek-chevron-right 0.5s ease-out forwards;
+    }
+
+    .#{$prefix}-seek-backward-label.#{$prefix}-seek-animating::before {
+      animation: #{$prefix}-seek-chevron-left 0.5s ease-out forwards;
+    }
+  }
+}
+
+@keyframes #{$prefix}-seek-chevron-right {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(8px);
+  }
+}
+
+@keyframes #{$prefix}-seek-chevron-left {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-8px);
   }
 }
