@@ -4,6 +4,23 @@ import { PlayerAPI } from 'bitmovin-player';
 import { i18n } from '../../localization/i18n';
 
 /**
+ * Message React Native can send to force the UI into or out of fullscreen visual state,
+ * independent of the player's ViewMode API. Use this to re-sync the UI when the native
+ * fullscreen state changes without going through player.setViewMode().
+ * Payload: `'true'` for fullscreen, `'false'` for inline.
+ */
+export const SET_FULLSCREEN_STATE_MESSAGE = 'setFullscreenState';
+
+declare const window: {
+  bitmovin?: {
+    customMessageHandler?: {
+      sendAsynchronous: (message: string, payload?: string) => void;
+      on: (event: string, callback: (data?: string) => void) => void;
+    };
+  };
+};
+
+/**
  * A button that toggles the player between windowed and fullscreen view.
  *
  * @category Buttons
@@ -60,6 +77,12 @@ export class FullscreenToggleButton extends ToggleButton<ToggleButtonConfig> {
           : player.exports.ViewMode.Fullscreen;
 
       player.setViewMode(targetViewMode);
+    });
+
+    // Allow React Native to force-sync the button state when the native fullscreen
+    // state changes without going through player.setViewMode().
+    window.bitmovin?.customMessageHandler?.on(SET_FULLSCREEN_STATE_MESSAGE, (data?: string) => {
+      data === 'true' ? this.on() : this.off();
     });
 
     // Startup init

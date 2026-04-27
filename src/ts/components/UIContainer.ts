@@ -10,6 +10,16 @@ import { Button, ButtonConfig } from './buttons/Button';
 import { TouchControlOverlay, TouchControlOverlayConfig } from './overlays/TouchControlOverlay';
 import { Component, ComponentConfig } from './Component';
 import { SettingsPanel } from './settings/SettingsPanel';
+import { SET_FULLSCREEN_STATE_MESSAGE } from './buttons/FullscreenToggleButton';
+
+declare const window: {
+  bitmovin?: {
+    customMessageHandler?: {
+      sendAsynchronous: (message: string, payload?: string) => void;
+      on: (event: string, callback: (data?: string) => void) => void;
+    };
+  };
+};
 
 /**
  * Configuration interface for a {@link UIContainer}.
@@ -425,6 +435,15 @@ export class UIContainer extends Container<UIContainerConfig> {
     // Fullscreen marker class
     player.on(player.exports.PlayerEvent.ViewModeChanged, () => {
       if (player.getViewMode() === player.exports.ViewMode.Fullscreen) {
+        container.addClass(this.prefixCss(UIContainer.FULLSCREEN));
+      } else {
+        container.removeClass(this.prefixCss(UIContainer.FULLSCREEN));
+      }
+    });
+    // Allow React Native to force-sync the CSS class when the native fullscreen
+    // state changes without going through player.setViewMode().
+    window.bitmovin?.customMessageHandler?.on(SET_FULLSCREEN_STATE_MESSAGE, (data?: string) => {
+      if (data === 'true') {
         container.addClass(this.prefixCss(UIContainer.FULLSCREEN));
       } else {
         container.removeClass(this.prefixCss(UIContainer.FULLSCREEN));

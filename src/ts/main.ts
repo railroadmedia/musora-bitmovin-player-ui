@@ -35,7 +35,7 @@ export {
 // Components
 export { Button, ButtonConfig, ButtonStyle } from './components/buttons/Button';
 export { ControlBar, ControlBarConfig } from './components/ControlBar';
-export { FullscreenToggleButton } from './components/buttons/FullscreenToggleButton';
+export { FullscreenToggleButton, SET_FULLSCREEN_STATE_MESSAGE } from './components/buttons/FullscreenToggleButton';
 export { HugePlaybackToggleButton } from './components/buttons/HugePlaybackToggleButton';
 export {
   PlaybackTimeLabel,
