@@ -55,6 +55,18 @@ $seekbar-bar-height: calc($font-size / 3);
     // Reduce width to leave some padding for the focus indicator on the left and right side
     width: calc(100% - 0.5rem);
 
+    // Expand touch target on coarse-pointer (touch) devices without changing appearance
+    @media (pointer: coarse) {
+      &::before {
+        content: '';
+        position: absolute;
+        top: -0.625rem;
+        bottom: -0.625rem;
+        left: 0;
+        right: 0;
+      }
+    }
+
     .#{$prefix}-seekbar-bars {
       @extend %bar;
       border-radius: 25px;
