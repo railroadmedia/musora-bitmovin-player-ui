@@ -80,6 +80,11 @@
 // Musora-specific sizing and spacing for center playback controls
 .#{$prefix}-ui-skin-musora {
   .#{$prefix}-ui-touch-control-overlay {
+    &::before,
+    &::after {
+      background-color: rgba(0, 0, 0, 0.3);
+    }
+
     > .#{$prefix}-container-wrapper {
       gap: 32px;
     }
@@ -123,6 +128,10 @@
       color: #fff;
       pointer-events: none;
       display: flex;
+
+      * {
+        pointer-events: none;
+      }
       font-family: 'Open Sans', sans-serif;
       font-size: 16px;
       font-style: normal;

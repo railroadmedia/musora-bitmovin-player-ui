@@ -126,15 +126,13 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
       this.quickSeekForwardButton = new QuickSeekButton({ seekSeconds: DEFAULT_SEEK_TIME });
     }
 
-    this.seekForwardLabel = new Label({
+    this.seekForwardLabel = new Label<LabelConfig>({
       text: '',
-      for: this.getConfig().id,
       cssClass: 'seek-forward-label',
       hidden: true,
     });
-    this.seekBackwardLabel = new Label({
+    this.seekBackwardLabel = new Label<LabelConfig>({
       text: '',
-      for: this.getConfig().id,
       cssClass: 'seek-backward-label',
       hidden: true,
     });
@@ -164,10 +162,21 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
 
     let playerSeekTime = 0;
     let seekDisplayTimeout: ReturnType<typeof setTimeout> | null = null;
+    let seekAccumulator = 0;
+    let activeSeekClass = '';
+    const seekTime = this.config.seekTime ?? DEFAULT_SEEK_TIME;
 
-    const showSeekIndicator = (label: Label<LabelConfig>, otherLabel: Label<LabelConfig>, text: string): void => {
+    const showSeekIndicator = (
+      label: Label<LabelConfig>,
+      otherLabel: Label<LabelConfig>,
+      text: string,
+      seekClass: string,
+      otherSeekClass: string,
+    ): void => {
       otherLabel.getDomElement().removeClass(this.prefixCss('seek-animating'));
       otherLabel.hide();
+      this.getDomElement().removeClass(this.prefixCss(otherSeekClass));
+      this.getDomElement().addClass(this.prefixCss(seekClass));
       label.setText(text);
       label.show();
       const el = label.getDomElement();
@@ -179,6 +188,9 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
       }
       seekDisplayTimeout = setTimeout(() => {
         label.hide();
+        this.getDomElement().removeClass(this.prefixCss(seekClass));
+        seekAccumulator = 0;
+        activeSeekClass = '';
         seekDisplayTimeout = null;
       }, 500);
     };
@@ -239,23 +251,37 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
     });
 
     this.touchControlEvents.onSeekBackward.subscribe(() => {
-      playerSeekTime = PlayerUtils.clampValueToRange(
-        playerSeekTime - this.config.seekTime,
-        0,
-        player.getDuration() ?? Infinity,
-      );
+      playerSeekTime = PlayerUtils.clampValueToRange(playerSeekTime - seekTime, 0, player.getDuration() ?? Infinity);
       player.seek(playerSeekTime);
-      showSeekIndicator(this.seekBackwardLabel, this.seekForwardLabel, `- ${this.config.seekTime}`);
+      if (activeSeekClass !== this.SEEK_BACKWARD_CLASS) {
+        seekAccumulator = 0;
+        activeSeekClass = this.SEEK_BACKWARD_CLASS;
+      }
+      seekAccumulator += seekTime;
+      showSeekIndicator(
+        this.seekBackwardLabel,
+        this.seekForwardLabel,
+        `- ${seekAccumulator}`,
+        this.SEEK_BACKWARD_CLASS,
+        this.SEEK_FORWARD_CLASS,
+      );
     });
 
     this.touchControlEvents.onSeekForward.subscribe(() => {
-      playerSeekTime = PlayerUtils.clampValueToRange(
-        playerSeekTime + this.config.seekTime,
-        0,
-        player.getDuration() ?? Infinity,
-      );
+      playerSeekTime = PlayerUtils.clampValueToRange(playerSeekTime + seekTime, 0, player.getDuration() ?? Infinity);
       player.seek(playerSeekTime);
-      showSeekIndicator(this.seekForwardLabel, this.seekBackwardLabel, `+ ${this.config.seekTime}`);
+      if (activeSeekClass !== this.SEEK_FORWARD_CLASS) {
+        seekAccumulator = 0;
+        activeSeekClass = this.SEEK_FORWARD_CLASS;
+      }
+      seekAccumulator += seekTime;
+      showSeekIndicator(
+        this.seekForwardLabel,
+        this.seekBackwardLabel,
+        `+ ${seekAccumulator}`,
+        this.SEEK_FORWARD_CLASS,
+        this.SEEK_BACKWARD_CLASS,
+      );
     });
 
     this.touchControlEvents.onSingleClick.subscribe(() => {
@@ -303,7 +329,8 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
 
     this.getDomElement().on('click', e => {
       const target = (e.target as HTMLElementWithComponent).component;
-      if (!target || target instanceof TouchControlOverlay) {
+      const isSeekLabel = target === this.seekForwardLabel || target === this.seekBackwardLabel;
+      if (!target || target instanceof TouchControlOverlay || isSeekLabel) {
         clickEventDispatcher(e);
       }
     });
