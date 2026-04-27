@@ -10,10 +10,6 @@
   overflow: hidden; // hide overflow from scale animation
   width: $icon-size-large;
 
-  &:hover {
-    @include svg-icon-shadow;
-  }
-
   .#{$prefix}-ui-icon {
     background-size: $icon-size-large;
     height: 100%;

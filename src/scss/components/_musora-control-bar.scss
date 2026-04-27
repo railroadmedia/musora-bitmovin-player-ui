@@ -129,8 +129,6 @@
         border-radius: 2px;
         box-shadow: none;
         z-index: 40;
-        // The JS positions via transform: translateX(…%). We centre the dot
-        // on that percentage by shifting it left by half its width.
         left: -4px;
         margin-left: 0;
       }
@@ -162,7 +160,6 @@
         }
 
         // Chapter gaps — mask-image on .seekbar-bars is computed by SeekBar.ts
-        // via MutationObserver; markers are invisible position anchors only.
         .#{$prefix}-seekbar-markers > .#{$prefix}-seekbar-marker {
           background-color: transparent;
           width: 3px;

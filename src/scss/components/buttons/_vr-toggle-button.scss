@@ -8,8 +8,4 @@
   .#{$prefix}-ui-icon {
     background-image: svg-load('../../assets/images/glasses.svg', fill=$color-icon);
   }
-
-  &:hover {
-    @include svg-icon-shadow;
-  }
 }

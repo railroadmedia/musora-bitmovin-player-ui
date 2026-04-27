@@ -4,10 +4,6 @@
 .#{$prefix}-ui-quickseekbutton {
   @extend %ui-button;
 
-  &:hover {
-    @include svg-icon-shadow;
-  }
-
   $seek-durations: 5, 10, 15, 20, 30, 60;
 
   &[data-#{$prefix}-seek-direction='forward'] {

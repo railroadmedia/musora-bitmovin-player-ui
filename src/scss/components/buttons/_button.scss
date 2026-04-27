@@ -28,12 +28,6 @@
     > * {
       pointer-events: none;
     }
-
-    .#{$prefix}-label {
-      &:hover {
-        text-decoration: none;
-      }
-    }
   }
 
   &.touched {
