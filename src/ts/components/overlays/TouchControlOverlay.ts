@@ -164,6 +164,7 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
     let seekDisplayTimeout: ReturnType<typeof setTimeout> | null = null;
     let seekAccumulator = 0;
     let activeSeekClass = '';
+    let seekLabelHiding = false;
     const seekTime = this.config.seekTime ?? DEFAULT_SEEK_TIME;
 
     const showSeekIndicator = (
@@ -173,6 +174,7 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
       seekClass: string,
       otherSeekClass: string,
     ): void => {
+      seekLabelHiding = false;
       otherLabel.getDomElement().removeClass(this.prefixCss('seek-animating'));
       otherLabel.hide();
       this.getDomElement().removeClass(this.prefixCss(otherSeekClass));
@@ -189,15 +191,30 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
       seekDisplayTimeout = setTimeout(() => {
         label.hide();
         this.getDomElement().removeClass(this.prefixCss(seekClass));
-        seekAccumulator = 0;
-        activeSeekClass = '';
         seekDisplayTimeout = null;
+        seekLabelHiding = true;
       }, 500);
     };
 
     this.doubleTapTimeout = new Timeout(this.config.seekDoubleTapTimeout, () => {
       this.couldBeDoubleTapping = false;
     });
+
+    const onSeekLabelTransitionEnd = (e: TransitionEvent): void => {
+      if (e.propertyName === 'opacity' && seekLabelHiding) {
+        seekLabelHiding = false;
+        seekAccumulator = 0;
+        activeSeekClass = '';
+      }
+    };
+    (this.seekForwardLabel.getDomElement().get(0) as HTMLElement).addEventListener(
+      'transitionend',
+      onSeekLabelTransitionEnd,
+    );
+    (this.seekBackwardLabel.getDomElement().get(0) as HTMLElement).addEventListener(
+      'transitionend',
+      onSeekLabelTransitionEnd,
+    );
 
     let isBufferingOverlayVisible = false;
 
@@ -253,7 +270,7 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
     this.touchControlEvents.onSeekBackward.subscribe(() => {
       playerSeekTime = PlayerUtils.clampValueToRange(playerSeekTime - seekTime, 0, player.getDuration() ?? Infinity);
       player.seek(playerSeekTime);
-      if (activeSeekClass !== this.SEEK_BACKWARD_CLASS) {
+      if (activeSeekClass !== this.SEEK_BACKWARD_CLASS || (seekDisplayTimeout === null && !seekLabelHiding)) {
         seekAccumulator = 0;
         activeSeekClass = this.SEEK_BACKWARD_CLASS;
       }
@@ -270,7 +287,7 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
     this.touchControlEvents.onSeekForward.subscribe(() => {
       playerSeekTime = PlayerUtils.clampValueToRange(playerSeekTime + seekTime, 0, player.getDuration() ?? Infinity);
       player.seek(playerSeekTime);
-      if (activeSeekClass !== this.SEEK_FORWARD_CLASS) {
+      if (activeSeekClass !== this.SEEK_FORWARD_CLASS || (seekDisplayTimeout === null && !seekLabelHiding)) {
         seekAccumulator = 0;
         activeSeekClass = this.SEEK_FORWARD_CLASS;
       }

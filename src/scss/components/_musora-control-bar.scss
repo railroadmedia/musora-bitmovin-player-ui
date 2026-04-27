@@ -225,11 +225,11 @@
   // Lift the controlbar to sit just above the fullscreen seekbar, which itself
   // has max(16px, safe-area) bottom padding. 12px adds clearance above the dot.
   .#{$prefix}-ui-controlbar {
-    padding-bottom: calc(12px + max(16px, env(safe-area-inset-bottom, 0)));
+    padding-bottom: calc(12px + max(24px, env(safe-area-inset-bottom, 0)));
   }
 
   .#{$prefix}-musora-always-seekbar {
-    padding: 0 40px max(16px, env(safe-area-inset-bottom, 0));
+    padding: 0 40px max(24px, env(safe-area-inset-bottom, 0));
     .#{$prefix}-ui-seekbar {
       bottom: 0px; // nudge the track down so the dot is flush with the bottom edge of the player
     }
