@@ -32,6 +32,12 @@ export class SubtitleSwitchHandler {
   private listElement: ListSelector<ListSelectorConfig>;
   private uimanager: UIInstanceManager;
 
+  /**
+   * Guards against programmatic selectItem calls (during restore / UI sync) being
+   * mistaken for user-initiated selections and triggering a storage write.
+   */
+  private isRestoringPreference = false;
+
   constructor(player: PlayerAPI, element: ListSelector<ListSelectorConfig>, uimanager: UIInstanceManager) {
     this.player = player;
     this.listElement = element;
@@ -65,16 +71,29 @@ export class SubtitleSwitchHandler {
     return { id: raw, lang: '', label: '' };
   }
 
+  /** Strips region/script suffix so "en-US" and "en" both normalise to "en". */
+  private static normalizeLang(lang: string): string {
+    return lang.toLowerCase().split(/[-_]/)[0];
+  }
+
   /**
    * Returns true when a player subtitle track matches the persisted preference.
-   * Matches on `id` first (exact), then falls back to `lang` (e.g. "en") so that
-   * the preference survives across sources that assign different internal IDs.
+   * Match order: exact id → exact lang → normalised lang (e.g. "en" matches "en-US") → label.
    */
   private static trackMatchesPersisted(track: SubtitleTrack, persisted: PersistedSubtitleTrack): boolean {
     if (track.id === persisted.id) {
       return true;
     }
-    if (persisted.lang && track.lang && track.lang === persisted.lang) {
+    if (persisted.lang && track.lang) {
+      if (track.lang === persisted.lang) {
+        return true;
+      }
+      if (SubtitleSwitchHandler.normalizeLang(track.lang) === SubtitleSwitchHandler.normalizeLang(persisted.lang)) {
+        return true;
+      }
+    }
+    // Label fallback: useful when lang is absent or encoded differently.
+    if (persisted.label && track.label && track.label.toLowerCase() === persisted.label.toLowerCase()) {
       return true;
     }
     return false;
@@ -100,6 +119,12 @@ export class SubtitleSwitchHandler {
 
   private bindSelectionEvent(): void {
     this.listElement.onItemSelected.subscribe((_, value: string) => {
+      // Programmatic selectItem calls (UI sync during restore) must not be treated
+      // as user selections — they would overwrite the stored preference.
+      if (this.isRestoringPreference) {
+        return;
+      }
+
       // TODO add support for multiple concurrent subtitle selections
       if (value === SubtitleSwitchHandler.SUBTITLES_OFF_KEY) {
         const currentSubtitle = this.player.subtitles
@@ -146,8 +171,9 @@ export class SubtitleSwitchHandler {
         persisted !== 'off' &&
         SubtitleSwitchHandler.trackMatchesPersisted(subtitle, persisted)
       ) {
+        // SubtitleEnabled will fire synchronously → selectCurrentSubtitle updates the UI
+        // with isRestoringPreference = true, so no storage write occurs.
         this.player.subtitles.enable(subtitle.id, true);
-        // SubtitleEnabled will fire → selectCurrentSubtitle updates the UI.
       }
     }
   };
@@ -161,6 +187,11 @@ export class SubtitleSwitchHandler {
     this.selectCurrentSubtitle();
   };
 
+  /**
+   * Updates the list selection to reflect the player's current subtitle state.
+   * Always runs with the restore guard active so it never triggers a storage write —
+   * this method is only for keeping the UI in sync, not recording user intent.
+   */
   private selectCurrentSubtitle = () => {
     if (!this.player.subtitles) {
       // Subtitles API not available (yet)
@@ -171,7 +202,11 @@ export class SubtitleSwitchHandler {
       .list()
       .filter(subtitle => subtitle.enabled)
       .pop();
-    this.listElement.selectItem(currentSubtitle ? currentSubtitle.id : SubtitleSwitchHandler.SUBTITLES_OFF_KEY);
+    const key = currentSubtitle ? currentSubtitle.id : SubtitleSwitchHandler.SUBTITLES_OFF_KEY;
+
+    this.isRestoringPreference = true;
+    this.listElement.selectItem(key);
+    this.isRestoringPreference = false;
   };
 
   private clearSubtitles = () => {
@@ -204,8 +239,10 @@ export class SubtitleSwitchHandler {
 
   /**
    * Restores the user's last chosen subtitle from localStorage against the currently
-   * available track list. Falls back to "off" when no matching track exists yet
-   * (addSubtitle will retry when the track eventually arrives).
+   * available track list. Falls back to mirroring the player's current state when no
+   * matching track exists yet (addSubtitle will retry when the track eventually arrives).
+   *
+   * Never writes to storage — only the user's own selections do that.
    */
   private applyPersistedSubtitle(): void {
     const raw = StorageUtils.getItem(SubtitleSwitchHandler.STORAGE_KEY);
@@ -225,9 +262,11 @@ export class SubtitleSwitchHandler {
         .filter(s => s.enabled)
         .pop();
       if (enabledSubtitle) {
+        // SubtitleDisabled fires synchronously → selectCurrentSubtitle (guarded) updates the UI.
         this.player.subtitles.disable(enabledSubtitle.id);
+      } else {
+        this.selectCurrentSubtitle();
       }
-      this.listElement.selectItem(SubtitleSwitchHandler.SUBTITLES_OFF_KEY);
       return;
     }
 
@@ -236,16 +275,18 @@ export class SubtitleSwitchHandler {
       return;
     }
 
-    // Try to find a matching track in the current source (by id, then by lang).
+    // Try to find a matching track in the current source (by id, then by lang, then by label).
     const available = this.player.subtitles.list();
     const match = available.find(s => SubtitleSwitchHandler.trackMatchesPersisted(s, persisted));
     if (match) {
+      // SubtitleEnabled fires synchronously → selectCurrentSubtitle (guarded) updates the UI.
       this.player.subtitles.enable(match.id, true);
-      this.listElement.selectItem(match.id);
       return;
     }
 
     // No match yet — addSubtitle will handle it when the track arrives.
+    // Do NOT write to storage: the user's original preference must be preserved for
+    // future sources that may include the requested track.
     this.selectCurrentSubtitle();
   }
 }
