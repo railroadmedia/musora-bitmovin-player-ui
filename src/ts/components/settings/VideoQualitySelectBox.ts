@@ -98,14 +98,19 @@ export class VideoQualitySelectBox extends SelectBox {
       // Add video qualities — display as "1080p" / "720p" etc. derived from the
       // rendition height. If two renditions share the same height, append a bitrate
       // hint (e.g. "1080p · 8 Mbps") so the user can tell them apart.
+      const sorted = [...videoQualities].sort((a, b) => {
+        if (a.height !== b.height) return a.height - b.height;
+        return a.bitrate - b.bitrate;
+      });
+
       const heightCounts: Record<number, number> = {};
-      for (const q of videoQualities) {
+      for (const q of sorted) {
         if (q.height > 0) {
           heightCounts[q.height] = (heightCounts[q.height] ?? 0) + 1;
         }
       }
 
-      for (const videoQuality of videoQualities) {
+      for (const videoQuality of sorted) {
         const label = VideoQualitySelectBox.qualityLabel(videoQuality, heightCounts);
         this.addItem(videoQuality.id, label);
       }
