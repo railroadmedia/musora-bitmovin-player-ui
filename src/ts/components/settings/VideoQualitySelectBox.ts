@@ -12,10 +12,11 @@ import { prefixCss } from '../DummyComponent';
  * {@link PlayerAPI.getAvailableVideoQualities}, {@link PlayerAPI.setVideoQuality}, and
  * {@link PlayerAPI.exports.PlayerEvent.VideoQualityChanged}.
  *
- * The last chosen quality id is stored in {@link StorageUtils} under a prefixed key so the same mode
- * (e.g. Auto or a fixed resolution) is re-applied when {@link PlayerAPI.exports.PlayerEvent.SourceLoaded}
- * fires for a new video. If that id is not in the new manifest, the player falls back to the default
- * (Auto for adaptive streams, first rendition for progressive) and storage is updated.
+ * The chosen quality is stored in {@link StorageUtils} by **rendition height** (e.g. `"720"`) rather
+ * than the source-specific rendition ID, so the same preference applies across different videos.
+ * "auto" is stored as the literal string `"auto"`. If the stored height is unavailable in a new
+ * source the player falls back to its default without overwriting storage, preserving the user's
+ * intent for future sources.
  * Disabled when {@link UIConfig.disableStorageApi} is true.
  *
  * @category Components
@@ -23,8 +24,14 @@ import { prefixCss } from '../DummyComponent';
 export class VideoQualitySelectBox extends SelectBox {
   private hasAuto: boolean;
 
-  /** localStorage key for last user-chosen video quality id (persists across sources). */
+  /** localStorage key for last user-chosen video quality (persisted as height or "auto"). */
   private static readonly STORAGE_KEY = prefixCss('video-quality-preference');
+
+  /**
+   * Guards against programmatic selectItem calls (during restore / UI sync) being
+   * mistaken for user-initiated selections and triggering a storage write.
+   */
+  private isRestoringPreference = false;
 
   constructor(config: ListSelectorConfig = {}) {
     super(config);
@@ -42,14 +49,22 @@ export class VideoQualitySelectBox extends SelectBox {
     super.configure(player, uimanager);
 
     const selectCurrentVideoQuality = (): void => {
+      this.isRestoringPreference = true;
       this.selectItem(player.getVideoQuality().id);
+      this.isRestoringPreference = false;
     };
 
-    const isPersistedIdSelectable = (qualityId: string): boolean => {
-      if (this.hasAuto && qualityId === 'auto') {
-        return true;
+    /** Finds the rendition ID whose height matches the stored preference, or null if unavailable. */
+    const findQualityIdByPersistedKey = (persisted: string): string | null => {
+      if (persisted === 'auto') {
+        return this.hasAuto ? 'auto' : null;
       }
-      return player.getAvailableVideoQualities().some(q => q.id === qualityId);
+      const height = parseInt(persisted, 10);
+      if (!isNaN(height)) {
+        const match = player.getAvailableVideoQualities().find(q => q.height === height);
+        return match?.id ?? null;
+      }
+      return null;
     };
 
     const defaultQualityId = (): string | null => {
@@ -63,20 +78,19 @@ export class VideoQualitySelectBox extends SelectBox {
     const applyPersistedPreferenceThenSyncUi = (): void => {
       const persisted = StorageUtils.getItem(VideoQualitySelectBox.STORAGE_KEY);
 
-      if (persisted !== null && isPersistedIdSelectable(persisted)) {
-        player.setVideoQuality(persisted);
-        selectCurrentVideoQuality();
-        return;
-      }
-
-      if (persisted !== null && !isPersistedIdSelectable(persisted)) {
-        const fallback = defaultQualityId();
-        if (fallback != null) {
-          player.setVideoQuality(fallback);
-          StorageUtils.setItem(VideoQualitySelectBox.STORAGE_KEY, fallback);
+      if (persisted !== null) {
+        const qualityId = findQualityIdByPersistedKey(persisted);
+        if (qualityId !== null) {
+          player.setVideoQuality(qualityId);
+          selectCurrentVideoQuality();
+          return;
         }
-        selectCurrentVideoQuality();
-        return;
+        // Stored preference not available in this source — apply the default but
+        // do NOT overwrite storage: preserve the user's intent for future sources.
+        const fallback = defaultQualityId();
+        if (fallback !== null) {
+          player.setVideoQuality(fallback);
+        }
       }
 
       selectCurrentVideoQuality();
@@ -98,14 +112,19 @@ export class VideoQualitySelectBox extends SelectBox {
       // Add video qualities — display as "1080p" / "720p" etc. derived from the
       // rendition height. If two renditions share the same height, append a bitrate
       // hint (e.g. "1080p · 8 Mbps") so the user can tell them apart.
+      const sorted = [...videoQualities].sort((a, b) => {
+        if (a.height !== b.height) return a.height - b.height;
+        return a.bitrate - b.bitrate;
+      });
+
       const heightCounts: Record<number, number> = {};
-      for (const q of videoQualities) {
+      for (const q of sorted) {
         if (q.height > 0) {
           heightCounts[q.height] = (heightCounts[q.height] ?? 0) + 1;
         }
       }
 
-      for (const videoQuality of videoQualities) {
+      for (const videoQuality of sorted) {
         const label = VideoQualitySelectBox.qualityLabel(videoQuality, heightCounts);
         this.addItem(videoQuality.id, label);
       }
@@ -118,8 +137,23 @@ export class VideoQualitySelectBox extends SelectBox {
     };
 
     this.onItemSelected.subscribe((sender: VideoQualitySelectBox, value: string) => {
+      // Programmatic selectItem calls (UI sync, ABR reporting a quality change) must not
+      // overwrite the user's stored preference.
+      if (this.isRestoringPreference) {
+        return;
+      }
+
       player.setVideoQuality(value);
-      StorageUtils.setItem(VideoQualitySelectBox.STORAGE_KEY, value);
+
+      // Persist by height (cross-source) rather than the source-specific rendition ID.
+      if (value === 'auto') {
+        StorageUtils.setItem(VideoQualitySelectBox.STORAGE_KEY, 'auto');
+      } else {
+        const quality = player.getAvailableVideoQualities().find(q => q.id === value);
+        if (quality && quality.height > 0) {
+          StorageUtils.setItem(VideoQualitySelectBox.STORAGE_KEY, String(quality.height));
+        }
+      }
     });
 
     // Re-apply preference when a new source loads (new video)
