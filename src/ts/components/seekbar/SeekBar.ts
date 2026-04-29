@@ -279,7 +279,12 @@ export class SeekBar extends Component<SeekBarConfig> {
 
     const resumeSeekBarUpdates = () => {
       this.isUiShown = true;
-      if (this.smoothPlaybackPositionUpdater && !player.isLive() && !this.smoothPlaybackPositionUpdater.isActive()) {
+      if (
+        this.smoothPlaybackPositionUpdater &&
+        !player.isLive() &&
+        !this.smoothPlaybackPositionUpdater.isActive() &&
+        !this.isUserSeeking
+      ) {
         playbackPositionHandler(null, true);
         this.smoothPlaybackPositionUpdater.start();
       }
@@ -391,7 +396,12 @@ export class SeekBar extends Component<SeekBarConfig> {
 
     const onPlayerSeeked = (event: PlayerEventBase = null) => {
       isPlayerSeeking = false;
-      this.setSeeking(false);
+      // Only clear the seeking state if the user is not still actively scrubbing.
+      // Preview seeks from seekWhileScrubbing fire Seeked while isUserSeeking is still true,
+      // and clearing the class here would let the smooth updater overwrite the drag position.
+      if (!this.isUserSeeking) {
+        this.setSeeking(false);
+      }
 
       // update playback position when a seek has finished
       playbackPositionHandler(event, true);
@@ -632,7 +642,7 @@ export class SeekBar extends Component<SeekBarConfig> {
     this.smoothPlaybackPositionUpdater = new Timeout(
       updateIntervalMs,
       () => {
-        if (this.isSeeking()) {
+        if (this.isSeeking() || this.isUserSeeking) {
           return;
         }
 
