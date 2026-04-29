@@ -10,11 +10,11 @@
   background-color: $color-background-seek-circle;
   border-radius: 50%;
   content: '';
-  height: 200%;
+  height: 150%;
   opacity: 0;
   pointer-events: none;
   position: absolute;
-  width: 100%;
+  width: 60%;
 }
 
 %seek-label {
@@ -56,12 +56,12 @@
 
   &::before {
     @extend %seek-circle;
-    left: -60%;
+    left: -30%;
   }
 
   &::after {
     @extend %seek-circle;
-    right: -60%;
+    right: -30%;
   }
 
   &.#{$prefix}-seek-forward {
@@ -163,11 +163,11 @@
     }
 
     .#{$prefix}-seek-forward-label {
-      right: 16px;
+      right: 24px;
     }
 
     .#{$prefix}-seek-backward-label {
-      left: 16px;
+      left: 24px;
     }
 
     .#{$prefix}-seek-forward-label::after {
