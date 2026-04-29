@@ -68,6 +68,14 @@ declare const window: {
   };
 };
 
+const MUSORA_BRAND_COLOR_CSS_VARIABLE = '--musora-brand-color';
+
+function setMusoraBrandColor(color?: string): void {
+  if (color) {
+    document.documentElement.style.setProperty(MUSORA_BRAND_COLOR_CSS_VARIABLE, color);
+  }
+}
+
 /**
  * Provides factory methods to create Bitmovin provided UIs.
  */
@@ -90,15 +98,15 @@ export namespace UIFactory {
   export function buildUI(player: PlayerAPI, config: UIConfig = {}): UIManager {
     const smallScreenSwitchWidth = 800;
 
+    setMusoraBrandColor(config.brandColor);
+
     // Subscribe to brand-color messages from the React Native host.
     // The RN side sends BitmovinCustomEvents.setMusoraBrandColor with a hex string.
     let navOverlay: TouchControlOverlay | null = null;
 
     if (window.bitmovin?.customMessageHandler) {
       window.bitmovin.customMessageHandler.on('setMusoraBrandColor', (data?: string) => {
-        if (data) {
-          document.documentElement.style.setProperty('--musora-brand-color', data);
-        }
+        setMusoraBrandColor(data);
       });
 
       window.bitmovin.customMessageHandler.on('setLessonNavigationState', (data?: string) => {
@@ -210,6 +218,8 @@ export namespace UIFactory {
   export function buildMusoraUI(player: PlayerAPI, config: UIConfig = {}): UIManager {
     let navOverlay: TouchControlOverlay | null = null;
 
+    setMusoraBrandColor(config.brandColor);
+
     const manager = new UIManager(
       player,
       [
@@ -237,9 +247,7 @@ export namespace UIFactory {
 
       // Subscribe to brand-color messages from the React Native host.
       window.bitmovin.customMessageHandler.on('setMusoraBrandColor', (data?: string) => {
-        if (data) {
-          document.documentElement.style.setProperty('--musora-brand-color', data);
-        }
+        setMusoraBrandColor(data);
       });
 
       window.bitmovin.customMessageHandler.on('setLessonNavigationState', (data?: string) => {

@@ -95,6 +95,14 @@
 
       .#{$prefix}-ui-icon {
         background-size: 50px;
+        transition: transform 0.15s ease;
+      }
+      &.touched {
+        transform: none;
+
+        .#{$prefix}-ui-icon {
+          transform: scale(0.8);
+        }
       }
     }
 

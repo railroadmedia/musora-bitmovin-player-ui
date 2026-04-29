@@ -125,7 +125,7 @@
       .#{$prefix}-seekbar-playbackposition-marker {
         width: 8px;
         height: 15px;
-        background-color: var(--musora-brand-color, #{$color-red});
+        background-color: var(--musora-brand-color, #{$color-transparent});
         border-radius: 2px;
         box-shadow: none;
         z-index: 40;
@@ -155,7 +155,7 @@
         }
 
         .#{$prefix}-seekbar-playbackposition {
-          background-color: var(--musora-brand-color, #{$color-red});
+          background-color: var(--musora-brand-color, #{$color-transparent});
           z-index: 10;
         }
 
