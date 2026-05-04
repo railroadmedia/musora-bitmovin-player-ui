@@ -68,6 +68,9 @@ export class SettingsToggleButton extends ToggleButton<SettingsToggleButtonConfi
     const config = this.getConfig();
     const settingsPanel = config.settingsPanel;
 
+    // Prevent the click from reaching the document outside-click handler on the settings panel.
+    this.getDomElement().on('click', (e: Event) => e.stopPropagation());
+
     this.onClick.subscribe(() => {
       // only hide other `SettingsPanel`s if a new one will be opened
       if (!settingsPanel.isShown()) {
