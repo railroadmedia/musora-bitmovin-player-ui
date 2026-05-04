@@ -300,6 +300,16 @@
   }
 }
 
+// In fullscreen the player is wider than the layout-max-width breakpoints, so the margin-top
+// overrides in bitmovinplayer-ui.scss don't apply. Explicitly position the panel below the
+// title bar.
+.#{$prefix}-ui-skin-musora.#{$prefix}-ui-skin-smallscreen.#{$prefix}-fullscreen {
+  .#{$prefix}-ui-settings-panel {
+    top: 50px;
+    right: 40px;
+  }
+}
+
 // TitleBar and ControlBar use hidden-animated-focusable (opacity-only hide), so they remain
 // interactive at opacity:0 unless we explicitly block pointer events. The UIContainer's
 // "* { pointer-events: auto }" rule means !important is required to override descendants.

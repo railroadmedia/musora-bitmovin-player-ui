@@ -23,7 +23,7 @@
   backdrop-filter: blur(10px);
   background-color: $background-color;
   border-radius: $border-radius;
-  bottom: 3.5em;
+  top: 16px;
   box-shadow: 0 0 3px 0 transparentize($color: #000, $amount: 0.75);
   height: fit-content;
   max-height: 60%;

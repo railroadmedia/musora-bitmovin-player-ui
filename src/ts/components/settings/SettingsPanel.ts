@@ -120,6 +120,11 @@ export class SettingsPanel<Config extends SettingsPanelConfig> extends Container
 
     const config = this.getConfig();
 
+    // Stop all clicks inside the panel from reaching the document outside-click handler.
+    // This also covers sub-pages with removeOnPop:true whose back button is removed from the
+    // DOM mid-bubble — the event path is frozen at dispatch time so it still hits us here.
+    this.getDomElement().on('click', e => e.stopPropagation());
+
     uimanager.onControlsHide.subscribe(() => this.hideHoveredSelectBoxes());
     uimanager.onComponentViewModeChanged.subscribe((_, { mode }) => this.trackComponentViewMode(mode));
 
@@ -160,61 +165,37 @@ export class SettingsPanel<Config extends SettingsPanelConfig> extends Container
       }
     };
 
-    const scheduleResetState = () => {
-      if (this.resetStateTimerId !== null) {
-        clearTimeout(this.resetStateTimerId);
-        this.resetStateTimerId = null;
-      }
-
-      if (config.stateResetDelay > -1) {
-        this.resetStateTimerId = window.setTimeout(() => this.resetState(), config.stateResetDelay);
+    const handleOutsideClick = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (!this.getDomElement().get(0).contains(target)) {
+        event.stopPropagation();
+        this.hide();
       }
     };
 
     this.onHide.subscribe(() => {
-      if (this.shouldResetStateImmediately) {
-        this.currentState = null;
-        this.shouldResetStateImmediately = false;
-      } else {
-        this.currentState = this.maybeSaveCurrentState();
-        scheduleResetState();
-      }
+      this.resetState();
 
       if (config.hideDelay > -1) {
-        // Clear timeout when hidden from outside
         this.hideTimeout.clear();
       }
 
-      // Since we don't reset the actual navigation here we need to simulate a onInactive event in case some panel
-      // needs to do something when they become invisible / inactive.
       this.activePage.onInactiveEvent();
 
       document.removeEventListener('keyup', maybeCloseSettingsPanel);
+      document.removeEventListener('click', handleOutsideClick, true);
     });
 
     this.onShow.subscribe(() => {
-      if (this.resetStateTimerId !== null) {
-        clearTimeout(this.resetStateTimerId);
-        this.resetStateTimerId = null;
-      }
-
-      if (this.currentState !== null) {
-        this.restoreNavigationState(this.currentState);
-      } else {
-        // No saved state (was reset), ensure visual classes are updated
-        this.updateActivePageClass();
-      }
-
-      // Since we don't need to navigate to the root page again we need to fire the onActive event when the settings
-      // panel gets visible.
+      this.updateActivePageClass();
       this.activePage.onActiveEvent();
 
       if (config.hideDelay > -1) {
-        // Activate timeout when shown
         this.hideTimeout.start();
       }
 
       document.addEventListener('keyup', maybeCloseSettingsPanel);
+      document.addEventListener('click', handleOutsideClick, true);
     });
 
     // pass event from root page through
@@ -224,11 +205,6 @@ export class SettingsPanel<Config extends SettingsPanelConfig> extends Container
 
     uimanager.onControlsHide.subscribe(() => {
       this.hide();
-    });
-    uimanager.onControlsShow.subscribe(() => {
-      if (this.currentState !== null) {
-        this.show();
-      }
     });
 
     this.updateActivePageClass();
