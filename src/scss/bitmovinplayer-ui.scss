@@ -6,6 +6,7 @@
 @import 'components/container';
 @import 'components/uicontainer';
 @import 'components/control-bar';
+@import 'components/musora-control-bar';
 @import 'components/buttons/button';
 @import 'components/buttons/playback-toggle-button';
 @import 'components/buttons/quick-seek-button';
@@ -78,7 +79,8 @@
   &.#{$prefix}-player-state-finished {
     .#{$prefix}-ui-titlebar,
     .#{$prefix}-ui-hugeplaybacktogglebutton,
-    .#{$prefix}-ui-smallcenteredplaybacktogglebutton {
+    .#{$prefix}-ui-smallcenteredplaybacktogglebutton,
+    .#{$prefix}-ui-quickseekbutton {
       display: none;
     }
   }

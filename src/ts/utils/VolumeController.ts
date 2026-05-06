@@ -1,5 +1,7 @@
 import { Event, EventDispatcher } from '../EventDispatcher';
 import { PlayerAPI } from 'bitmovin-player';
+import { StorageUtils } from './StorageUtils';
+import { prefixCss } from '../components/DummyComponent';
 
 export interface VolumeSettingChangedArgs {
   volume: number;
@@ -11,6 +13,10 @@ export interface VolumeSettingChangedArgs {
  */
 export class VolumeController {
   private static readonly issuerName = 'ui-volumecontroller';
+
+  /** localStorage keys for persisting volume and muted state across sessions. */
+  private static readonly STORAGE_VOLUME_KEY = prefixCss('volume-preference');
+  private static readonly STORAGE_MUTED_KEY = prefixCss('muted-preference');
 
   private readonly events = {
     onChanged: new EventDispatcher<VolumeController, VolumeSettingChangedArgs>(),
@@ -29,6 +35,24 @@ export class VolumeController {
     player.on(player.exports.PlayerEvent.VolumeChanged, handler);
     player.on(player.exports.PlayerEvent.Muted, handler);
     player.on(player.exports.PlayerEvent.Unmuted, handler);
+
+    // Restore persisted volume/muted state. Bitmovin Player v8 allows volume
+    // operations before a source is loaded, so we apply immediately.
+    this.applyPersistedVolume();
+  }
+
+  /**
+   * Restores the user's previously saved volume and muted preference from localStorage.
+   */
+  private applyPersistedVolume(): void {
+    const persistedVolume = StorageUtils.getItem(VolumeController.STORAGE_VOLUME_KEY);
+    const persistedMuted = StorageUtils.getItem(VolumeController.STORAGE_MUTED_KEY);
+    if (persistedVolume !== null) {
+      this.setVolume(parseFloat(persistedVolume));
+    }
+    if (persistedMuted !== null) {
+      this.setMuted(persistedMuted === 'true');
+    }
   }
 
   setVolume(volume: number): void {
@@ -90,6 +114,10 @@ export class VolumeController {
     this.storeVolume();
 
     this.events.onChanged.dispatch(this, { volume: uiVolume, muted: uiMuted });
+
+    // Persist the user's volume preference for restoration on next app launch.
+    StorageUtils.setItem(VolumeController.STORAGE_VOLUME_KEY, String(playerVolume));
+    StorageUtils.setItem(VolumeController.STORAGE_MUTED_KEY, String(playerMuted));
   }
 
   /**

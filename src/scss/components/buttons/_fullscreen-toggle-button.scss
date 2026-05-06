@@ -8,10 +8,6 @@
     background-image: svg-load('../../assets/images/fullscreen.svg', fill=$color-icon);
   }
 
-  &:hover {
-    @include svg-icon-shadow;
-  }
-
   &.#{$prefix}-on {
     .#{$prefix}-ui-icon {
       background-image: svg-load('../../assets/images/fullscreenX.svg', fill=$color-icon);

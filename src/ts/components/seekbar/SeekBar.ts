@@ -122,6 +122,7 @@ export class SeekBar extends Component<SeekBarConfig> {
   private label: SeekBarLabel;
 
   private seekBarMarkersContainer: DOM;
+  private seekBarBarsContainer: DOM;
   private timelineMarkersHandler: TimelineMarkersHandler;
 
   private uiBoundingRect: DOMRect;
@@ -278,7 +279,12 @@ export class SeekBar extends Component<SeekBarConfig> {
 
     const resumeSeekBarUpdates = () => {
       this.isUiShown = true;
-      if (this.smoothPlaybackPositionUpdater && !player.isLive() && !this.smoothPlaybackPositionUpdater.isActive()) {
+      if (
+        this.smoothPlaybackPositionUpdater &&
+        !player.isLive() &&
+        !this.smoothPlaybackPositionUpdater.isActive() &&
+        !this.isUserSeeking
+      ) {
         playbackPositionHandler(null, true);
         this.smoothPlaybackPositionUpdater.start();
       }
@@ -304,9 +310,6 @@ export class SeekBar extends Component<SeekBarConfig> {
       }
 
       this.isUiShown = false;
-      if (this.smoothPlaybackPositionUpdater && this.smoothPlaybackPositionUpdater.isActive()) {
-        this.smoothPlaybackPositionUpdater.clear();
-      }
     });
 
     let isPlaying = false;
@@ -393,7 +396,12 @@ export class SeekBar extends Component<SeekBarConfig> {
 
     const onPlayerSeeked = (event: PlayerEventBase = null) => {
       isPlayerSeeking = false;
-      this.setSeeking(false);
+      // Only clear the seeking state if the user is not still actively scrubbing.
+      // Preview seeks from seekWhileScrubbing fire Seeked while isUserSeeking is still true,
+      // and clearing the class here would let the smooth updater overwrite the drag position.
+      if (!this.isUserSeeking) {
+        this.setSeeking(false);
+      }
 
       // update playback position when a seek has finished
       playbackPositionHandler(event, true);
@@ -560,6 +568,7 @@ export class SeekBar extends Component<SeekBarConfig> {
       timelineMarkerConfig,
       () => this.seekBar.width(),
       this.seekBarMarkersContainer,
+      this.seekBarBarsContainer,
     );
     this.timelineMarkersHandler.initialize(player, uimanager);
   }
@@ -633,7 +642,7 @@ export class SeekBar extends Component<SeekBarConfig> {
     this.smoothPlaybackPositionUpdater = new Timeout(
       updateIntervalMs,
       () => {
-        if (this.isSeeking()) {
+        if (this.isSeeking() || this.isUserSeeking) {
           return;
         }
 
@@ -753,6 +762,7 @@ export class SeekBar extends Component<SeekBarConfig> {
     const seekBarBarsContainer = new DOM('div', {
       class: this.prefixCss('seekbar-bars'),
     });
+    this.seekBarBarsContainer = seekBarBarsContainer;
 
     // Indicator that shows the buffer fill level
     const seekBarBufferLevel = new DOM('div', {
@@ -799,6 +809,11 @@ export class SeekBar extends Component<SeekBarConfig> {
     seekBar.append(seekBarBarsContainer, this.seekBarMarkersContainer, this.seekBarPlaybackPositionMarker);
 
     let seeking = false;
+    // Touch drag tracking: require minimum horizontal movement before a touch initiates a seek,
+    // so that a simple tap on the seekbar does not accidentally jump playback.
+    let touchDragConfirmed = false;
+    let touchStartX = 0;
+    const TOUCH_DRAG_THRESHOLD_PX = 5;
 
     // Define handler functions so we can attach/remove them later
     const mouseTouchMoveHandler = (e: MouseEvent | TouchEvent) => {
@@ -806,6 +821,20 @@ export class SeekBar extends Component<SeekBarConfig> {
       // Avoid propagation to VR handler
       if (this.player.vr != null) {
         e.stopPropagation();
+      }
+
+      if (BrowserUtils.isTouchSupported && this.isTouchEvent(e)) {
+        if (!touchDragConfirmed) {
+          const currentX = (e as TouchEvent).touches[0].pageX;
+          if (Math.abs(currentX - touchStartX) < TOUCH_DRAG_THRESHOLD_PX) {
+            return;
+          }
+          // Drag confirmed — now initialize seeking state
+          touchDragConfirmed = true;
+          this.setSeeking(true);
+          seeking = true;
+          this.onSeekEvent();
+        }
       }
 
       const offset = this.getOffset(e);
@@ -823,6 +852,11 @@ export class SeekBar extends Component<SeekBarConfig> {
       // Remove handlers, seek operation is finished
       new DOM(document).off('touchmove mousemove', mouseTouchMoveHandler);
       new DOM(document).off('touchend mouseup', mouseTouchUpHandler);
+
+      // For touch, only commit the seek if the user dragged — not just tapped
+      if (BrowserUtils.isTouchSupported && this.isTouchEvent(e) && !touchDragConfirmed) {
+        return;
+      }
 
       let targetPercentage = 100 * this.getOffset(e);
 
@@ -857,11 +891,18 @@ export class SeekBar extends Component<SeekBarConfig> {
         e.stopPropagation();
       }
 
-      this.setSeeking(true); // Set seeking class on DOM element
-      seeking = true; // Set seek tracking flag
+      if (isTouchEvent) {
+        // For touch, defer seeking until a drag is confirmed in touchmove to prevent
+        // accidental seeks from taps on the player.
+        touchDragConfirmed = false;
+        touchStartX = (e as TouchEvent).touches[0].pageX;
+      } else {
+        this.setSeeking(true); // Set seeking class on DOM element
+        seeking = true; // Set seek tracking flag
 
-      // Fire seeked event
-      this.onSeekEvent();
+        // Fire seeked event
+        this.onSeekEvent();
+      }
 
       // Add handler to track the seek operation over the whole document
       // This enables that scrubbing doesn't require the mouse to stay inside the UI elements itself and works

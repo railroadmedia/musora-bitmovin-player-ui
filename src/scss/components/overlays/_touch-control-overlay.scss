@@ -10,10 +10,11 @@
   background-color: $color-background-seek-circle;
   border-radius: 50%;
   content: '';
-  height: 200%;
+  height: 150%;
   opacity: 0;
+  pointer-events: none;
   position: absolute;
-  width: 100%;
+  width: 60%;
 }
 
 %seek-label {
@@ -55,12 +56,12 @@
 
   &::before {
     @extend %seek-circle;
-    left: -60%;
+    left: -30%;
   }
 
   &::after {
     @extend %seek-circle;
-    right: -60%;
+    right: -30%;
   }
 
   &.#{$prefix}-seek-forward {
@@ -73,5 +74,138 @@
     &::before {
       opacity: 1;
     }
+  }
+}
+
+// Musora-specific sizing and spacing for center playback controls
+.#{$prefix}-ui-skin-musora {
+  .#{$prefix}-ui-touch-control-overlay {
+    &::before,
+    &::after {
+      background-color: rgba(0, 0, 0, 0.3);
+    }
+
+    > .#{$prefix}-container-wrapper {
+      gap: 32px;
+    }
+
+    .#{$prefix}-ui-smallcenteredplaybacktogglebutton {
+      height: 50px;
+      width: 50px;
+
+      .#{$prefix}-ui-icon {
+        background-size: 50px;
+        transition: transform 0.15s ease;
+      }
+      &.touched {
+        transform: none;
+
+        .#{$prefix}-ui-icon {
+          transform: scale(0.8);
+        }
+      }
+    }
+
+    .#{$prefix}-ui-quickseekbutton {
+      height: 35px;
+      min-width: 35px;
+      padding: 0;
+
+      .#{$prefix}-ui-icon {
+        background-size: 35px;
+        height: 35px;
+        width: 35px;
+      }
+    }
+
+    // Applied by setLessonNavState() when prevDisabled / nextDisabled is true.
+    // Greys out the button using the colour provided by the native host.
+    .#{$prefix}-lesson-nav-disabled {
+      opacity: 0.5;
+      pointer-events: none;
+      color: var(--musora-nav-disabled-color, #666e7d);
+
+      .#{$prefix}-ui-icon {
+        filter: grayscale(1);
+      }
+    }
+
+    .#{$prefix}-seek-forward-label,
+    .#{$prefix}-seek-backward-label {
+      align-items: center;
+      color: #fff;
+      pointer-events: none;
+      display: flex;
+
+      * {
+        pointer-events: none;
+      }
+      font-family: 'Open Sans', sans-serif;
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 700;
+      line-height: normal;
+      top: 50%;
+      transform: translateY(-50%);
+      white-space: nowrap;
+    }
+
+    .#{$prefix}-seek-forward-label::after,
+    .#{$prefix}-seek-backward-label::before {
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: contain;
+      content: '';
+      display: inline-block;
+      flex-shrink: 0;
+      height: 36px;
+      width: 36px;
+    }
+
+    .#{$prefix}-seek-forward-label {
+      right: 24px;
+    }
+
+    .#{$prefix}-seek-backward-label {
+      left: 24px;
+    }
+
+    .#{$prefix}-seek-forward-label::after {
+      background-image: svg-load('../../assets/images/angle-right.svg', stroke=$color-icon);
+      margin-left: -10px;
+    }
+
+    .#{$prefix}-seek-backward-label::before {
+      background-image: svg-load('../../assets/images/angle-left.svg', stroke=$color-icon);
+      margin-right: -10px;
+    }
+
+    .#{$prefix}-seek-forward-label.#{$prefix}-seek-animating::after {
+      animation: #{$prefix}-seek-chevron-right 0.5s ease-out forwards;
+    }
+
+    .#{$prefix}-seek-backward-label.#{$prefix}-seek-animating::before {
+      animation: #{$prefix}-seek-chevron-left 0.5s ease-out forwards;
+    }
+  }
+}
+
+@keyframes #{$prefix}-seek-chevron-right {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(8px);
+  }
+}
+
+@keyframes #{$prefix}-seek-chevron-left {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-8px);
   }
 }

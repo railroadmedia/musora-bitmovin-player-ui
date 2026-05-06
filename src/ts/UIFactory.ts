@@ -58,14 +58,23 @@ import { RecommendationOverlayNavigationGroup } from './spatialnavigation/Recomm
 import { MusoraStandardEndScreen } from './components/musorastandardendscreen';
 import { CloseButton } from './components/buttons/CloseButton';
 import { BackButton } from './components/buttons/BackButton';
+import { MUSORA_LESSON_NEXT_MESSAGE, MUSORA_LESSON_PREVIOUS_MESSAGE } from './utils/MusoraLessonNavigation';
 
 declare const window: {
-  bitmovin: {
-    customMessageHandler: {
+  bitmovin?: {
+    customMessageHandler?: {
       on: (event: string, callback: (data?: string) => void) => void;
     };
   };
 };
+
+const MUSORA_BRAND_COLOR_CSS_VARIABLE = '--musora-brand-color';
+
+function setMusoraBrandColor(color?: string): void {
+  if (color) {
+    document.documentElement.style.setProperty(MUSORA_BRAND_COLOR_CSS_VARIABLE, color);
+  }
+}
 
 /**
  * Provides factory methods to create Bitmovin provided UIs.
@@ -89,11 +98,40 @@ export namespace UIFactory {
   export function buildUI(player: PlayerAPI, config: UIConfig = {}): UIManager {
     const smallScreenSwitchWidth = 800;
 
+    setMusoraBrandColor(config.brandColor);
+
+    // Subscribe to brand-color messages from the React Native host.
+    // The RN side sends BitmovinCustomEvents.setMusoraBrandColor with a hex string.
+    let navOverlay: TouchControlOverlay | null = null;
+
+    if (window.bitmovin?.customMessageHandler) {
+      window.bitmovin.customMessageHandler.on('setMusoraBrandColor', (data?: string) => {
+        setMusoraBrandColor(data);
+      });
+
+      window.bitmovin.customMessageHandler.on('setLessonNavigationState', (data?: string) => {
+        if (!data || !navOverlay) return;
+        try {
+          const { show, previousDisabled, nextDisabled, disabledColor } = JSON.parse(data) as {
+            show: boolean;
+            previousDisabled: boolean;
+            nextDisabled: boolean;
+            disabledColor: string;
+          };
+          navOverlay.setLessonNavState(show, previousDisabled, nextDisabled, disabledColor);
+        } catch (_) {
+          // Ignore malformed payloads
+        }
+      });
+    }
+
     return new UIManager(
       player,
       [
         {
-          ui: musoraSmallScreenUILayout(),
+          ui: musoraSmallScreenUILayout(overlay => {
+            navOverlay = overlay;
+          }),
           condition: (context: UIConditionContext) => {
             return true;
           },
@@ -178,11 +216,17 @@ export namespace UIFactory {
   }
 
   export function buildMusoraUI(player: PlayerAPI, config: UIConfig = {}): UIManager {
+    let navOverlay: TouchControlOverlay | null = null;
+
+    setMusoraBrandColor(config.brandColor);
+
     const manager = new UIManager(
       player,
       [
         {
-          ui: musoraSmallScreenUILayout(),
+          ui: musoraSmallScreenUILayout(overlay => {
+            navOverlay = overlay;
+          }),
           condition: (context: UIConditionContext) => {
             return true;
           },
@@ -191,7 +235,7 @@ export namespace UIFactory {
       config,
     );
 
-    if (window.bitmovin.customMessageHandler) {
+    if (window.bitmovin?.customMessageHandler) {
       window.bitmovin.customMessageHandler.on('setChapterMarkers', (data?: string) => {
         const markers = JSON.parse(data) as TimelineMarker[];
         manager.getConfig().metadata.markers = [];
@@ -199,6 +243,26 @@ export namespace UIFactory {
         markers.forEach((marker: TimelineMarker) => {
           manager.addTimelineMarker(marker);
         });
+      });
+
+      // Subscribe to brand-color messages from the React Native host.
+      window.bitmovin.customMessageHandler.on('setMusoraBrandColor', (data?: string) => {
+        setMusoraBrandColor(data);
+      });
+
+      window.bitmovin.customMessageHandler.on('setLessonNavigationState', (data?: string) => {
+        if (!data || !navOverlay) return;
+        try {
+          const { show, previousDisabled, nextDisabled, disabledColor } = JSON.parse(data) as {
+            show: boolean;
+            previousDisabled: boolean;
+            nextDisabled: boolean;
+            disabledColor: string;
+          };
+          navOverlay.setLessonNavState(show, previousDisabled, nextDisabled, disabledColor);
+        } catch (_) {
+          // Ignore malformed payloads
+        }
       });
     }
 
@@ -514,7 +578,7 @@ function smallScreenAdsUILayout() {
   });
 }
 
-export function musoraSmallScreenUILayout() {
+export function musoraSmallScreenUILayout(onOverlayReady?: (overlay: TouchControlOverlay) => void) {
   const subtitleOverlay = new SubtitleOverlay();
 
   // const mainSettingsPanelPage = new SettingsPanelPage({
@@ -571,34 +635,53 @@ export function musoraSmallScreenUILayout() {
   const titleBar = new TitleBar({
     components: [
       new BackButton(),
+      new MetadataLabel({ content: MetadataLabelContent.Title, cssClasses: ['musora-titlebar-video-title'] }),
       new Spacer(),
       new CastToggleButton(),
       new VRToggleButton(),
       new PictureInPictureToggleButton(),
       new AirPlayToggleButton(),
-      new VolumeToggleButton(),
       new SettingsToggleButton({ settingsPanel: settingsPanel }),
-      new FullscreenToggleButton(),
     ],
   });
+
+  // No SeekBarLabel — hover preview would duplicate the bottom time pill.
+  // snappingEnabled: false — prevent the dot from jumping to chapter marker positions on drag.
+  const seekBar = new SeekBar({ snappingEnabled: false });
 
   const controlBar = new ControlBar({
     components: [
       new Container({
+        cssClasses: ['musora-controlbar-timeline'],
         components: [
-          new PlaybackTimeLabel({
-            timeLabelMode: PlaybackTimeLabelMode.CurrentTime,
-            hideInLivePlayback: true,
-          }),
-          new SeekBar({ label: new SeekBarLabel() }),
-          new PlaybackTimeLabel({
-            timeLabelMode: PlaybackTimeLabelMode.TotalTime,
-            cssClasses: ['text-right'],
+          // ── Row 1: time pill (left) + fullscreen (right) ──────────────────
+          new Container({
+            cssClasses: ['musora-controlbar-time-row'],
+            components: [
+              new PlaybackTimeLabel({
+                timeLabelMode: PlaybackTimeLabelMode.CurrentAndTotalTime,
+                hideInLivePlayback: false,
+                timeSeparator: ' / ',
+                // Mirror scrub position in the pill while dragging
+                syncTimeWithSeekPreview: true,
+                disableAdaptiveMinWidth: true,
+                cssClasses: ['musora-playback-time-pill'],
+              }),
+              new Spacer(),
+              new FullscreenToggleButton({ cssClasses: ['musora-controlbar-fullscreen'] }),
+            ],
           }),
         ],
-        cssClasses: ['controlbar-top'],
       }),
     ],
+  });
+
+  // Always-visible seek bar — sits outside the ControlBar so it is never
+  // hidden by the UI hide/show cycle. The dot and pointer events are suppressed
+  // via a CSS sibling selector when the ControlBar is hidden.
+  const alwaysVisibleSeekBar = new Container({
+    cssClasses: ['musora-always-seekbar'],
+    components: [seekBar],
   });
 
   return new UIContainer({
@@ -606,9 +689,19 @@ export function musoraSmallScreenUILayout() {
       subtitleOverlay,
       new BufferingOverlay(),
       new CastStatusOverlay(),
-      new PlaybackToggleOverlay(),
+      (() => {
+        const touchOverlay = new TouchControlOverlay({
+          lessonNavigation: {
+            previousMessage: MUSORA_LESSON_PREVIOUS_MESSAGE,
+            nextMessage: MUSORA_LESSON_NEXT_MESSAGE,
+          },
+        });
+        onOverlayReady?.(touchOverlay);
+        return touchOverlay;
+      })(),
       new MusoraStandardEndScreen(),
       controlBar,
+      alwaysVisibleSeekBar,
       titleBar,
       settingsPanel,
       new ErrorMessageOverlay(),

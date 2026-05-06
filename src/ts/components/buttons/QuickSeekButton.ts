@@ -1,8 +1,16 @@
 import { Button, ButtonConfig } from './Button';
 import { i18n } from '../../localization/i18n';
-import { PlayerAPI, SeekEvent, TimeShiftEvent } from 'bitmovin-player';
+import { PlayerAPI, TimeShiftEvent } from 'bitmovin-player';
 import { UIInstanceManager } from '../../UIManager';
 import { PlayerUtils } from '../../utils/PlayerUtils';
+
+declare const window: {
+  bitmovin?: {
+    customMessageHandler?: {
+      sendAsynchronous: (message: string) => void;
+    };
+  };
+};
 
 /**
  * @category Configs
@@ -18,6 +26,15 @@ export interface QuickSeekButtonConfig extends ButtonConfig {
    * Default is -10.
    */
   seekSeconds?: number;
+  /**
+   * When set, each activation sends this string via `window.bitmovin.customMessageHandler.sendAsynchronous`
+   * instead of seeking. Used for lesson previous/next (see {@link TouchControlOverlayConfig.lessonNavigation}).
+   */
+  customMessage?: string;
+  /**
+   * Required when using {@link QuickSeekButtonConfig.customMessage} for default accessibility copy and styling hooks.
+   */
+  lessonNavigationRole?: 'previous' | 'next';
 }
 
 /**
@@ -40,18 +57,29 @@ export class QuickSeekButton extends Button<QuickSeekButtonConfig> {
       this.config,
     );
 
-    const seekDirection = this.config.seekSeconds < 0 ? 'rewind' : 'forward';
+    const cfg = <QuickSeekButtonConfig>this.config;
 
-    this.config.text = this.config.text || i18n.getLocalizer(`quickseek.${seekDirection}`);
-    this.config.ariaLabel =
-      this.config.ariaLabel ||
-      i18n.getLocalizer(`quickseek.${seekDirection}`, {
-        seekSeconds: Math.abs(this.config.seekSeconds),
-      });
+    if (cfg.customMessage) {
+      const role = cfg.lessonNavigationRole ?? 'previous';
+      cfg.text = cfg.text ?? '';
+      cfg.ariaLabel = cfg.ariaLabel ?? i18n.getLocalizer(role === 'previous' ? 'lesson.previous' : 'lesson.next');
+      cfg.cssClasses = (cfg.cssClasses ?? []).concat([
+        role === 'previous' ? 'ui-lesson-nav-previous' : 'ui-lesson-nav-next',
+      ]);
+    } else {
+      const seekDirection = cfg.seekSeconds < 0 ? 'rewind' : 'forward';
 
-    this.getDomElement()
-      .data(this.prefixCss('seek-direction'), seekDirection)
-      .data(this.prefixCss('seek-seconds'), Math.abs(this.config.seekSeconds).toString());
+      cfg.text = cfg.text || i18n.getLocalizer(`quickseek.${seekDirection}`);
+      cfg.ariaLabel =
+        cfg.ariaLabel ||
+        i18n.getLocalizer(`quickseek.${seekDirection}`, {
+          seekSeconds: Math.abs(cfg.seekSeconds),
+        });
+
+      this.getDomElement()
+        .data(this.prefixCss('seek-direction'), seekDirection)
+        .data(this.prefixCss('seek-seconds'), Math.abs(cfg.seekSeconds).toString());
+    }
   }
 
   configure(player: PlayerAPI, uimanager: UIInstanceManager): void {
@@ -87,6 +115,15 @@ export class QuickSeekButton extends Button<QuickSeekButtonConfig> {
     timeShiftDetector.detect();
     liveStreamDetector.detect();
 
+    const customMessage = (<QuickSeekButtonConfig>this.config).customMessage;
+
+    if (customMessage) {
+      this.onClick.subscribe(() => {
+        window.bitmovin?.customMessageHandler?.sendAsynchronous(customMessage);
+      });
+      return;
+    }
+
     this.onClick.subscribe(() => {
       if (isLive && !hasTimeShift) {
         // If no DVR window is available, the button should be hidden anyway, so this is to be absolutely sure
@@ -98,6 +135,8 @@ export class QuickSeekButton extends Button<QuickSeekButtonConfig> {
         return;
       }
 
+      // Use our locally-tracked target so rapid taps always accumulate from a known-valid
+      // position rather than calling getCurrentTime() mid-seek (which can return NaN on some platforms).
       const currentPosition =
         this.currentSeekTarget !== null
           ? this.currentSeekTarget
@@ -109,22 +148,19 @@ export class QuickSeekButton extends Button<QuickSeekButtonConfig> {
 
       if (isLive) {
         const clampedValue = PlayerUtils.clampValueToRange(newSeekTime, player.getMaxTimeShift(), 0);
+        this.currentSeekTarget = clampedValue;
         player.timeShift(clampedValue);
       } else {
-        const clampedValue = PlayerUtils.clampValueToRange(newSeekTime, 0, player.getDuration());
+        const clampedValue = PlayerUtils.clampValueToRange(newSeekTime, 0, player.getDuration() ?? Infinity);
+        this.currentSeekTarget = clampedValue;
         player.seek(clampedValue);
       }
     });
 
-    this.player.on(this.player.exports.PlayerEvent.Seek, this.onSeek);
     this.player.on(this.player.exports.PlayerEvent.Seeked, this.onSeekedOrTimeShifted);
     this.player.on(this.player.exports.PlayerEvent.TimeShift, this.onTimeShift);
     this.player.on(this.player.exports.PlayerEvent.TimeShifted, this.onSeekedOrTimeShifted);
   }
-
-  private onSeek = (event: SeekEvent): void => {
-    this.currentSeekTarget = event.seekTarget;
-  };
 
   private onSeekedOrTimeShifted = () => {
     this.currentSeekTarget = null;
@@ -135,10 +171,11 @@ export class QuickSeekButton extends Button<QuickSeekButtonConfig> {
   };
 
   release(): void {
-    this.player.off(this.player.exports.PlayerEvent.Seek, this.onSeek);
-    this.player.off(this.player.exports.PlayerEvent.Seeked, this.onSeekedOrTimeShifted);
-    this.player.off(this.player.exports.PlayerEvent.TimeShift, this.onTimeShift);
-    this.player.off(this.player.exports.PlayerEvent.TimeShifted, this.onSeekedOrTimeShifted);
+    if (!(<QuickSeekButtonConfig>this.config).customMessage && this.player != null) {
+      this.player.off(this.player.exports.PlayerEvent.Seeked, this.onSeekedOrTimeShifted);
+      this.player.off(this.player.exports.PlayerEvent.TimeShift, this.onTimeShift);
+      this.player.off(this.player.exports.PlayerEvent.TimeShifted, this.onSeekedOrTimeShifted);
+    }
     this.currentSeekTarget = null;
     this.player = null;
   }

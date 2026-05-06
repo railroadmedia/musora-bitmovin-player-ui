@@ -28,6 +28,7 @@ export interface MarkersConfig extends ComponentConfig {
 
 export class TimelineMarkersHandler {
   private markersContainer: DOM;
+  private barsContainer: DOM;
   private timelineMarkers: SeekBarMarker[];
   private player: PlayerAPI;
   private uimanager: UIInstanceManager;
@@ -42,10 +43,11 @@ export class TimelineMarkersHandler {
   // it for marker position calculation during time-shifting/scrubbing.
   private seekableRangeSnapshot: { start: number; end: number; timestampMs: number } | null = null;
 
-  constructor(config: MarkersConfig, getSeekBarWidth: () => number, markersContainer: DOM) {
+  constructor(config: MarkersConfig, getSeekBarWidth: () => number, markersContainer: DOM, barsContainer: DOM) {
     this.config = config;
     this.getSeekBarWidth = getSeekBarWidth;
     this.markersContainer = markersContainer;
+    this.barsContainer = barsContainer;
     this.timelineMarkers = [];
   }
 
@@ -226,6 +228,7 @@ export class TimelineMarkersHandler {
   private clearMarkers(): void {
     this.timelineMarkers = [];
     this.markersContainer.empty();
+    this.updateGapMask();
   }
 
   private removeMarkerFromConfig(marker: TimelineMarker): void {
@@ -292,6 +295,8 @@ export class TimelineMarkersHandler {
         }
       }
     });
+
+    this.updateGapMask();
   }
 
   private getMarkerCssProperties(
@@ -379,6 +384,45 @@ export class TimelineMarkersHandler {
         this.createMarkerDOM(marker);
       }
     });
+    this.updateGapMask();
+  }
+
+  private updateGapMask(): void {
+    const seekBarWidth = this.getSeekBarWidth();
+    const el = this.barsContainer.get(0) as HTMLElement;
+    if (!el) return;
+
+    if (this.timelineMarkers.length === 0 || seekBarWidth === 0) {
+      el.style.removeProperty('mask-image');
+      el.style.removeProperty('-webkit-mask-image');
+      return;
+    }
+
+    const GAP_PX = 3;
+    const sorted = this.timelineMarkers.slice().sort((a, b) => a.position - b.position);
+    const stops: string[] = [];
+    let prev = 0;
+
+    sorted.forEach(marker => {
+      if (marker.position <= 0 || marker.position >= 100) return;
+
+      const centerPx = (marker.position / 100) * seekBarWidth;
+      const leftPx = Math.max(0, centerPx - GAP_PX / 2);
+      const rightPx = Math.min(seekBarWidth, centerPx + GAP_PX / 2);
+      const left = (leftPx / seekBarWidth) * 100;
+      const right = (rightPx / seekBarWidth) * 100;
+      if (left > prev) {
+        stops.push(`white ${prev}%`, `white ${left}%`);
+      }
+      stops.push(`transparent ${left}%`, `transparent ${right}%`);
+      prev = right;
+    });
+
+    stops.push(`white ${prev}%`, `white 100%`);
+
+    const gradient = `linear-gradient(to right, ${stops.join(', ')})`;
+    el.style.setProperty('mask-image', gradient);
+    el.style.setProperty('-webkit-mask-image', gradient);
   }
 
   private startLiveMarkerUpdater(): void {

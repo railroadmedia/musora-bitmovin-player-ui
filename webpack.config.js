@@ -1,7 +1,6 @@
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const replacer = require('replacer-util').replacer;
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 
@@ -177,6 +176,7 @@ module.exports = (env, { mode }) => {
 
 async function createJavascriptUiFrameworkFilesWithReplacedPrefix() {
   await exec('npx tsc'); // run the typescript compiler to generate the individual UI Framework JS files in `dist/js/framework/`
+  const { replacer } = await import('replacer-util');
   const options = {
     templatingOn: false, // disable liquid syntax to avoid issues with {{ and }}
     find: '{{PREFIX}}',

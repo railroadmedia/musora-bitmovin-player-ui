@@ -11,6 +11,7 @@ export { PlayerUtils } from './utils/PlayerUtils';
 export { UIUtils } from './utils/UIUtils';
 export { BrowserUtils } from './utils/BrowserUtils';
 export { StorageUtils } from './utils/StorageUtils';
+export { MUSORA_LESSON_NEXT_MESSAGE, MUSORA_LESSON_PREVIOUS_MESSAGE } from './utils/MusoraLessonNavigation';
 export { ErrorUtils } from './utils/ErrorUtils';
 export { ShadowDomManager } from './utils/ShadowDomManager';
 // Localization
@@ -34,7 +35,7 @@ export {
 // Components
 export { Button, ButtonConfig, ButtonStyle } from './components/buttons/Button';
 export { ControlBar, ControlBarConfig } from './components/ControlBar';
-export { FullscreenToggleButton } from './components/buttons/FullscreenToggleButton';
+export { FullscreenToggleButton, SET_FULLSCREEN_STATE_MESSAGE } from './components/buttons/FullscreenToggleButton';
 export { HugePlaybackToggleButton } from './components/buttons/HugePlaybackToggleButton';
 export {
   PlaybackTimeLabel,
@@ -140,6 +141,8 @@ export {
 } from './components/settings/DynamicSettingsPanelItem';
 export { ReplayButton } from './components/buttons/ReplayButton';
 export { QuickSeekButton, QuickSeekButtonConfig } from './components/buttons/QuickSeekButton';
+export { MusoraPreviousButton } from './components/buttons/MusoraPreviousButton';
+export { MusoraNextButton } from './components/buttons/MusoraNextButton';
 export {
   ListSelector,
   ListSelectorConfig,
@@ -163,7 +166,11 @@ export {
   SettingsPanelPageNavigatorConfig,
 } from './components/settings/SettingsPanelPageNavigatorButton';
 export { InteractiveSettingsPanelItem } from './components/settings/InteractiveSettingsPanelItem';
-export { TouchControlOverlay, TouchControlOverlayConfig } from './components/overlays/TouchControlOverlay';
+export {
+  TouchControlOverlay,
+  TouchControlOverlayConfig,
+  LessonNavigationMessages,
+} from './components/overlays/TouchControlOverlay';
 export { CharacterEdgeColorSelectBox } from './components/settings/subtitlesettings/CharacterEdgeColorSelectBox';
 export { FontStyleSelectBox } from './components/settings/subtitlesettings/FontStyleSelectBox';
 

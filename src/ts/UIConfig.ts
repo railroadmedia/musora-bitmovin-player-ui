@@ -94,6 +94,10 @@ export interface UIConfig {
     recommendations?: RecommendationConfig[];
   };
   /**
+   * Initial Musora brand color used by the custom UI before native brand-color messages arrive.
+   */
+  brandColor?: string;
+  /**
    * Specifies if the UI variants should be resolved and switched automatically upon certain player events. The default
    * is `true`. Should be set to `false` if purely manual switching through {@link UIManager.resolveUiVariant} is
    * desired. A hybrid approach can be used by setting this to `true` (or leaving the default) and overriding

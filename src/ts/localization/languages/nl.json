@@ -74,5 +74,7 @@
   "seekBar.timeshift": "Tijdverschuiving",
   "seekBar.durationText": "van",
   "quickseek.forward": "{seekSeconds} seconden vooruitspoelen",
-  "quickseek.rewind": "{seekSeconds} seconden terugspoelen"
+  "quickseek.rewind": "{seekSeconds} seconden terugspoelen",
+  "lesson.previous": "Vorige les",
+  "lesson.next": "Volgende les"
 }

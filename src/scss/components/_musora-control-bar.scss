@@ -1,0 +1,343 @@
+@import '../variables';
+
+// ────────────────────────────────────────────────────────────────────────────
+// Musora small-screen control bar
+// Layout: time-pill + fullscreen row, floating above the always-visible seek bar.
+// ────────────────────────────────────────────────────────────────────────────
+.#{$prefix}-ui-skin-musora.#{$prefix}-ui-skin-smallscreen .#{$prefix}-ui-controlbar {
+  // Remove the default gradient backdrop — the time pill has its own.
+  background: none;
+
+  padding-top: 0;
+  padding-left: 0;
+  padding-right: 0;
+  padding-bottom: 12px;
+
+  // ── Outer column ─────────────────────────────────────────────────────────
+  .#{$prefix}-musora-controlbar-timeline {
+    > .#{$prefix}-container-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      row-gap: 0;
+      width: 100%;
+    }
+  }
+
+  // ── Row 1 — pill (left) + fullscreen (right) ────────────────────────────
+  .#{$prefix}-musora-controlbar-time-row {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.35em max(16px, env(safe-area-inset-right, 0)) 0.35em max(16px, env(safe-area-inset-left, 0));
+
+    > .#{$prefix}-container-wrapper {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: center;
+      width: 100%;
+      min-width: 0; // allow row to respect parent width when safe-area + pill compete
+    }
+
+    .#{$prefix}-ui-spacer {
+      flex: 1;
+      min-width: 0;
+      height: auto;
+      width: auto;
+    }
+
+    // Prevent the nowrap time string from forcing the fullscreen control off-screen
+    // (parent UI container uses overflow: hidden — common in landscape with notch insets).
+    .#{$prefix}-ui-playbacktimelabel.#{$prefix}-musora-playback-time-pill {
+      flex: 0 1 auto;
+      min-width: 0;
+      max-width: 100%;
+      overflow: hidden;
+
+      .#{$prefix}-ui-label-text {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+
+    .#{$prefix}-musora-controlbar-fullscreen {
+      flex-shrink: 0;
+      position: relative;
+      z-index: 1;
+      background-color: rgba(12, 21, 36, 0.4);
+      border-radius: 50%;
+    }
+  }
+
+  // ── Time pill ────────────────────────────────────────────────────────────
+  .#{$prefix}-musora-playback-time-pill {
+    border-radius: 999px;
+    padding: 0.4em 0.85em;
+    background-color: rgba(12, 21, 36, 0.4);
+    font-family: 'Open Sans', sans-serif;
+    font-size: 12px;
+    line-height: 16px;
+    color: #ffffff;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// Always-visible seek bar
+// Sits outside the ControlBar so it is never affected by the UI hide cycle.
+// Positioned at the very bottom, flush with edges.
+// 12 px symmetric padding gives the 13 px dot enough room at 0 % and 100 %.
+// ────────────────────────────────────────────────────────────────────────────
+.#{$prefix}-ui-skin-musora.#{$prefix}-ui-skin-smallscreen {
+  .#{$prefix}-musora-always-seekbar {
+    position: absolute;
+    bottom: -5px; // nudge the seek bar down so the dot is flush with the bottom edge of the player
+    left: 0;
+    right: 0;
+    padding: 0;
+    box-sizing: border-box;
+    display: flex;
+
+    > .#{$prefix}-container-wrapper {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+
+    // ── SeekBar hover label — hidden in Musora skin ────────────────────────
+    .#{$prefix}-ui-seekbar-label {
+      display: none !important;
+    }
+
+    .#{$prefix}-ui-seekbar {
+      flex: 1;
+      min-width: 0;
+      height: 20px;
+      display: flex;
+      align-items: flex-end;
+      position: relative;
+
+      // ── Dot ────────────────────────────────────────────────────────────
+      .#{$prefix}-seekbar-playbackposition-marker {
+        width: 8px;
+        height: 15px;
+        background-color: var(--musora-brand-color, #{$color-transparent});
+        border-radius: 2px;
+        box-shadow: none;
+        z-index: 40;
+        left: -4px;
+        margin-left: 0;
+      }
+
+      // ── Track ──────────────────────────────────────────────────────────
+      .#{$prefix}-seekbar {
+        height: 4px;
+        width: 100%;
+        position: relative;
+        overflow: visible;
+
+        .#{$prefix}-seekbar-bars {
+          height: 100%;
+          border-radius: 0;
+        }
+
+        // Colours
+        .#{$prefix}-seekbar-backdrop {
+          background-color: #969faecc;
+        }
+
+        .#{$prefix}-seekbar-bufferlevel {
+          background-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .#{$prefix}-seekbar-playbackposition {
+          background-color: var(--musora-brand-color, #{$color-transparent});
+          z-index: 10;
+        }
+
+        // Chapter gaps — mask-image on .seekbar-bars is computed by SeekBar.ts
+        .#{$prefix}-seekbar-markers > .#{$prefix}-seekbar-marker {
+          background-color: transparent;
+          width: 3px;
+          z-index: 30;
+          height: 100%;
+
+          &::after {
+            display: none;
+          }
+
+          > .#{$prefix}-seekbar-marker-indicator {
+            display: none;
+          }
+        }
+      }
+    }
+  }
+
+  // When the ControlBar is hidden (controls not visible), hide the seek dot
+  // and block all pointer events on the seek bar so it isn't accidentally dragged.
+  .#{$prefix}-ui-controlbar.#{$prefix}-hidden ~ .#{$prefix}-musora-always-seekbar {
+    pointer-events: none;
+
+    .#{$prefix}-seekbar-playbackposition-marker {
+      opacity: 0;
+    }
+
+    .#{$prefix}-seekbar {
+      height: 2px;
+    }
+
+    .#{$prefix}-seekbar-backdrop {
+      background-color: #969fae99;
+    }
+  }
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// Video title in the title bar — hidden by default, visible in fullscreen only.
+// ────────────────────────────────────────────────────────────────────────────
+.#{$prefix}-ui-skin-musora .#{$prefix}-musora-titlebar-video-title {
+  display: none;
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// Non-fullscreen: align TitleBar horizontal padding to the ControlBar time-row
+// (both max(1em, safe-area-inset)) so the gear and fullscreen icons sit at the
+// same x-position. The seek bar remains full-width.
+// ────────────────────────────────────────────────────────────────────────────
+.#{$prefix}-ui-skin-musora.#{$prefix}-ui-skin-smallscreen .#{$prefix}-ui-titlebar {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// Fullscreen overrides
+// - TitleBar, ControlBar time-row, and SeekBar all get 40 px horizontal padding
+//   so their content edges line up vertically.
+// - Seek bar also gets extra bottom breathing room and rounded track ends.
+// - Title bar: back button hidden, video title shown.
+// ────────────────────────────────────────────────────────────────────────────
+.#{$prefix}-ui-skin-musora.#{$prefix}-ui-skin-smallscreen.#{$prefix}-fullscreen {
+  // Lift the controlbar to sit just above the fullscreen seekbar, which itself
+  // has max(16px, safe-area) bottom padding. 12px adds clearance above the dot.
+  .#{$prefix}-ui-controlbar {
+    padding-bottom: calc(12px + calc(16px + env(safe-area-inset-bottom, 0)));
+  }
+
+  .#{$prefix}-musora-always-seekbar {
+    padding: 0 40px calc(16px + env(safe-area-inset-bottom, 0));
+    .#{$prefix}-ui-seekbar {
+      bottom: 0px; // nudge the track down so the dot is flush with the bottom edge of the player
+    }
+    .#{$prefix}-seekbar .#{$prefix}-seekbar-bars {
+      height: 5px;
+      border-radius: 2px;
+    }
+    .#{$prefix}-seekbar-playbackposition-marker {
+      height: 11px;
+    }
+  }
+
+  // When the ControlBar is hidden (controls not visible), hide the seek dot
+  // and block all pointer events on the seek bar so it isn't accidentally dragged.
+  .#{$prefix}-ui-controlbar.#{$prefix}-hidden ~ .#{$prefix}-musora-always-seekbar {
+    pointer-events: none;
+    opacity: 0; // hide seek bar when controls are hidden in fullscreen
+  }
+
+  .#{$prefix}-musora-controlbar-time-row {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+
+  .#{$prefix}-ui-titlebar {
+    padding-left: 40px;
+    padding-right: 40px;
+
+    // Align all title bar children to the vertical midpoint.
+    > .#{$prefix}-container-wrapper {
+      align-items: center;
+    }
+
+    .#{$prefix}-ui-backbutton {
+      display: none;
+    }
+
+    // Collapse the spacer so the title can claim all remaining width.
+    .#{$prefix}-ui-spacer {
+      flex: 0;
+      width: 0;
+      min-width: 0;
+    }
+
+    .#{$prefix}-musora-titlebar-video-title {
+      display: block;
+      flex: 1;
+      min-width: 0;
+      align-self: center;
+      color: #fff;
+      font-family: 'Open Sans', sans-serif;
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 700;
+      line-height: 129%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+}
+
+// Ensure the settings panel floats above control bar elements (the fullscreen button has
+// z-index: 1 which would otherwise render above it).
+.#{$prefix}-ui-skin-musora {
+  .#{$prefix}-ui-settings-panel {
+    z-index: 2;
+  }
+}
+
+// In fullscreen the player is wider than the layout-max-width breakpoints, so the margin-top
+// overrides in bitmovinplayer-ui.scss don't apply. Explicitly position the panel below the
+// title bar.
+.#{$prefix}-ui-skin-musora.#{$prefix}-ui-skin-smallscreen.#{$prefix}-fullscreen {
+  .#{$prefix}-ui-settings-panel {
+    top: 50px;
+    right: 40px;
+  }
+}
+
+// TitleBar and ControlBar use hidden-animated-focusable (opacity-only hide), so they remain
+// interactive at opacity:0 unless we explicitly block pointer events. The UIContainer's
+// "* { pointer-events: auto }" rule means !important is required to override descendants.
+.#{$prefix}-ui-skin-musora {
+  .#{$prefix}-ui-titlebar.#{$prefix}-hidden,
+  .#{$prefix}-ui-titlebar.#{$prefix}-hidden *,
+  .#{$prefix}-ui-controlbar.#{$prefix}-hidden,
+  .#{$prefix}-ui-controlbar.#{$prefix}-hidden * {
+    pointer-events: none !important;
+  }
+}
+
+// Tapping empty space in the visible ControlBar should fall through to the TouchControlOverlay
+// so the single-tap handler can toggle the UI off. The UIContainer base sets
+// "* { pointer-events: auto }" with specificity (0,1,0); using 3 class selectors here
+// wins without !important. The fullscreen container is re-enabled specifically because
+// Button subclasses overwrite cssClass (so bmpui-ui-button is absent from rendered elements).
+.#{$prefix}-ui-skin-musora.#{$prefix}-ui-skin-smallscreen .#{$prefix}-ui-controlbar,
+.#{$prefix}-ui-skin-musora.#{$prefix}-ui-skin-smallscreen .#{$prefix}-ui-controlbar * {
+  pointer-events: none;
+}
+
+.#{$prefix}-ui-skin-musora.#{$prefix}-ui-skin-smallscreen
+  .#{$prefix}-ui-controlbar
+  .#{$prefix}-musora-controlbar-fullscreen,
+.#{$prefix}-ui-skin-musora.#{$prefix}-ui-skin-smallscreen
+  .#{$prefix}-ui-controlbar
+  .#{$prefix}-musora-controlbar-fullscreen
+  * {
+  pointer-events: auto;
+}
