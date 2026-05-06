@@ -113,6 +113,17 @@
           border-radius: 4px;
           flex-shrink: 0;
           max-width: 340px;
+
+          .#{$prefix}-locked {
+            width: 100%;
+            height: 100%;
+            background-color: #0c152466;
+            background-image: url('../../assets/images/musora-lock.svg');
+            background-size: 32%;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-radius: 4px;
+          }
         }
 
         .#{$prefix}-text-area {
@@ -265,7 +276,7 @@
                 height: 100%;
                 background-color: #0c152466;
 
-                background-image: url('../../assets/images/lock.svg');
+                background-image: url('../../assets/images/musora-lock.svg');
                 background-size: 32%;
                 background-position: center;
                 background-repeat: no-repeat;
