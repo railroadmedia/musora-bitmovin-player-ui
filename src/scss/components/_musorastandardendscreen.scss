@@ -57,14 +57,14 @@
       cursor: pointer;
       color: $color-primary;
       flex-shrink: 0;
-      display: none; // Hidden by default
+      display: flex;
       align-items: center;
       justify-content: center;
       width: 32px;
       height: 32px;
       border-radius: 50%;
       transition: all $animation-duration-short ease;
-      background-image: url('../../assets/images/chev-left.svg');
+      background-image: url('../../assets/images/angle-left.svg');
       background-size: 16px;
       background-position: center;
       background-repeat: no-repeat;
@@ -215,7 +215,6 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding-left: 32px;
 
         .#{$prefix}-top-title {
           text-align: center;
@@ -602,7 +601,8 @@
 
     > .#{$prefix}-container-wrapper {
       .#{$prefix}-musora-up-next-end-screen-item .#{$prefix}-back-button,
-      .#{$prefix}-musora-method-session-end-screen-item .#{$prefix}-back-button {
+      .#{$prefix}-musora-method-session-end-screen-item .#{$prefix}-back-button,
+      .#{$prefix}-musora-award-end-screen-item .#{$prefix}-back-button {
         position: absolute;
         top: clamp(12px, 2vh, 20px);
         left: clamp(12px, 2vw, 20px);

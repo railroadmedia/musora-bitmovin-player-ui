@@ -623,12 +623,15 @@ class MusoraUpNextEndScreenItem extends MusoraStandardEndScreenItem {
       buttonRow.append(goHomeButton);
     } else {
       // Standard / course-complete / locked variants: same behavior, different labels
+      const isLockedVariant = this.data.variant === 'locked';
       let defaultCancelLabel = 'Cancel';
       let defaultPlayNowLabel = 'Play Now';
       if (this.data.variant === 'course-complete') {
         defaultCancelLabel = 'Back To Home';
-      } else if (this.data.variant === 'locked') {
+      } else if (isLockedVariant) {
         defaultPlayNowLabel = 'Unlock Next Lesson';
+        // Locked has no countdown to cancel — secondary action goes straight to Replay.
+        defaultCancelLabel = 'Replay';
       }
       const cancelLabel = this.data.cancelLabel || defaultCancelLabel;
       const playNowLabel = this.data.actionLabel || defaultPlayNowLabel;
@@ -637,9 +640,13 @@ class MusoraUpNextEndScreenItem extends MusoraStandardEndScreenItem {
         class: this.prefixCss('cancel-button'),
       }).html(cancelLabel);
 
-      this.cancelButtonHandler = this.onCancel.bind(this);
-      cancelButton.on('click', this.cancelButtonHandler!);
-      this.cancelButtonElement = cancelButton;
+      if (isLockedVariant) {
+        cancelButton.on('click', this.onReplay.bind(this));
+      } else {
+        this.cancelButtonHandler = this.onCancel.bind(this);
+        cancelButton.on('click', this.cancelButtonHandler!);
+        this.cancelButtonElement = cancelButton;
+      }
 
       const playNowButton = new DOM('button', {
         class: this.prefixCss('play-now-button'),
@@ -674,7 +681,7 @@ class MusoraUpNextEndScreenItem extends MusoraStandardEndScreenItem {
 interface MethodSessionData {
   lessons: {
     thumbnail: string;
-    status: 'completed' | 'next' | 'upcoming' | 'locked';
+    status: 'completed' | 'next' | 'upcoming';
     /** When true, render this lesson with the locked overlay and label, regardless of status. */
     need_access?: boolean;
   }[];
@@ -756,7 +763,7 @@ class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
     this.data.lessons.forEach((item, index) => {
       // need_access takes priority over completion: if the user has lost access,
       // show the lock even if they previously completed the lesson
-      const isLocked = item.need_access || item.status === 'locked';
+      const isLocked = item.need_access;
       const isCompleted = !isLocked && (item.status === 'completed' || this.data.sessionCompleted);
 
       const contentItem = new DOM('div', {
@@ -788,19 +795,7 @@ class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
       contentItem.append(thumbnail);
 
       if (!this.data.sessionCompleted) {
-        if (isLocked) {
-          const label = new DOM('div', {
-            class: `${this.prefixCss(`label`)} ${this.prefixCss('locked')}`,
-          }).html('Locked');
-
-          contentItem.append(label);
-        } else if (item.status === 'completed') {
-          const label = new DOM('div', {
-            class: `${this.prefixCss(`label`)} ${this.prefixCss('completed')}`,
-          }).html('Completed');
-
-          contentItem.append(label);
-        } else if (item.status === 'next') {
+        if (item.status === 'next') {
           // When the countdown is disabled (e.g. variant === 'locked'), countdownValue
           // is undefined — render a static "Up Next" label instead of the timer.
           const hasCountdown = this.countdownValue !== undefined;
@@ -815,6 +810,18 @@ class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
             label.append(time);
             this.nextLabelElement = label;
           }
+
+          contentItem.append(label);
+        } else if (isLocked) {
+          const label = new DOM('div', {
+            class: `${this.prefixCss(`label`)} ${this.prefixCss('locked')}`,
+          }).html('Locked');
+
+          contentItem.append(label);
+        } else if (item.status === 'completed') {
+          const label = new DOM('div', {
+            class: `${this.prefixCss(`label`)} ${this.prefixCss('completed')}`,
+          }).html('Completed');
 
           contentItem.append(label);
         } else if (item.status === 'upcoming') {
@@ -854,19 +861,26 @@ class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
       class: this.prefixCss('button-row'),
     });
 
-    const defaultCancelLabel = this.data.sessionCompleted ? 'Back to Home' : 'Cancel';
+    const isLockedVariant = this.data.variant === 'locked';
+    let defaultCancelLabel = this.data.sessionCompleted ? 'Back to Home' : 'Cancel';
     let defaultPlayNowLabel = this.data.sessionCompleted ? 'Keep Going' : 'Play Now';
-    if (this.data.variant === 'locked') {
+    if (isLockedVariant) {
       defaultPlayNowLabel = 'Unlock Next Lesson';
+      // Locked has no countdown to cancel — secondary action goes straight to Replay.
+      defaultCancelLabel = 'Replay';
     }
 
     const cancelButton = new DOM('button', {
       class: this.prefixCss('cancel-button'),
     }).html(this.data.cancelLabel || defaultCancelLabel);
 
-    this.cancelButtonHandler = this.onCancel.bind(this);
-    cancelButton.on('click', this.cancelButtonHandler!);
-    this.cancelButtonElement = cancelButton;
+    if (isLockedVariant) {
+      cancelButton.on('click', this.onReplay.bind(this));
+    } else {
+      this.cancelButtonHandler = this.onCancel.bind(this);
+      cancelButton.on('click', this.cancelButtonHandler!);
+      this.cancelButtonElement = cancelButton;
+    }
 
     const playNowButton = new DOM('button', {
       class: this.prefixCss('play-now-button'),
@@ -926,6 +940,12 @@ class MusoraAwardEndScreenItem extends MusoraStandardEndScreenItem {
       class: this.prefixCss('top-row'),
     });
 
+    const backButton = new DOM('button', {
+      class: this.prefixCss('back-button'),
+    });
+
+    backButton.on('click', this.onBack.bind(this));
+
     const topTitle = new DOM('div', {
       class: this.prefixCss('top-title'),
     }).html('Great job! Learning Path Complete!');
@@ -936,6 +956,7 @@ class MusoraAwardEndScreenItem extends MusoraStandardEndScreenItem {
 
     closeButton.on('click', this.onClose.bind(this));
 
+    topRow.append(backButton);
     topRow.append(topTitle);
     topRow.append(closeButton);
     itemElement.append(topRow);
