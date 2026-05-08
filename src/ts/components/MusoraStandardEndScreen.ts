@@ -385,7 +385,7 @@ class MusoraStandardEndScreenItem extends Component<MusoraStandardEndScreenItemC
         timerElement.textContent = this.countdownValue.toString();
       }
       if (this.countdownValue <= 0) {
-        if (this.countdownTimer && window.bitmovin.customMessageHandler) {
+        if (this.countdownTimer && window.bitmovin?.customMessageHandler) {
           window.bitmovin.customMessageHandler.sendAsynchronous('onEndScreenAutoAction');
         }
         if (this.countdownTimer) {
@@ -461,6 +461,12 @@ class MusoraStandardEndScreenItem extends Component<MusoraStandardEndScreenItemC
   }
 }
 
+enum EndScreenVariant {
+  Unreleased = 'unreleased',
+  CourseComplete = 'course-complete',
+  Locked = 'locked',
+}
+
 interface UpNextData {
   title: string;
   subtitle: string;
@@ -472,7 +478,7 @@ interface UpNextData {
    * - 'course-complete' – shows Course Complete styling with BACK TO HOME / PLAY NOW CTAs and no countdown
    * - 'locked' – shows locked overlay on the thumbnail, no countdown, primary CTA defaults to "Unlock Next Lesson"
    */
-  variant?: 'unreleased' | 'course-complete' | 'locked';
+  variant?: EndScreenVariant;
   unreleasedText?: string;
   disableCountdown?: boolean;
   /** Override label for the primary action button (Play Now / Go Home / Unlock Next Lesson). */
@@ -493,9 +499,9 @@ class MusoraUpNextEndScreenItem extends MusoraStandardEndScreenItem {
     // Only setup timer when countdown is enabled and variant supports it
     const shouldUseCountdown =
       !data.disableCountdown &&
-      data.variant !== 'unreleased' &&
-      data.variant !== 'course-complete' &&
-      data.variant !== 'locked';
+      data.variant !== EndScreenVariant.Unreleased &&
+      data.variant !== EndScreenVariant.CourseComplete &&
+      data.variant !== EndScreenVariant.Locked;
     if (shouldUseCountdown) {
       this.setupTimer(data.delay);
     }
@@ -526,12 +532,12 @@ class MusoraUpNextEndScreenItem extends MusoraStandardEndScreenItem {
       class: this.prefixCss('up-next-text'),
     });
 
-    if (this.data.variant === 'unreleased') {
+    if (this.data.variant === EndScreenVariant.Unreleased) {
       // For unreleased variant, just show "Up Next" without timer
       upNextText.html('Up Next');
-    } else if (this.data.variant === 'course-complete') {
+    } else if (this.data.variant === EndScreenVariant.CourseComplete) {
       upNextText.html('Course Complete');
-    } else if (this.data.variant === 'locked') {
+    } else if (this.data.variant === EndScreenVariant.Locked) {
       upNextText.html('Up Next');
     } else {
       // For standard variant, show countdown timer
@@ -678,10 +684,17 @@ class MusoraUpNextEndScreenItem extends MusoraStandardEndScreenItem {
   }
 }
 
+enum MethodSessionStatus {
+  Completed = 'completed',
+  Next = 'next',
+  Upcoming = 'upcoming',
+  Locked = 'locked',
+}
+
 interface MethodSessionData {
   lessons: {
     thumbnail: string;
-    status: 'completed' | 'next' | 'upcoming';
+    status: MethodSessionStatus;
     /** When true, render this lesson with the locked overlay and label, regardless of status. */
     need_access?: boolean;
   }[];
@@ -764,7 +777,7 @@ class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
       // need_access takes priority over completion: if the user has lost access,
       // show the lock even if they previously completed the lesson
       const isLocked = item.need_access;
-      const isCompleted = !isLocked && (item.status === 'completed' || this.data.sessionCompleted);
+      const isCompleted = !isLocked && (item.status === MethodSessionStatus.Completed || this.data.sessionCompleted);
 
       const contentItem = new DOM('div', {
         class: this.prefixCss('session-step'),
@@ -795,7 +808,7 @@ class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
       contentItem.append(thumbnail);
 
       if (!this.data.sessionCompleted) {
-        if (item.status === 'next') {
+        if (item.status === MethodSessionStatus.Next) {
           // When the countdown is disabled (e.g. variant === 'locked'), countdownValue
           // is undefined — render a static "Up Next" label instead of the timer.
           const hasCountdown = this.countdownValue !== undefined;
@@ -812,19 +825,19 @@ class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
           }
 
           contentItem.append(label);
-        } else if (isLocked) {
+        } else if (isLocked || item.status === MethodSessionStatus.Locked) {
           const label = new DOM('div', {
             class: `${this.prefixCss(`label`)} ${this.prefixCss('locked')}`,
           }).html('Locked');
 
           contentItem.append(label);
-        } else if (item.status === 'completed') {
+        } else if (item.status === MethodSessionStatus.Completed) {
           const label = new DOM('div', {
             class: `${this.prefixCss(`label`)} ${this.prefixCss('completed')}`,
           }).html('Completed');
 
           contentItem.append(label);
-        } else if (item.status === 'upcoming') {
+        } else if (item.status === MethodSessionStatus.Upcoming) {
           const label = new DOM('div', {
             class: `${this.prefixCss(`label`)}`,
           }).html('Upcoming');
