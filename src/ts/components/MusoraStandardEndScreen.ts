@@ -308,8 +308,12 @@ export class MusoraStandardEndScreen extends Container<ContainerConfig> {
 
       window.bitmovin.customMessageHandler.on('stopCountdown', () => {
         this.getComponents().forEach(component => {
-          if (component instanceof MusoraStandardEndScreenItem) {
+          if (component instanceof MusoraUpNextEndScreenItem) {
             component.stopTimer();
+            component.onStopCountdown();
+          } else if (component instanceof MusoraMethodSessionEndScreenItem) {
+            component.stopTimer();
+            component.onStopCountdown();
           }
         });
       });
@@ -401,11 +405,6 @@ class MusoraStandardEndScreenItem extends Component<MusoraStandardEndScreenItemC
     if (this.countdownTimer) {
       clearInterval(this.countdownTimer);
       this.countdownTimer = null;
-    }
-    // Update the DOM immediately to reflect the stopped state
-    const timerElement = document.querySelector(`.${this.prefixCss('timer')}`);
-    if (timerElement) {
-      timerElement.textContent = '0';
     }
     // Set countdown to 0 to indicate stopped state
     this.countdownValue = 0;
@@ -504,6 +503,9 @@ class MusoraUpNextEndScreenItem extends MusoraStandardEndScreenItem {
       data.variant !== EndScreenVariant.Locked;
     if (shouldUseCountdown) {
       this.setupTimer(data.delay);
+    } else {
+      // When countdown is disabled, set countdownValue to 0 so DOM checks don't fail
+      this.countdownValue = 0;
     }
   }
 
@@ -539,8 +541,11 @@ class MusoraUpNextEndScreenItem extends MusoraStandardEndScreenItem {
       upNextText.html('Course Complete');
     } else if (this.data.variant === EndScreenVariant.Locked) {
       upNextText.html('Up Next');
+    } else if (this.data.disableCountdown) {
+      // Standard variant with countdown disabled - show post-Cancel state immediately
+      upNextText.html('Up Next');
     } else {
-      // For standard variant, show countdown timer
+      // Standard variant with countdown enabled - show timer
       upNextText.html('Up Next in ');
       const timer = new DOM('span', {
         class: this.prefixCss('timer'),
@@ -630,13 +635,19 @@ class MusoraUpNextEndScreenItem extends MusoraStandardEndScreenItem {
     } else {
       // Standard / course-complete / locked variants: same behavior, different labels
       const isLockedVariant = this.data.variant === 'locked';
+      const isCourseCompleteVariant = this.data.variant === 'course-complete';
+      // Only apply disableCountdown behavior to standard variant (not course-complete or locked)
+      const isCountdownDisabled = !isCourseCompleteVariant && !isLockedVariant && this.data.disableCountdown;
       let defaultCancelLabel = 'Cancel';
       let defaultPlayNowLabel = 'Play Now';
-      if (this.data.variant === 'course-complete') {
+      if (isCourseCompleteVariant) {
         defaultCancelLabel = 'Back To Home';
       } else if (isLockedVariant) {
         defaultPlayNowLabel = 'Unlock Next Lesson';
         // Locked has no countdown to cancel — secondary action goes straight to Replay.
+        defaultCancelLabel = 'Replay';
+      } else if (isCountdownDisabled) {
+        // When countdown is disabled (standard variant only), show Replay (post-Cancel state)
         defaultCancelLabel = 'Replay';
       }
       const cancelLabel = this.data.cancelLabel || defaultCancelLabel;
@@ -646,7 +657,7 @@ class MusoraUpNextEndScreenItem extends MusoraStandardEndScreenItem {
         class: this.prefixCss('cancel-button'),
       }).html(cancelLabel);
 
-      if (isLockedVariant) {
+      if (isLockedVariant || isCountdownDisabled) {
         cancelButton.on('click', this.onReplay.bind(this));
       } else {
         this.cancelButtonHandler = this.onCancel.bind(this);
@@ -673,6 +684,17 @@ class MusoraUpNextEndScreenItem extends MusoraStandardEndScreenItem {
 
   onCancel(): void {
     super.onCancel();
+    if (this.upNextTextElement) {
+      this.upNextTextElement.html('Up Next');
+    }
+    if (this.cancelButtonElement && this.cancelButtonHandler) {
+      this.cancelButtonElement.html('Replay');
+      this.cancelButtonElement.off('click', this.cancelButtonHandler);
+      this.cancelButtonElement.on('click', this.onReplay.bind(this));
+    }
+  }
+
+  onStopCountdown(): void {
     if (this.upNextTextElement) {
       this.upNextTextElement.html('Up Next');
     }
@@ -711,6 +733,8 @@ interface MethodSessionData {
   actionLabel?: string;
   /** Override label for the secondary/cancel button. */
   cancelLabel?: string;
+  /** When true, disable countdown and auto-advance, showing post-Cancel state instead. */
+  disableCountdown?: boolean;
 }
 
 class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
@@ -722,8 +746,11 @@ class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
   constructor(config: MusoraStandardEndScreenItemConfig, data: MethodSessionData) {
     super(config);
     this.data = data;
-    if (!data.sessionCompleted && data.variant !== 'locked') {
+    if (!data.sessionCompleted && !data.disableCountdown && data.variant !== 'locked') {
       this.setupTimer(data.nextLessonDelay);
+    } else {
+      // When countdown is disabled or sessionCompleted, set countdownValue to 0
+      this.countdownValue = 0;
     }
   }
 
@@ -809,9 +836,9 @@ class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
 
       if (!this.data.sessionCompleted) {
         if (item.status === MethodSessionStatus.Next) {
-          // When the countdown is disabled (e.g. variant === 'locked'), countdownValue
-          // is undefined — render a static "Up Next" label instead of the timer.
-          const hasCountdown = this.countdownValue !== undefined;
+          // Render timer only if countdown is enabled and active (not disabled or completed)
+          const hasCountdown =
+            !this.data.disableCountdown && this.countdownValue !== undefined && this.countdownValue > 0;
           const label = new DOM('div', {
             class: hasCountdown ? `${this.prefixCss(`label`)} ${this.prefixCss('time')}` : `${this.prefixCss(`label`)}`,
           }).html(hasCountdown ? 'Starting in ' : 'Up Next');
@@ -875,11 +902,15 @@ class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
     });
 
     const isLockedVariant = this.data.variant === 'locked';
+    const isCountdownDisabled = this.data.disableCountdown && !this.data.sessionCompleted;
     let defaultCancelLabel = this.data.sessionCompleted ? 'Back to Home' : 'Cancel';
     let defaultPlayNowLabel = this.data.sessionCompleted ? 'Keep Going' : 'Play Now';
     if (isLockedVariant) {
       defaultPlayNowLabel = 'Unlock Next Lesson';
       // Locked has no countdown to cancel — secondary action goes straight to Replay.
+      defaultCancelLabel = 'Replay';
+    } else if (isCountdownDisabled) {
+      // When countdown is disabled, show Replay (post-Cancel state)
       defaultCancelLabel = 'Replay';
     }
 
@@ -887,7 +918,7 @@ class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
       class: this.prefixCss('cancel-button'),
     }).html(this.data.cancelLabel || defaultCancelLabel);
 
-    if (isLockedVariant) {
+    if (isLockedVariant || isCountdownDisabled) {
       cancelButton.on('click', this.onReplay.bind(this));
     } else {
       this.cancelButtonHandler = this.onCancel.bind(this);
@@ -911,6 +942,18 @@ class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
 
   onCancel(): void {
     super.onCancel();
+    if (this.nextLabelElement) {
+      this.nextLabelElement.html('Up Next');
+      this.nextLabelElement.removeClass(this.prefixCss('time'));
+    }
+    if (this.cancelButtonElement && this.cancelButtonHandler) {
+      this.cancelButtonElement.html('Replay');
+      this.cancelButtonElement.off('click', this.cancelButtonHandler);
+      this.cancelButtonElement.on('click', this.onReplay.bind(this));
+    }
+  }
+
+  onStopCountdown(): void {
     if (this.nextLabelElement) {
       this.nextLabelElement.html('Up Next');
       this.nextLabelElement.removeClass(this.prefixCss('time'));
