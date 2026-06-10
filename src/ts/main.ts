@@ -80,7 +80,7 @@ export {
   ErrorMessageMap,
 } from './components/overlays/ErrorMessageOverlay';
 export { RecommendationOverlay } from './components/overlays/RecommendationOverlay';
-export { MusoraStandardEndScreen } from './components/musorastandardendscreen';
+export { MusoraStandardEndScreen } from './components/MusoraStandardEndScreen';
 export { RecommendationItem, RecommendationItemConfig } from './components/RecommendationItem';
 export { SeekBarLabel, SeekBarLabelConfig } from './components/seekbar/SeekBarLabel';
 export { SubtitleOverlay } from './components/overlays/SubtitleOverlay';

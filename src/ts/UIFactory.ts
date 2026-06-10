@@ -55,7 +55,7 @@ import { AdMessageLabel } from './components/ads/AdMessageLabel';
 import { FocusableContainer } from './spatialnavigation/FocusableContainer';
 import { BrowserUtils } from './utils/BrowserUtils';
 import { RecommendationOverlayNavigationGroup } from './spatialnavigation/RecommendationOverlayNavigationGroup';
-import { MusoraStandardEndScreen } from './components/musorastandardendscreen';
+import { MusoraStandardEndScreen } from './components/MusoraStandardEndScreen';
 import { CloseButton } from './components/buttons/CloseButton';
 import { BackButton } from './components/buttons/BackButton';
 import { MUSORA_LESSON_NEXT_MESSAGE, MUSORA_LESSON_PREVIOUS_MESSAGE } from './utils/MusoraLessonNavigation';
