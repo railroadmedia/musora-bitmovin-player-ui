@@ -308,10 +308,7 @@ export class MusoraStandardEndScreen extends Container<ContainerConfig> {
 
       window.bitmovin.customMessageHandler.on('stopCountdown', () => {
         this.getComponents().forEach(component => {
-          if (component instanceof MusoraUpNextEndScreenItem) {
-            component.stopTimer();
-            component.onStopCountdown();
-          } else if (component instanceof MusoraMethodSessionEndScreenItem) {
+          if (component instanceof MusoraUpNextEndScreenItem || component instanceof MusoraMethodSessionEndScreenItem) {
             component.stopTimer();
             component.onStopCountdown();
           }
