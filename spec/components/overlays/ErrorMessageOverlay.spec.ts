@@ -50,7 +50,7 @@ describe('ErrorMessageOverlay', () => {
       it('uses message from the error event when mobile v3', () => {
         const setTextSpy = jest.spyOn(errorMessageOverlay['errorLabel'], 'setText');
 
-        errorMessageOverlay['tvNoiseBackground'] = { start: () => {} } as any;
+        errorMessageOverlay['background'] = { start: () => {} } as any;
 
         errorMessageOverlay.configure(playerMock, uiInstanceManagerMock);
 

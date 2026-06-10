@@ -26,7 +26,7 @@ describe('TimelineMarkersHandler', () => {
     const config = {
       snappingRange: 2,
     };
-    timelineMarkersHandlerMock = new TimelineMarkersHandler(config, () => 100, DOMMock);
+    timelineMarkersHandlerMock = new TimelineMarkersHandler(config, () => 100, DOMMock, DOMMock);
     playerMock = MockHelper.getPlayerMock();
     uimanagerMock = MockHelper.getUiInstanceManagerMock();
   });
