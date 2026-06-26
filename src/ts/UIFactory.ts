@@ -691,6 +691,7 @@ export function musoraSmallScreenUILayout(onOverlayReady?: (overlay: TouchContro
       new CastStatusOverlay(),
       (() => {
         const touchOverlay = new TouchControlOverlay({
+          spacebarPlaybackShortcut: true,
           lessonNavigation: {
             previousMessage: MUSORA_LESSON_PREVIOUS_MESSAGE,
             nextMessage: MUSORA_LESSON_NEXT_MESSAGE,
