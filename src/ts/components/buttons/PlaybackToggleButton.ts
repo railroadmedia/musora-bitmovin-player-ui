@@ -14,7 +14,23 @@ export interface PlaybackToggleButtonConfig extends ToggleButtonConfig {
    * Default is false.
    */
   enterFullscreenOnInitialPlayback?: boolean;
+
+  /**
+   * Toggles playback when Space is pressed after focusing or clicking the playback toggle.
+   * Default is false.
+   */
+  spacebarPlaybackShortcut?: boolean;
 }
+
+const SET_SPACEBAR_PLAYBACK_SHORTCUT_ACTIVE_MESSAGE = 'setSpacebarPlaybackShortcutActive';
+
+declare const window: {
+  bitmovin?: {
+    customMessageHandler?: {
+      on: (event: string, callback: (data?: string) => void) => void;
+    };
+  };
+};
 
 /**
  * A button that toggles between playback and pause.
@@ -44,6 +60,10 @@ export class PlaybackToggleButton extends ToggleButton<PlaybackToggleButtonConfi
 
   configure(player: PlayerAPI, uimanager: UIInstanceManager, handleClickEvent: boolean = true): void {
     super.configure(player, uimanager);
+
+    if (this.config.spacebarPlaybackShortcut) {
+      this.addSpacebarKeyboardActivation(uimanager);
+    }
 
     // Set enterFullscreenOnInitialPlayback if set in the uimanager config
     if (typeof uimanager.getConfig().enterFullscreenOnInitialPlayback === 'boolean') {
@@ -149,5 +169,79 @@ export class PlaybackToggleButton extends ToggleButton<PlaybackToggleButtonConfi
 
     // Startup init
     playbackStateHandler();
+  }
+
+  private addSpacebarKeyboardActivation(uimanager: UIInstanceManager): void {
+    const buttonElement = this.getDomElement().get(0);
+    let handledSpacebar = false;
+    let spacebarShortcutActive = false;
+
+    const isPlaybackToggleTarget = (target: EventTarget | null) =>
+      target instanceof Node && buttonElement.contains(target);
+
+    const updateSpacebarShortcutState = (event: Event) => {
+      spacebarShortcutActive = isPlaybackToggleTarget(event.target);
+    };
+
+    window.bitmovin?.customMessageHandler?.on(SET_SPACEBAR_PLAYBACK_SHORTCUT_ACTIVE_MESSAGE, (data?: string) => {
+      spacebarShortcutActive = data === 'true';
+
+      if (!spacebarShortcutActive) {
+        handledSpacebar = false;
+      }
+    });
+
+    const handleSpacebar = (event: KeyboardEvent) => {
+      if (
+        event.defaultPrevented ||
+        event.repeat ||
+        !spacebarShortcutActive ||
+        !PlaybackToggleButton.isSpacebarEvent(event)
+      ) {
+        return;
+      }
+
+      event.preventDefault();
+
+      if (!handledSpacebar) {
+        handledSpacebar = true;
+        this.onClickEvent();
+        setTimeout(() => {
+          handledSpacebar = false;
+        }, 250);
+      }
+    };
+
+    const resetSpacebar = (event: KeyboardEvent) => {
+      if (PlaybackToggleButton.isSpacebarEvent(event)) {
+        handledSpacebar = false;
+      }
+    };
+    const keyboardEvents: Array<'keydown' | 'keypress'> = ['keydown', 'keypress'];
+    const activationEvents: Array<'click' | 'focusin' | 'touchstart'> = ['click', 'focusin', 'touchstart'];
+
+    keyboardEvents.forEach(event => document.addEventListener(event, handleSpacebar, true));
+    document.addEventListener('keyup', resetSpacebar, true);
+    activationEvents.forEach(event => document.addEventListener(event, updateSpacebarShortcutState, true));
+
+    uimanager.onRelease.subscribe(() => {
+      keyboardEvents.forEach(event => document.removeEventListener(event, handleSpacebar, true));
+      document.removeEventListener('keyup', resetSpacebar, true);
+      activationEvents.forEach(event => document.removeEventListener(event, updateSpacebarShortcutState, true));
+    });
+  }
+
+  private static isSpacebarEvent(event: KeyboardEvent): boolean {
+    const legacyEvent = event as KeyboardEvent & { charCode?: number; keyIdentifier?: string; which?: number };
+
+    return (
+      event.key === ' ' ||
+      event.key === 'Spacebar' ||
+      event.code === 'Space' ||
+      event.keyCode === 32 ||
+      legacyEvent.which === 32 ||
+      legacyEvent.charCode === 32 ||
+      legacyEvent.keyIdentifier === 'U+0020'
+    );
   }
 }

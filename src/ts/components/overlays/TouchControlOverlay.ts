@@ -28,6 +28,12 @@ export interface TouchControlOverlayConfig extends ContainerConfig {
   enterFullscreenOnInitialPlayback?: boolean;
 
   /**
+   * Toggles playback when Space is pressed after focusing or clicking the playback toggle.
+   * Default: false.
+   */
+  spacebarPlaybackShortcut?: boolean;
+
+  /**
    * Specifies whether the first touch event received by the {@link UIContainer} should be prevented or not.
    *
    * Default: true
@@ -109,6 +115,7 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
 
     this.playbackToggleButton = new SmallCenteredPlaybackToggleButton({
       enterFullscreenOnInitialPlayback: Boolean(config.enterFullscreenOnInitialPlayback),
+      spacebarPlaybackShortcut: Boolean(config.spacebarPlaybackShortcut),
     });
 
     const lessonNav = config.lessonNavigation;
