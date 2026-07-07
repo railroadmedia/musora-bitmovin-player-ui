@@ -110,16 +110,16 @@ describe('SettingsPanel', () => {
       });
     });
 
-    it('restores the last active page when the panel opens again', () => {
+    it('resets to root page when the panel hides and shows again', () => {
       settingsPanel.setActivePage(firstPage);
       settingsPanel.setActivePage(secondPage);
 
-      // Fake hide event to persist the state
+      // Fake hide event resets navigation to root
       (settingsPanel as any).componentEvents.onHide.dispatch(settingsPanel);
 
-      // Fake show event should restore the previous state
+      // Fake show event should show root page, not the previously active page
       (settingsPanel as any).componentEvents.onShow.dispatch(settingsPanel);
-      expect(settingsPanel.getActivePage()).toBe(secondPage);
+      expect(settingsPanel.getActivePage()).toBe(rootPage);
     });
 
     describe('onInactiveEvent', () => {
@@ -140,12 +140,12 @@ describe('SettingsPanel', () => {
         expect(spy).toHaveBeenCalled();
       });
 
-      it('fires for current page if the settings panel hides', () => {
+      it('fires for root page when the settings panel hides', () => {
         const spy = jest.fn();
-        secondPage.onInactive.subscribe(spy);
+        rootPage.onInactive.subscribe(spy);
 
         settingsPanel.setActivePage(secondPage);
-        // Fake hide event
+        // Fake hide event resets to root, then fires onInactive for root page
         (settingsPanel as any).componentEvents.onHide.dispatch(settingsPanel);
         expect(spy).toHaveBeenCalled();
       });
@@ -169,20 +169,23 @@ describe('SettingsPanel', () => {
         expect(spy).toHaveBeenCalled();
       });
 
-      it('fires for the previously active page when the settings panel becomes visible again', () => {
+      it('fires for root page when the settings panel becomes visible again after hide', () => {
         const rootSpy = jest.fn();
         const secondPageSpy = jest.fn();
         rootPage.onActive.subscribe(rootSpy);
         secondPage.onActive.subscribe(secondPageSpy);
 
         settingsPanel.setActivePage(secondPage);
-        // Fake hide event
+        // Fake hide event resets navigation to root
         (settingsPanel as any).componentEvents.onHide.dispatch(settingsPanel);
 
-        // Fake show event
+        rootSpy.mockClear();
+        secondPageSpy.mockClear();
+
+        // Fake show event fires onActive for root page
         (settingsPanel as any).componentEvents.onShow.dispatch(settingsPanel);
-        expect(secondPageSpy).toHaveBeenCalled();
-        expect(rootSpy).not.toHaveBeenCalled();
+        expect(rootSpy).toHaveBeenCalled();
+        expect(secondPageSpy).not.toHaveBeenCalled();
       });
     });
 
