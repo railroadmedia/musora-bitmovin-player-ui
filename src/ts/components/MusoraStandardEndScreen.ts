@@ -773,7 +773,7 @@ class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
 
     const topTitle = new DOM('div', {
       class: this.prefixCss('top-title'),
-    }).html(this.data.sessionCompleted ? 'Method Session Complete!' : "Here's What To Do Today");
+    }).html(this.data.sessionCompleted ? 'My Path Session Complete!' : "Here's What To Do Today");
 
     const closeButton = new DOM('button', {
       class: this.prefixCss('close-button'),
@@ -1088,7 +1088,7 @@ class MusoraAwardEndScreenItem extends MusoraStandardEndScreenItem {
 
     const cancelButton = new DOM('button', {
       class: this.prefixCss('cancel-button'),
-    }).html('Go TO METHOD');
+    }).html('Go TO MY PATH');
 
     cancelButton.on('click', this.onCancel.bind(this));
 
