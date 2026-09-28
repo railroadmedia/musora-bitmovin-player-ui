@@ -1,0 +1,89 @@
+@import '../../variables';
+@import '../../mixins';
+
+.#{$prefix}-ui-microphonebutton {
+  @extend %ui-button;
+
+  .#{$prefix}-ui-icon {
+    background-image: svg-load('../../assets/images/mic.svg', fill=$color-icon);
+    background-size: contain;
+    position: relative;
+  }
+
+  // The capsule (mic head) region within the 15x20 mic-recording.svg canvas,
+  // as a percentage box, so the overlay layers below line up with it.
+  $mic-capsule-left: 37.5%;
+  $mic-capsule-top: 9.375%;
+  $mic-capsule-width: 25%;
+  $mic-capsule-height: 43.75%;
+
+  %mic-capsule-layer {
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    display: none;
+    height: $mic-capsule-height;
+    left: $mic-capsule-left;
+    position: absolute;
+    top: $mic-capsule-top;
+    width: $mic-capsule-width;
+  }
+
+  // Static empty-capsule outline, always visible while recording.
+  .#{$prefix}-mic-outline {
+    @extend %mic-capsule-layer;
+
+    background-image: svg-load('../../assets/images/mic-recording-outline.svg');
+  }
+
+  // Solid capsule fill, revealed from the bottom via clip-path to read as
+  // the capsule filling and emptying inside the outline above. The
+  // clip-path stops (0%/63.6%/31.8%/27.3%) match the fill height of the
+  // provided animation frames (empty, low, high, full).
+  .#{$prefix}-mic-level {
+    @extend %mic-capsule-layer;
+
+    background-image: svg-load('../../assets/images/mic-recording-fill.svg');
+    clip-path: inset(100% 0 0 0);
+  }
+
+  &.#{$prefix}-mic-off {
+    .#{$prefix}-ui-icon {
+      background-image: svg-load('../../assets/images/mic-off.svg', fill=$color-icon);
+    }
+  }
+
+  &.#{$prefix}-mic-recording {
+    .#{$prefix}-ui-icon {
+      background-image: svg-load('../../assets/images/mic-recording.svg');
+    }
+
+    .#{$prefix}-mic-outline,
+    .#{$prefix}-mic-level {
+      display: block;
+    }
+
+    .#{$prefix}-mic-level {
+      animation: #{$prefix}-mic-level-pulse 1.6s ease-in-out infinite;
+    }
+  }
+}
+
+@keyframes #{$prefix}-mic-level-pulse {
+  0%,
+  100% {
+    clip-path: inset(100% 0 0 0);
+  }
+
+  25% {
+    clip-path: inset(63.6% 0 0 0);
+  }
+
+  60% {
+    clip-path: inset(31.8% 0 0 0);
+  }
+
+  80% {
+    clip-path: inset(27.3% 0 0 0);
+  }
+}
