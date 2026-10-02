@@ -107,6 +107,12 @@ export {
 } from './components/buttons/BackButton';
 export { MetadataLabel, MetadataLabelContent, MetadataLabelConfig } from './components/labels/MetadataLabel';
 export { AirPlayToggleButton } from './components/buttons/AirPlayToggleButton';
+export {
+  MicrophoneButton,
+  MicrophoneButtonConfig,
+  MICROPHONE_BUTTON_MESSAGE,
+  SET_MICROPHONE_STATE_MESSAGE,
+} from './components/buttons/MicrophoneButton';
 export { VolumeSlider, VolumeSliderConfig } from './components/seekbar/VolumeSlider';
 export { PictureInPictureToggleButton } from './components/buttons/PictureInPictureToggleButton';
 export { Spacer } from './components/Spacer';
