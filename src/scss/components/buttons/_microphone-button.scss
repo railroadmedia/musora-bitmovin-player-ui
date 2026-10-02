@@ -10,41 +10,30 @@
     position: relative;
   }
 
-  // The capsule (mic head) region within the 15x20 mic-recording.svg canvas,
-  // as a percentage box, so the overlay layers below line up with it.
-  $mic-capsule-left: 37.5%;
-  $mic-capsule-top: 9.375%;
-  $mic-capsule-width: 25%;
-  $mic-capsule-height: 43.75%;
-
-  %mic-capsule-layer {
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: contain;
+  // SVG overlay built in MicrophoneButton.ts, in the same 15x20 coordinate
+  // space as mic-recording.svg so the fill below aligns with the icon.
+  .#{$prefix}-mic-capsule-overlay {
     display: none;
-    height: $mic-capsule-height;
-    left: $mic-capsule-left;
+    height: 100%;
+    left: 0;
     position: absolute;
-    top: $mic-capsule-top;
-    width: $mic-capsule-width;
+    top: 0;
+    width: 100%;
+
+    svg {
+      display: block;
+      height: 100%;
+      width: 100%;
+    }
   }
 
-  // Static empty-capsule outline, always visible while recording.
-  .#{$prefix}-mic-outline {
-    @extend %mic-capsule-layer;
-
-    background-image: svg-load('../../assets/images/mic-recording-outline.svg');
-  }
-
-  // Solid capsule fill, revealed from the bottom via clip-path to read as
-  // the capsule filling and emptying inside the outline above. The
-  // clip-path stops (0%/63.6%/31.8%/27.3%) match the fill height of the
-  // provided animation frames (empty, low, high, full).
+  // fill-box anchors the scale to the capsule's own bottom edge rather than
+  // the SVG's origin, so it reads as the capsule filling from the bottom.
   .#{$prefix}-mic-level {
-    @extend %mic-capsule-layer;
-
-    background-image: svg-load('../../assets/images/mic-recording-fill.svg');
-    clip-path: inset(100% 0 0 0);
+    fill: #e6172c; // matches the hardcoded fill in mic-recording.svg
+    transform-box: fill-box;
+    transform-origin: bottom;
+    transform: scaleY(0);
   }
 
   &.#{$prefix}-mic-off {
@@ -58,8 +47,7 @@
       background-image: svg-load('../../assets/images/mic-recording.svg');
     }
 
-    .#{$prefix}-mic-outline,
-    .#{$prefix}-mic-level {
+    .#{$prefix}-mic-capsule-overlay {
       display: block;
     }
 
@@ -72,18 +60,18 @@
 @keyframes #{$prefix}-mic-level-pulse {
   0%,
   100% {
-    clip-path: inset(100% 0 0 0);
+    transform: scaleY(0);
   }
 
   25% {
-    clip-path: inset(63.6% 0 0 0);
+    transform: scaleY(0.364);
   }
 
   60% {
-    clip-path: inset(31.8% 0 0 0);
+    transform: scaleY(0.682);
   }
 
   80% {
-    clip-path: inset(27.3% 0 0 0);
+    transform: scaleY(0.727);
   }
 }

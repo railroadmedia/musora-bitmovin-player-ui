@@ -63,13 +63,28 @@ export class MicrophoneButton extends Button<MicrophoneButtonConfig> {
   protected toDomElement(): DOM {
     const buttonElement = super.toDomElement();
 
-    // Recording-only capsule indicator, stacked on top of the mic icon's
-    // background-image: a static outline (the empty capsule) plus a fill
-    // layer that's revealed from the bottom via clip-path to read as the
-    // capsule filling and emptying while capture is running.
+    // mic-recording.svg already draws the capsule outline as a hollow ring,
+    // so this overlay only fills its interior. The path is copied from that
+    // same capsule so the fill clips exactly to the icon's own edges.
     const iconElement = buttonElement.find('.' + this.prefixCss('ui-icon'));
-    iconElement.append(new DOM('div', { class: this.prefixCss('mic-outline') }));
-    iconElement.append(new DOM('div', { class: this.prefixCss('mic-level') }));
+    const overlay = new DOM('div', { class: this.prefixCss('mic-capsule-overlay') });
+    const capsuleInteriorPath =
+      'M7.5 1.95593C6.51611 1.95593 5.68359 2.78845 5.68359 3.77233V8.61609C5.68359 9.63781 6.51611 10.4325 7.5 10.4325' +
+      'C8.52173 10.4325 9.31641 9.63781 9.31641 8.61609V3.77233C9.31641 2.78845 8.52173 1.95593 7.5 1.95593Z';
+
+    overlay.html(
+      '<svg viewBox="0 0 15 20" xmlns="http://www.w3.org/2000/svg">' +
+        '<defs>' +
+        `<clipPath id="${this.prefixCss('mic-capsule-clip')}">` +
+        `<path d="${capsuleInteriorPath}" />` +
+        '</clipPath>' +
+        '</defs>' +
+        `<rect class="${this.prefixCss('mic-level')}" x="5.68359" y="1.95593" width="3.63282" height="8.47657" clip-path="url(#${this.prefixCss(
+          'mic-capsule-clip',
+        )})" />` +
+        '</svg>',
+    );
+    iconElement.append(overlay);
 
     return buttonElement;
   }
