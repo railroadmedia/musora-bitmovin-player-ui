@@ -1,0 +1,77 @@
+@import '../../variables';
+@import '../../mixins';
+
+.#{$prefix}-ui-microphonebutton {
+  @extend %ui-button;
+
+  .#{$prefix}-ui-icon {
+    background-image: svg-load('../../assets/images/mic.svg', fill=$color-icon);
+    background-size: contain;
+    position: relative;
+  }
+
+  // SVG overlay built in MicrophoneButton.ts, in the same 15x20 coordinate
+  // space as mic-recording.svg so the fill below aligns with the icon.
+  .#{$prefix}-mic-capsule-overlay {
+    display: none;
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+
+    svg {
+      display: block;
+      height: 100%;
+      width: 100%;
+    }
+  }
+
+  // fill-box anchors the scale to the capsule's own bottom edge rather than
+  // the SVG's origin, so it reads as the capsule filling from the bottom.
+  .#{$prefix}-mic-level {
+    fill: #e6172c; // matches the hardcoded fill in mic-recording.svg
+    transform-box: fill-box;
+    transform-origin: bottom;
+    transform: scaleY(0);
+  }
+
+  &.#{$prefix}-mic-off {
+    .#{$prefix}-ui-icon {
+      background-image: svg-load('../../assets/images/mic-off.svg', fill=$color-icon);
+    }
+  }
+
+  &.#{$prefix}-mic-recording {
+    .#{$prefix}-ui-icon {
+      background-image: svg-load('../../assets/images/mic-recording.svg');
+    }
+
+    .#{$prefix}-mic-capsule-overlay {
+      display: block;
+    }
+
+    .#{$prefix}-mic-level {
+      animation: #{$prefix}-mic-level-pulse 1.6s ease-in-out infinite;
+    }
+  }
+}
+
+@keyframes #{$prefix}-mic-level-pulse {
+  0%,
+  100% {
+    transform: scaleY(0);
+  }
+
+  25% {
+    transform: scaleY(0.364);
+  }
+
+  60% {
+    transform: scaleY(0.682);
+  }
+
+  80% {
+    transform: scaleY(0.727);
+  }
+}
