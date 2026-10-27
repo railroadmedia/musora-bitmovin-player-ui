@@ -21,6 +21,7 @@ import { Spacer } from './components/Spacer';
 import { PictureInPictureToggleButton } from './components/buttons/PictureInPictureToggleButton';
 import { AirPlayToggleButton } from './components/buttons/AirPlayToggleButton';
 import { MicrophoneButton } from './components/buttons/MicrophoneButton';
+import { MusoraLessonActionBar } from './components/MusoraLessonActionBar';
 import { CastToggleButton } from './components/buttons/CastToggleButton';
 import { VRToggleButton } from './components/buttons/VRToggleButton';
 import { SettingsToggleButton } from './components/settings/SettingsToggleButton';
@@ -705,6 +706,7 @@ export function musoraSmallScreenUILayout(onOverlayReady?: (overlay: TouchContro
       new MusoraStandardEndScreen(),
       controlBar,
       alwaysVisibleSeekBar,
+      new MusoraLessonActionBar(),
       titleBar,
       settingsPanel,
       new ErrorMessageOverlay(),
