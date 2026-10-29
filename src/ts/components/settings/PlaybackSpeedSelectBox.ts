@@ -8,6 +8,25 @@ import { prefixCss } from '../DummyComponent';
 
 const SPEED_MATCH_EPSILON = 1e-4;
 
+// Android's native player has no speed-change event, so the app hears of each change from here.
+const PLAYBACK_SPEED_CHANGE_MESSAGE = 'onPlaybackSpeedChange';
+
+declare const window: {
+  bitmovin?: {
+    customMessageHandler?: {
+      sendAsynchronous: (message: string, payload?: string) => void;
+    };
+  };
+};
+
+const applyPlaybackSpeed = (player: PlayerAPI, speed: number): void => {
+  player.setPlaybackSpeed(speed);
+  window.bitmovin?.customMessageHandler?.sendAsynchronous(
+    PLAYBACK_SPEED_CHANGE_MESSAGE,
+    JSON.stringify({ speed, atMs: Date.now() }),
+  );
+};
+
 /** Preset rates with stable string keys (avoids float/string mismatches vs player APIs). */
 const PRESET_SPEEDS: readonly { key: string; value: number }[] = [
   { key: '0.5', value: 0.5 },
@@ -58,7 +77,7 @@ export class PlaybackSpeedSelectBox extends SelectBox {
     this.addDefaultItems();
 
     this.onItemSelected.subscribe((sender: PlaybackSpeedSelectBox, value: string) => {
-      player.setPlaybackSpeed(parseFloat(value));
+      applyPlaybackSpeed(player, parseFloat(value));
       // Do not persist speed changes made during a livestream — the preference
       // is VOD-only and should not carry over to future live sessions.
       if (!player.isLive()) {
@@ -79,13 +98,13 @@ export class PlaybackSpeedSelectBox extends SelectBox {
     // Livestreams always start at 1.0x regardless of any saved VOD preference.
     const applyPersistedOrCurrentSpeed = (): void => {
       if (player.isLive()) {
-        player.setPlaybackSpeed(1);
+        applyPlaybackSpeed(player, 1);
         this.setSpeed(1);
         return;
       }
       const persisted = StorageUtils.getItem(PlaybackSpeedSelectBox.STORAGE_KEY);
       if (persisted !== null) {
-        player.setPlaybackSpeed(parseFloat(persisted));
+        applyPlaybackSpeed(player, parseFloat(persisted));
         this.setSpeed(parseFloat(persisted));
       } else {
         syncUiWithPlayerSpeed();
