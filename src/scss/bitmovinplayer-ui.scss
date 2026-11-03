@@ -141,9 +141,34 @@
     .#{$prefix}-ui-settings-panel {
       left: max(1em, env(safe-area-inset-left, 0));
       right: max(1em, env(safe-area-inset-right, 0));
-      margin-top: 2em;
-      max-height: calc(100% - 2em - 3.5em);
+      margin-top: 0;
+      top: 48px;
+      max-height: calc(100% - 56px);
       width: unset;
+
+      > .#{$prefix}-container-wrapper {
+        padding-top: 2.25em;
+      }
+
+      .#{$prefix}-ui-settings-panel-close {
+        top: 0.25em;
+      }
+
+      // Fade at the bottom edge hints that the list scrolls.
+      &::after {
+        background: linear-gradient(to bottom, transparent, transparentize($color-background-menu, 0.05));
+        bottom: 0;
+        content: '';
+        display: block;
+        height: 20px;
+        margin-top: -20px;
+        pointer-events: none;
+        position: sticky;
+      }
+    }
+
+    .#{$prefix}-ui-settings-panel-item {
+      padding: 0.55rem 1rem;
     }
   }
 
