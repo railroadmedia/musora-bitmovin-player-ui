@@ -60,6 +60,7 @@ import { RecommendationOverlayNavigationGroup } from './spatialnavigation/Recomm
 import { MusoraStandardEndScreen } from './components/MusoraStandardEndScreen';
 import { CloseButton } from './components/buttons/CloseButton';
 import { BackButton } from './components/buttons/BackButton';
+import { PrerollSkipButton } from './components/buttons/PrerollSkipButton';
 import { MUSORA_LESSON_NEXT_MESSAGE, MUSORA_LESSON_PREVIOUS_MESSAGE } from './utils/MusoraLessonNavigation';
 
 declare const window: {
@@ -71,10 +72,36 @@ declare const window: {
 };
 
 const MUSORA_BRAND_COLOR_CSS_VARIABLE = '--musora-brand-color';
+let musoraBrandColor: string | undefined;
 
 function setMusoraBrandColor(color?: string): void {
   if (color) {
-    document.documentElement.style.setProperty(MUSORA_BRAND_COLOR_CSS_VARIABLE, color);
+    musoraBrandColor = color;
+  }
+
+  // During preroll the stylesheet (html.musora-preroll) owns the color, so drop the inline override.
+  if (document.documentElement.classList.contains('musora-preroll')) {
+    document.documentElement.style.removeProperty(MUSORA_BRAND_COLOR_CSS_VARIABLE);
+  } else if (musoraBrandColor) {
+    document.documentElement.style.setProperty(MUSORA_BRAND_COLOR_CSS_VARIABLE, musoraBrandColor);
+  }
+}
+
+function setPrerollMode(data?: string, touchOverlay?: TouchControlOverlay | null): void {
+  let enabled = false;
+  try {
+    enabled = !!data && (JSON.parse(data) as { enabled?: boolean }).enabled === true;
+  } catch (_) {
+    return;
+  }
+
+  document.documentElement.classList.toggle('musora-preroll', enabled);
+  setMusoraBrandColor();
+  touchOverlay?.setSeekingEnabled(!enabled);
+  const seekBar = document.querySelector('.bmpui-musora-always-seekbar .bmpui-ui-seekbar');
+  if (seekBar) {
+    seekBar.setAttribute('aria-disabled', enabled ? 'true' : 'false');
+    seekBar.setAttribute('tabindex', enabled ? '-1' : '0');
   }
 }
 
@@ -109,6 +136,10 @@ export namespace UIFactory {
     if (window.bitmovin?.customMessageHandler) {
       window.bitmovin.customMessageHandler.on('setMusoraBrandColor', (data?: string) => {
         setMusoraBrandColor(data);
+      });
+
+      window.bitmovin.customMessageHandler.on('setPrerollMode', (data?: string) => {
+        setPrerollMode(data, navOverlay);
       });
 
       window.bitmovin.customMessageHandler.on('setLessonNavigationState', (data?: string) => {
@@ -250,6 +281,10 @@ export namespace UIFactory {
       // Subscribe to brand-color messages from the React Native host.
       window.bitmovin.customMessageHandler.on('setMusoraBrandColor', (data?: string) => {
         setMusoraBrandColor(data);
+      });
+
+      window.bitmovin.customMessageHandler.on('setPrerollMode', (data?: string) => {
+        setPrerollMode(data, navOverlay);
       });
 
       window.bitmovin.customMessageHandler.on('setLessonNavigationState', (data?: string) => {
@@ -668,9 +703,16 @@ export function musoraSmallScreenUILayout(onOverlayReady?: (overlay: TouchContro
                 // Mirror scrub position in the pill while dragging
                 syncTimeWithSeekPreview: true,
                 disableAdaptiveMinWidth: true,
-                cssClasses: ['musora-playback-time-pill'],
+                cssClasses: ['musora-playback-time-pill', 'musora-standard-time'],
+              }),
+              new PlaybackTimeLabel({
+                timeLabelMode: PlaybackTimeLabelMode.RemainingTime,
+                hideInLivePlayback: false,
+                disableAdaptiveMinWidth: true,
+                cssClasses: ['musora-playback-time-pill', 'musora-preroll-time'],
               }),
               new Spacer(),
+              new PrerollSkipButton(),
               new FullscreenToggleButton({ cssClasses: ['musora-controlbar-fullscreen'] }),
             ],
           }),

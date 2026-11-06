@@ -197,6 +197,78 @@
   }
 }
 
+// Inline learning-path preroll mode is toggled by the React Native host.
+.musora-preroll .#{$prefix}-ui-skin-musora.#{$prefix}-ui-skin-smallscreen {
+  .#{$prefix}-musora-standard-time {
+    display: none;
+  }
+
+  .#{$prefix}-musora-preroll-time {
+    display: inline-flex;
+  }
+
+  .#{$prefix}-musora-always-seekbar {
+    pointer-events: none;
+    touch-action: none;
+
+    .#{$prefix}-seekbar-playbackposition,
+    .#{$prefix}-seekbar-seekposition,
+    .#{$prefix}-seekbar-playbackposition-marker {
+      background-color: $color-highlight !important;
+    }
+  }
+
+  .#{$prefix}-musora-preroll-skip {
+    display: inline-flex;
+  }
+}
+
+html.musora-preroll {
+  --musora-brand-color: #{$color-highlight};
+}
+
+.#{$prefix}-musora-preroll-time,
+.#{$prefix}-musora-preroll-skip {
+  display: none;
+}
+
+.#{$prefix}-musora-preroll-skip {
+  box-sizing: border-box;
+  height: 27px;
+  padding: 6px 12px;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  flex-shrink: 0;
+  margin-right: 8px;
+  border: 0;
+  border-radius: 81px;
+  background: rgba(12, 21, 36, 0.4);
+  color: #fff;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px !important;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+
+  .#{$prefix}-label {
+    color: #fff;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 12px !important;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+  }
+
+  .#{$prefix}-ui-icon {
+    width: 15px;
+    min-width: 15px;
+    height: 15px;
+    background-image: svg-load('../../assets/images/ad-skip.svg', fill=#fff);
+    background-size: 15px;
+  }
+}
+
 // ────────────────────────────────────────────────────────────────────────────
 // Video title in the title bar — hidden by default, visible in fullscreen only.
 // ────────────────────────────────────────────────────────────────────────────
@@ -338,6 +410,8 @@
 .#{$prefix}-ui-skin-musora.#{$prefix}-ui-skin-smallscreen
   .#{$prefix}-ui-controlbar
   .#{$prefix}-musora-controlbar-fullscreen
-  * {
+  *,
+.#{$prefix}-ui-skin-musora.#{$prefix}-ui-skin-smallscreen .#{$prefix}-ui-controlbar .#{$prefix}-musora-preroll-skip,
+.#{$prefix}-ui-skin-musora.#{$prefix}-ui-skin-smallscreen .#{$prefix}-ui-controlbar .#{$prefix}-musora-preroll-skip * {
   pointer-events: auto;
 }

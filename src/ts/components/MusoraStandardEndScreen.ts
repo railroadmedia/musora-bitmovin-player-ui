@@ -730,6 +730,8 @@ interface MethodSessionData {
   actionLabel?: string;
   /** Override label for the secondary/cancel button. */
   cancelLabel?: string;
+  /** Override the title shown when the session is complete. */
+  sessionCompletedTitle?: string;
   /** When true, disable countdown and auto-advance, showing post-Cancel state instead. */
   disableCountdown?: boolean;
 }
@@ -773,7 +775,11 @@ class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
 
     const topTitle = new DOM('div', {
       class: this.prefixCss('top-title'),
-    }).html(this.data.sessionCompleted ? 'Method Session Complete!' : "Here's What To Do Today");
+    }).html(
+      this.data.sessionCompleted
+        ? this.data.sessionCompletedTitle || 'Method Session Complete!'
+        : "Here's What To Do Today",
+    );
 
     const closeButton = new DOM('button', {
       class: this.prefixCss('close-button'),
@@ -968,6 +974,7 @@ interface AwardData {
   lessons: number;
   minutes: number;
   skills: number;
+  cancelLabel?: string;
 }
 
 class MusoraAwardEndScreenItem extends MusoraStandardEndScreenItem {
@@ -1088,7 +1095,7 @@ class MusoraAwardEndScreenItem extends MusoraStandardEndScreenItem {
 
     const cancelButton = new DOM('button', {
       class: this.prefixCss('cancel-button'),
-    }).html('Go TO METHOD');
+    }).html(this.data.cancelLabel || 'Go TO METHOD');
 
     cancelButton.on('click', this.onCancel.bind(this));
 
