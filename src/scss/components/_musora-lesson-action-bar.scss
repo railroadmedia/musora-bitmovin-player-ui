@@ -57,6 +57,8 @@
   min-width: 20px;
   padding: 6px 8px;
 
+  // The design draws 16px glyphs (20px for the thumb) in a 20px frame. Each SVG pads its
+  // glyph differently, so every icon gets the background size that yields the design's glyph.
   .#{$prefix}-ui-icon {
     background-size: 16px;
     height: 20px;
@@ -68,27 +70,38 @@
     background-image: svg-load('../../assets/images/lesson-complete.svg');
   }
 
+  // 28px glyph on a 32px canvas.
   &.#{$prefix}-musora-lesson-action-complete.#{$prefix}-musora-lesson-action-active .#{$prefix}-ui-icon {
     background-image: svg-load('../../assets/images/lesson-completed.svg');
+    background-size: 18px;
   }
 
+  // Same thumb as the design's 20px asset, drawn on a 16px canvas.
   &.#{$prefix}-musora-lesson-action-like .#{$prefix}-ui-icon {
     background-image: svg-load('../../assets/images/lesson-like.svg');
+    background-size: 20px;
   }
 
   &.#{$prefix}-musora-lesson-action-like.#{$prefix}-musora-lesson-action-active .#{$prefix}-ui-icon {
     background-image: svg-load('../../assets/images/lesson-liked.svg');
+    background-size: 20px;
   }
 
+  // An open book is wider than tall (18px wide in the design).
   &.#{$prefix}-musora-lesson-action-notes .#{$prefix}-ui-icon {
     background-image: svg-load('../../assets/images/lesson-notes.svg');
+    background-size: 18px;
   }
 
+  // The design's two-bubble glyph, 18px on a 20px canvas.
   &.#{$prefix}-musora-lesson-action-comments .#{$prefix}-ui-icon {
     background-image: svg-load('../../assets/images/lesson-comments.svg');
+    background-size: 20px;
   }
 
+  // The dots span 18 of the 24px canvas, drawn about 14px wide.
   &.#{$prefix}-musora-lesson-action-more .#{$prefix}-ui-icon {
     background-image: svg-load('../../assets/images/lesson-more.svg');
+    background-size: 18px;
   }
 }
