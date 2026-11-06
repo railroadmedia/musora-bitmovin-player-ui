@@ -4,9 +4,14 @@
 .#{$prefix}-ui-microphonebutton {
   @extend %ui-button;
 
+  // mic.svg's 15x20 canvas has no padding, so it is drawn 20px tall to match the
+  // AirPlay and Settings glyphs, which sit inside padded 24px canvases.
+  $mic-glyph-width: 15px;
+  $mic-glyph-height: 20px;
+
   .#{$prefix}-ui-icon {
     background-image: svg-load('../../assets/images/mic.svg', fill=$color-icon);
-    background-size: contain;
+    background-size: $mic-glyph-width $mic-glyph-height;
     position: relative;
   }
 
@@ -14,11 +19,12 @@
   // space as mic-recording.svg so the fill below aligns with the icon.
   .#{$prefix}-mic-capsule-overlay {
     display: none;
-    height: 100%;
-    left: 0;
+    height: $mic-glyph-height;
+    left: 50%;
     position: absolute;
-    top: 0;
-    width: 100%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: $mic-glyph-width;
 
     svg {
       display: block;
@@ -43,8 +49,10 @@
   }
 
   &.#{$prefix}-mic-off {
+    // The slash makes this canvas wider; contained in the 24px box its mic is about 20px tall.
     .#{$prefix}-ui-icon {
       background-image: svg-load('../../assets/images/mic-off.svg', fill=$color-icon);
+      background-size: contain;
     }
   }
 
