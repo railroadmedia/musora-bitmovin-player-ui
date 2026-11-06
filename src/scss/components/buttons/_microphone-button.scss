@@ -27,13 +27,19 @@
     }
   }
 
+  // The red fallback matches mic-recording.svg until the host sends a brand colour.
+  .#{$prefix}-mic-outline,
+  .#{$prefix}-mic-level {
+    fill: var(--musora-brand-color, #e6172c);
+  }
+
   // fill-box anchors the scale to the capsule's own bottom edge rather than
   // the SVG's origin, so it reads as the capsule filling from the bottom.
+  // MicrophoneButton sets --mic-level every frame from the live input level.
   .#{$prefix}-mic-level {
-    fill: #e6172c; // matches the hardcoded fill in mic-recording.svg
     transform-box: fill-box;
     transform-origin: bottom;
-    transform: scaleY(0);
+    transform: scaleY(var(--mic-level, 0));
   }
 
   &.#{$prefix}-mic-off {
@@ -44,14 +50,15 @@
 
   &.#{$prefix}-mic-recording {
     .#{$prefix}-ui-icon {
-      background-image: svg-load('../../assets/images/mic-recording.svg');
+      background-image: none;
     }
 
     .#{$prefix}-mic-capsule-overlay {
       display: block;
     }
 
-    .#{$prefix}-mic-level {
+    // Pulses only until the first level arrives, e.g. if the host never sends any.
+    &:not(.#{$prefix}-mic-level-live) .#{$prefix}-mic-level {
       animation: #{$prefix}-mic-level-pulse 1.6s ease-in-out infinite;
     }
   }
