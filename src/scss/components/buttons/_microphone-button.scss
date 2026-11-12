@@ -1,0 +1,92 @@
+@import '../../variables';
+@import '../../mixins';
+
+.#{$prefix}-ui-microphonebutton {
+  @extend %ui-button;
+
+  // mic.svg's 15x20 canvas has no padding, so it is drawn 20px tall to match the
+  // AirPlay and Settings glyphs, which sit inside padded 24px canvases.
+  $mic-glyph-width: 15px;
+  $mic-glyph-height: 20px;
+
+  .#{$prefix}-ui-icon {
+    background-image: svg-load('../../assets/images/mic.svg', fill=$color-icon);
+    background-size: $mic-glyph-width $mic-glyph-height;
+    position: relative;
+  }
+
+  // SVG overlay built in MicrophoneButton.ts, in the same 15x20 coordinate
+  // space as mic-recording.svg so the fill below aligns with the icon.
+  .#{$prefix}-mic-capsule-overlay {
+    display: none;
+    height: $mic-glyph-height;
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: $mic-glyph-width;
+
+    svg {
+      display: block;
+      height: 100%;
+      width: 100%;
+    }
+  }
+
+  // The red fallback matches mic-recording.svg until the host sends a brand colour.
+  .#{$prefix}-mic-outline,
+  .#{$prefix}-mic-level {
+    fill: var(--musora-brand-color, #e6172c);
+  }
+
+  // fill-box anchors the scale to the capsule's own bottom edge rather than
+  // the SVG's origin, so it reads as the capsule filling from the bottom.
+  // MicrophoneButton sets --mic-level every frame from the live input level.
+  .#{$prefix}-mic-level {
+    transform-box: fill-box;
+    transform-origin: bottom;
+    transform: scaleY(var(--mic-level, 0));
+  }
+
+  &.#{$prefix}-mic-off {
+    // The slash makes this canvas wider; contained in the 24px box its mic is about 20px tall.
+    .#{$prefix}-ui-icon {
+      background-image: svg-load('../../assets/images/mic-off.svg', fill=$color-icon);
+      background-size: contain;
+    }
+  }
+
+  &.#{$prefix}-mic-recording {
+    .#{$prefix}-ui-icon {
+      background-image: none;
+    }
+
+    .#{$prefix}-mic-capsule-overlay {
+      display: block;
+    }
+
+    // Pulses only until the first level arrives, e.g. if the host never sends any.
+    &:not(.#{$prefix}-mic-level-live) .#{$prefix}-mic-level {
+      animation: #{$prefix}-mic-level-pulse 1.6s ease-in-out infinite;
+    }
+  }
+}
+
+@keyframes #{$prefix}-mic-level-pulse {
+  0%,
+  100% {
+    transform: scaleY(0);
+  }
+
+  25% {
+    transform: scaleY(0.364);
+  }
+
+  60% {
+    transform: scaleY(0.682);
+  }
+
+  80% {
+    transform: scaleY(0.727);
+  }
+}

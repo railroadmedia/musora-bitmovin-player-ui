@@ -107,6 +107,19 @@ export {
 } from './components/buttons/BackButton';
 export { MetadataLabel, MetadataLabelContent, MetadataLabelConfig } from './components/labels/MetadataLabel';
 export { AirPlayToggleButton } from './components/buttons/AirPlayToggleButton';
+export {
+  MicrophoneButton,
+  MicrophoneButtonConfig,
+  MICROPHONE_BUTTON_MESSAGE,
+  SET_MICROPHONE_STATE_MESSAGE,
+} from './components/buttons/MicrophoneButton';
+export {
+  MusoraLessonActionBar,
+  MusoraLessonAction,
+  MusoraLessonActionsState,
+  LESSON_ACTION_PRESS_MESSAGE,
+  SET_LESSON_ACTIONS_STATE_MESSAGE,
+} from './components/MusoraLessonActionBar';
 export { VolumeSlider, VolumeSliderConfig } from './components/seekbar/VolumeSlider';
 export { PictureInPictureToggleButton } from './components/buttons/PictureInPictureToggleButton';
 export { Spacer } from './components/Spacer';
