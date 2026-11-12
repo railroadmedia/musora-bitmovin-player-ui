@@ -103,6 +103,7 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
 
   // Lesson-navigation visibility/disabled state set by the native host
   private lessonNavVisible: boolean = true;
+  private seekingEnabled: boolean = true;
   private lessonNavPrevDisabled: boolean = false;
   private lessonNavNextDisabled: boolean = false;
 
@@ -275,6 +276,7 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
     });
 
     this.touchControlEvents.onSeekBackward.subscribe(() => {
+      if (!this.seekingEnabled) return;
       playerSeekTime = PlayerUtils.clampValueToRange(playerSeekTime - seekTime, 0, player.getDuration() ?? Infinity);
       player.seek(playerSeekTime);
       if (activeSeekClass !== this.SEEK_BACKWARD_CLASS || (seekDisplayTimeout === null && !seekLabelHiding)) {
@@ -292,6 +294,7 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
     });
 
     this.touchControlEvents.onSeekForward.subscribe(() => {
+      if (!this.seekingEnabled) return;
       playerSeekTime = PlayerUtils.clampValueToRange(playerSeekTime + seekTime, 0, player.getDuration() ?? Infinity);
       player.seek(playerSeekTime);
       if (activeSeekClass !== this.SEEK_FORWARD_CLASS || (seekDisplayTimeout === null && !seekLabelHiding)) {
@@ -445,6 +448,14 @@ export class TouchControlOverlay extends Container<TouchControlOverlayConfig> {
 
     this.lessonNavPrevDisabled = prevDisabled;
     this.lessonNavNextDisabled = nextDisabled;
+  }
+
+  /** Enables or disables all quick-seek and double-tap seek actions. */
+  public setSeekingEnabled(enabled: boolean): void {
+    this.seekingEnabled = enabled;
+    if (!enabled) {
+      this.hideSeekAnimationElements();
+    }
   }
 
   private applyNavButtonDisabledState(button: QuickSeekButton, disabled: boolean, color: string): void {
