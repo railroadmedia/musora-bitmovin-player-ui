@@ -227,6 +227,12 @@ html.musora-preroll {
   --musora-brand-color: #{$color-highlight};
 }
 
+html.musora-preroll .#{$prefix}-musora-always-seekbar,
+html.musora-preroll .#{$prefix}-musora-always-seekbar * {
+  pointer-events: none !important;
+  touch-action: none;
+}
+
 .#{$prefix}-musora-preroll-time,
 .#{$prefix}-musora-preroll-skip {
   display: none;

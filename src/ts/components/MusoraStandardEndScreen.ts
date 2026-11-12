@@ -970,7 +970,10 @@ class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
 }
 
 interface AwardData {
-  award: string;
+  award?: string;
+  awardTemplate?: string;
+  awardLogo?: string;
+  awardBrand?: string;
   lessons: number;
   minutes: number;
   skills: number;
@@ -1026,11 +1029,31 @@ class MusoraAwardEndScreenItem extends MusoraStandardEndScreenItem {
       class: this.prefixCss('content-row'),
     });
 
+    const awardImage = this.data.award || this.data.awardTemplate;
     const award = new DOM('div', {
       class: this.prefixCss('award'),
-    }).css({
-      'background-image': 'url(' + this.data.award + ')',
     });
+
+    if (awardImage) {
+      award.css({
+        'background-image': 'url(' + awardImage + ')',
+      });
+    }
+
+    if (!this.data.award && this.data.awardLogo) {
+      const awardLogoClasses = [this.prefixCss('award-logo')];
+      if (this.data.awardBrand) {
+        awardLogoClasses.push(this.prefixCss(`award-logo-${this.data.awardBrand}`));
+      }
+
+      award.append(
+        new DOM('div', {
+          class: awardLogoClasses.join(' '),
+        }).css({
+          'background-image': 'url(' + this.data.awardLogo + ')',
+        }),
+      );
+    }
 
     contentRow.append(award);
 
