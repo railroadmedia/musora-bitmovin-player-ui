@@ -79,11 +79,15 @@ export class DOM<Config extends ComponentConfig = ComponentConfig> {
     component?: Component<ComponentConfig>,
   ) {
     if (something instanceof Array) {
-      if (something.length > 0 && something[0] instanceof HTMLElement) {
+      // `instanceof Element`, not `instanceof HTMLElement` — the latter excludes SVG elements
+      // (SVGCircleElement etc. extend SVGElement/Element, not HTMLElement), which silently left
+      // `this.elements` unset for any match list containing one, e.g. from `.find()` locating an
+      // SVG shape.
+      if (something.length > 0 && something[0] instanceof Element) {
         const elements = something as HTMLElementWithComponent[];
         this.elements = elements;
       }
-    } else if (something instanceof HTMLElement) {
+    } else if (something instanceof Element) {
       const element = something as HTMLElementWithComponent;
       this.elements = [element];
     } else if (something instanceof Document || something instanceof ShadowRoot) {

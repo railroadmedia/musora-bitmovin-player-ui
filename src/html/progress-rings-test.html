@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Musora Progress Ring Animation POC</title>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- UI bundle only — this page renders the ring components directly, no player needed. -->
+    <script src="<%= uiScript %>"></script>
+    <link rel="stylesheet" href="<%= uiStylesheet %>" />
+
+    <style>
+      body {
+        background: #0c1524;
+        color: #fff;
+        font-family: sans-serif;
+        margin: 0;
+        padding: 40px;
+      }
+
+      a {
+        color: #ffae00;
+      }
+
+      h1 {
+        font-size: 20px;
+        font-weight: 600;
+      }
+
+      .rings {
+        display: flex;
+        gap: 80px;
+        margin-top: 30px;
+      }
+
+      .ring-panel {
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .ring-mount {
+        background: #111;
+        border-radius: 50%;
+        padding: 20px;
+      }
+
+      .controls {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        width: 260px;
+      }
+
+      .controls label {
+        display: flex;
+        flex-direction: column;
+        font-size: 12px;
+      }
+
+      .controls input {
+        margin-top: 4px;
+      }
+
+      button {
+        background: #ffae00;
+        border: none;
+        border-radius: 4px;
+        color: #0c1524;
+        cursor: pointer;
+        font-weight: 600;
+        margin-top: 4px;
+        padding: 8px 12px;
+      }
+
+      button:hover {
+        background: #ffc737;
+      }
+
+      .presets {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 8px;
+      }
+
+      .presets button {
+        flex: 1 1 auto;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Musora End-Screen Progress Ring — Animation POC</h1>
+    <p>Standalone harness for iterating on ring visuals/animation before wiring into the real end screen.</p>
+
+    <div class="rings">
+      <div class="ring-panel">
+        <h2>Daily (solid)</h2>
+        <div class="ring-mount" id="daily-mount"></div>
+        <div class="controls">
+          <label>From (minutes) <input id="daily-from" type="number" value="10" /></label>
+          <label>To (minutes) <input id="daily-to" type="number" value="25" /></label>
+          <label>Goal (minutes) <input id="daily-goal" type="number" value="30" /></label>
+          <button id="daily-animate">Animate</button>
+          <div class="presets">
+            <button data-daily-preset="0,15,30">Mid-goal</button>
+            <button data-daily-preset="25,30,30">Reach goal</button>
+            <button data-daily-preset="20,42,30">Exceed goal</button>
+            <button data-daily-preset="0,0,30">Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="ring-panel">
+        <h2>Weekly (segmented)</h2>
+        <div class="ring-mount" id="weekly-mount"></div>
+        <div class="controls">
+          <label>Filled days <input id="weekly-filled" type="number" value="3" min="0" max="7" /></label>
+          <button id="weekly-animate">Animate</button>
+          <div class="presets">
+            <button data-weekly-preset="0">Reset</button>
+            <button data-weekly-preset="3">3 / 7</button>
+            <button data-weekly-preset="7">Goal met (7 / 7)</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="text/javascript">
+      var dailyRing = new bitmovin.playerui.MusoraDailyProgressRing({ size: 180, strokeWidth: 16 });
+      document.getElementById('daily-mount').appendChild(dailyRing.getDomElement().get(0));
+
+      var weeklyRing = new bitmovin.playerui.MusoraWeeklyProgressRing({ size: 180, strokeWidth: 16, totalSegments: 7 });
+      document.getElementById('weekly-mount').appendChild(weeklyRing.getDomElement().get(0));
+
+      function animateDaily(fromMinutes, toMinutes, goalMinutes) {
+        dailyRing.animateProgress(fromMinutes * 60, toMinutes * 60, goalMinutes * 60);
+      }
+
+      function animateWeekly(filledDays) {
+        weeklyRing.setFilledSegments(filledDays);
+      }
+
+      document.getElementById('daily-animate').addEventListener('click', function () {
+        animateDaily(
+          Number(document.getElementById('daily-from').value),
+          Number(document.getElementById('daily-to').value),
+          Number(document.getElementById('daily-goal').value),
+        );
+      });
+
+      document.getElementById('weekly-animate').addEventListener('click', function () {
+        animateWeekly(Number(document.getElementById('weekly-filled').value));
+      });
+
+      document.querySelectorAll('[data-daily-preset]').forEach(function (button) {
+        button.addEventListener('click', function () {
+          var parts = button.getAttribute('data-daily-preset').split(',').map(Number);
+          document.getElementById('daily-from').value = parts[0];
+          document.getElementById('daily-to').value = parts[1];
+          document.getElementById('daily-goal').value = parts[2];
+          animateDaily(parts[0], parts[1], parts[2]);
+        });
+      });
+
+      document.querySelectorAll('[data-weekly-preset]').forEach(function (button) {
+        button.addEventListener('click', function () {
+          var filled = Number(button.getAttribute('data-weekly-preset'));
+          document.getElementById('weekly-filled').value = filled;
+          animateWeekly(filled);
+        });
+      });
+    </script>
+  </body>
+</html>

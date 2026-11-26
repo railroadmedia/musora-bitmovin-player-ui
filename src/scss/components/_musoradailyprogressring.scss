@@ -1,0 +1,389 @@
+@import '../variables';
+@import '../mixins';
+
+// ProgressCircle.tsx's colors.practice.primary (AppStyle.ts MUSORA_GOLD_DARK).
+$musora-practice-gold: #ffae00;
+
+.#{$prefix}-ui-musora-daily-progress-ring {
+  // Actual width/height come from the `size` option, set inline in toDomElement.
+  display: block;
+  height: 180px;
+  position: relative;
+  width: 180px;
+
+  svg {
+    display: block;
+    height: 100%;
+    overflow: visible;
+    // Positioned (not static) so DOM order decides stacking against the also-positioned
+    // .daily-ring-gold-track — otherwise it paints on top of the svg regardless of DOM order.
+    position: relative;
+    width: 100%;
+  }
+
+  .#{$prefix}-daily-ring-track {
+    stroke: #404b61;
+    opacity: 1;
+    // Forces its own compositor layer up front, rather than promoting one only once the
+    // celebrating animation starts — a known fix for opacity-animation repaint bugs on SVG
+    // shape elements in some embedded WebViews.
+    will-change: opacity;
+
+    &.#{$prefix}-daily-ring-track-celebrating {
+      animation: #{$prefix}-daily-ring-track-celebrate 400ms cubic-bezier(0.5, 0, 0.5, 1) forwards;
+    }
+  }
+
+  @keyframes #{$prefix}-daily-ring-track-celebrate {
+    0% {
+      opacity: 1;
+    }
+
+    100% {
+      opacity: 0;
+    }
+  }
+
+  // Rounded stroke-linecap on a near-zero-length arc reads as a single dot at ratio≈0 — intended.
+  .#{$prefix}-daily-ring-fill {
+    filter: drop-shadow(0 0 3px rgba(255, 174, 0, 0.5));
+    stroke: $musora-practice-gold;
+    stroke-dashoffset: calc(var(--daily-ring-circumference, 1) * (1 - var(--daily-ring-fill-ratio, 0)));
+    // view-box not fill-box: fill-box on a fill="none" shape can resolve to a zero-size box in
+    // some WebViews, pivoting the transform from the wrong point.
+    transform-box: view-box;
+    transform-origin: center;
+    // Always-active (not just while celebrating) — introducing a transform only when celebrating
+    // starts triggered a WebView compositing bug (stale + new layer both rendering).
+    transform: rotate(-90deg);
+    opacity: 1;
+    will-change: opacity, transform;
+
+    &.#{$prefix}-daily-ring-fill-celebrating {
+      animation: #{$prefix}-daily-ring-fill-celebrate 400ms cubic-bezier(0.5, 0, 0.5, 1) forwards;
+    }
+  }
+
+  @keyframes #{$prefix}-daily-ring-fill-celebrate {
+    // rotate(-90deg) must stay in every step, or the omitted value snaps the arc to 0deg. The
+    // pop-scale itself lives on the shared daily-ring-pop-group animation, not duplicated here.
+    // Fades to 0 by 100% so the illustrated gold-track image underneath shows through.
+    0% {
+      filter: drop-shadow(0 0 3px rgba(255, 174, 0, 0.5));
+      opacity: 1;
+      transform: rotate(-90deg);
+    }
+
+    30% {
+      filter: drop-shadow(0 0 6.5px rgba(255, 174, 0, 0.5));
+      opacity: 1;
+      transform: rotate(-90deg);
+    }
+
+    100% {
+      filter: drop-shadow(0 0 3px rgba(255, 174, 0, 0.5));
+      opacity: 0;
+      transform: rotate(-90deg);
+    }
+  }
+
+  // Beyond-goal gradient overlay, mirrors ProgressCircle.tsx's dark gradient sweep.
+  .#{$prefix}-daily-ring-exceeded {
+    stroke-opacity: var(--daily-ring-exceeded-opacity, 0);
+    transform-box: view-box;
+    transform-origin: center;
+    transform: rotate(var(--daily-ring-exceeded-rotation, 0deg));
+  }
+
+  .#{$prefix}-daily-ring-gradient-stop {
+    stop-color: $musora-practice-gold;
+  }
+
+  // Caps the fill's leading tip so its round-linecap glow doesn't bleed past the track beneath
+  // it — same "progress dot" patch as ProgressCircle.tsx.
+  .#{$prefix}-daily-ring-dot {
+    filter: drop-shadow(0 0 3px rgba(255, 174, 0, 0.5));
+    stroke: $musora-practice-gold;
+    opacity: 1;
+    transform-box: view-box;
+    transform-origin: center;
+    transform: rotate(var(--daily-ring-dot-rotation, -90deg));
+
+    // Own keyframe (not daily-ring-fill-celebrate) — that one hardcodes rotate(-90deg) per step,
+    // which would snap the dot off its tracked head position instead of pulsing in place.
+    &.#{$prefix}-daily-ring-fill-celebrating {
+      animation: #{$prefix}-daily-ring-dot-celebrate 400ms cubic-bezier(0.5, 0, 0.5, 1) forwards;
+    }
+  }
+
+  @keyframes #{$prefix}-daily-ring-dot-celebrate {
+    // Pop-scale lives on the shared daily-ring-pop-group animation, not duplicated here.
+    0% {
+      filter: drop-shadow(0 0 3px rgba(255, 174, 0, 0.5));
+      opacity: 1;
+      transform: rotate(var(--daily-ring-dot-rotation, -90deg));
+    }
+
+    30% {
+      filter: drop-shadow(0 0 6.5px rgba(255, 174, 0, 0.5));
+      opacity: 1;
+      transform: rotate(var(--daily-ring-dot-rotation, -90deg));
+    }
+
+    // Fades out alongside the fill (daily-ring-fill-celebrate) so the flat-color dot doesn't
+    // persist on top of the illustrated gold track underneath — the gold-blend patch (a crop of
+    // that same track's texture) takes over at its last position instead.
+    100% {
+      filter: drop-shadow(0 0 3px rgba(255, 174, 0, 0.5));
+      opacity: 0;
+      transform: rotate(var(--daily-ring-dot-rotation, -90deg));
+    }
+  }
+
+  // Shared pop-scale for track/fill/exceeded/dot (grouped together in toDomElement's svg markup)
+  // so all four visibly pop as one ring instead of each separately pasting the same keyframe.
+  // Uniform scale commutes with each child's own rotate(), so nesting doesn't skew anything.
+  .#{$prefix}-daily-ring-pop-group {
+    transform-box: view-box;
+    transform-origin: center;
+    // Same WebView compositor-layer fix as daily-ring-track/-fill above — without it, this
+    // group's pop can start a frame or two out of step with the gold-blend mask shape's own
+    // (necessarily separate, see below) pop, reading as slightly out of sync with the rest.
+    will-change: transform;
+
+    &.#{$prefix}-daily-ring-fill-celebrating {
+      animation: #{$prefix}-daily-ring-pop-group-pop 400ms cubic-bezier(0.5, 0, 0.5, 1) forwards;
+    }
+  }
+
+  @keyframes #{$prefix}-daily-ring-pop-group-pop {
+    0% {
+      transform: scale(1);
+    }
+
+    30% {
+      transform: scale(1.1);
+    }
+
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  // The mask "window" (see toDomElement's <mask>) — same shape/dasharray as daily-ring-dot, and
+  // rotates the same way, so the image it reveals is always sampled from the dot's current angle.
+  .#{$prefix}-daily-ring-gold-blend-mask-shape {
+    transform-box: view-box;
+    transform-origin: center;
+    transform: rotate(var(--daily-ring-dot-rotation, -90deg));
+    // Same WebView compositor-layer fix as daily-ring-track/-fill/-pop-group — this element's
+    // pop animation is necessarily separate from the group's (see below), so without its own
+    // early layer it can start a frame or two late and read as out of sync with the rest.
+    will-change: transform;
+
+    // Can't join daily-ring-pop-group for its scale pop — SVG <mask> content lives outside the
+    // visible tree, so a group transform elsewhere never reaches it. Shares the trigger class but
+    // needs its own keyframe: no opacity fade (unlike the dot, this window must stay visible —
+    // fading it would hide the gold-blend image behind it) and rotate(var(...)) in every step, or
+    // the omitted value would snap it to its un-rotated angle.
+    &.#{$prefix}-daily-ring-fill-celebrating {
+      animation: #{$prefix}-daily-ring-gold-blend-mask-pop 400ms cubic-bezier(0.5, 0, 0.5, 1) forwards;
+    }
+  }
+
+  @keyframes #{$prefix}-daily-ring-gold-blend-mask-pop {
+    0% {
+      transform: rotate(var(--daily-ring-dot-rotation, -90deg)) scale(1);
+    }
+
+    30% {
+      transform: rotate(var(--daily-ring-dot-rotation, -90deg)) scale(1.1);
+    }
+
+    100% {
+      transform: rotate(var(--daily-ring-dot-rotation, -90deg)) scale(1);
+    }
+  }
+
+  // The masked image itself is never rotated — it stays pixel-aligned with the identical, static
+  // daily-ring-gold-track image behind it, so the small revealed window blends in with zero seam
+  // and no shadow of its own (unlike a separately-rotated raster crop would have).
+  .#{$prefix}-daily-ring-gold-blend {
+    opacity: 0;
+
+    &.#{$prefix}-daily-ring-gold-blend-playing {
+      animation: #{$prefix}-daily-ring-gold-blend-in 400ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+  }
+
+  @keyframes #{$prefix}-daily-ring-gold-blend-in {
+    0% {
+      opacity: 0;
+    }
+
+    100% {
+      opacity: 1;
+    }
+  }
+
+  // Matches ProgressCircle.tsx's innerCard (primary[1] from AppStyle.ts).
+  .#{$prefix}-daily-ring-card {
+    background-color: #192233;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  // Figma's illustrated "Gold disc" (10542:40958) — fades in over the card's flat navy
+  // background on goal-reached, instead of the navy staying visible underneath.
+  .#{$prefix}-daily-ring-card-gold {
+    background-position: center;
+    background-size: cover;
+    border-radius: 50%;
+    left: 50%;
+    opacity: 0;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%) rotate(-30deg) scale(0.85);
+
+    &.#{$prefix}-daily-ring-card-gold-playing {
+      animation: #{$prefix}-daily-ring-card-gold-in 400ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+  }
+
+  @keyframes #{$prefix}-daily-ring-card-gold-in {
+    0% {
+      opacity: 0;
+      transform: translate(-50%, -50%) rotate(-30deg) scale(0.85);
+    }
+
+    100% {
+      opacity: 1;
+      transform: translate(-50%, -50%) rotate(0deg) scale(1);
+    }
+  }
+
+  // Figma's illustrated gold-track ring, "Progress_1 (gold)" (10542:40952) — layered behind the
+  // stroke ring; hidden until goal-reached.
+  .#{$prefix}-daily-ring-gold-track {
+    background-position: center;
+    background-size: contain;
+    left: 50%;
+    opacity: 0;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+
+    &.#{$prefix}-daily-ring-gold-track-playing {
+      // Delayed, and shortened to still land at the same 400ms finish as the live stroke's own
+      // fade-out (daily-ring-fill/track-celebrate) — so it only becomes visible once the live
+      // ring's pop-scale has mostly settled back to 1, instead of appearing immediately while
+      // the ring is still scaled up and poking past this (slightly oversized, by design) image's
+      // edge. A longer delay here without shortening the duration would leave a gap: both fully
+      // faded away with neither one visible before this one finishes coming in.
+      animation: #{$prefix}-daily-ring-gold-track-in 200ms cubic-bezier(0.16, 1, 0.3, 1) 200ms forwards;
+    }
+  }
+
+  @keyframes #{$prefix}-daily-ring-gold-track-in {
+    0% {
+      opacity: 0;
+    }
+
+    100% {
+      opacity: 1;
+    }
+  }
+
+  // Matches ProgressCircle.tsx's detailsContainer.
+  .#{$prefix}-daily-ring-content {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+
+    // Figma's completed state (node 10542:40924): icon/time/label leave the centered flex stack
+    // for independent positions — icon pinned top, time recentered, label below.
+    &.#{$prefix}-daily-ring-content-celebrating {
+      display: block;
+
+      // Not transitioned: `top` starts from a flex-computed `auto`, which doesn't animate.
+      .#{$prefix}-daily-ring-clock,
+      .#{$prefix}-daily-ring-time,
+      .#{$prefix}-daily-ring-goal {
+        left: 50%;
+        margin: 0;
+        position: absolute;
+        transform: translate(-50%, -50%);
+      }
+
+      .#{$prefix}-daily-ring-clock {
+        top: 25.5%;
+      }
+
+      .#{$prefix}-daily-ring-time {
+        top: 51%;
+      }
+
+      .#{$prefix}-daily-ring-goal {
+        top: 75%;
+      }
+    }
+  }
+
+  // colors.primary[4] from the dark theme (AppStyle.ts).
+  .#{$prefix}-daily-ring-clock {
+    color: #404b61;
+    height: 14px;
+    margin-bottom: 4px;
+    // Lets the celebration checkmark overlay it via inset:0.
+    position: relative;
+    width: 12px;
+
+    svg {
+      display: block;
+      height: 100%;
+      width: 100%;
+    }
+  }
+
+  .#{$prefix}-daily-ring-time {
+    color: #fff;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    white-space: nowrap;
+
+    // Figma (node 10542:40978): white -> #4A3000 on goal-reached, alongside the gold-disc card
+    // fade and the goal label's own (differently-colored) crossfade.
+    &.#{$prefix}-daily-ring-time-celebrating {
+      animation: #{$prefix}-daily-ring-time-celebrate 240ms ease-out forwards;
+    }
+  }
+
+  @keyframes #{$prefix}-daily-ring-time-celebrate {
+    0% {
+      color: #fff;
+    }
+
+    100% {
+      color: #4a3000;
+    }
+  }
+
+  // colors.primary[8] from the dark theme (AppStyle.ts).
+  .#{$prefix}-daily-ring-goal {
+    color: #ebeff5;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    white-space: nowrap;
+  }
+}

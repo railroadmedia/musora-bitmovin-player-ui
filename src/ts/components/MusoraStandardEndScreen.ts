@@ -5,12 +5,17 @@ import { UIInstanceManager } from '../UIManager';
 import { HugeReplayButton } from './buttons/HugeReplayButton';
 import { RecommendationConfig } from '../UIConfig';
 import { PlayerAPI } from 'bitmovin-player';
+import { MusoraDailyProgressRing } from './MusoraDailyProgressRing';
+import { MusoraWeeklyProgressRing } from './MusoraWeeklyProgressRing';
 
 /**
  * Overlays the player and displays recommended videos for Musora standard end screen.
  *
  * @category Containers
  */
+
+// POC ONLY — see MusoraAwardEndScreenItem.toDomElement. Must be false on main.
+const PROGRESS_RING_POC_ONLY = true;
 
 declare const window: {
   bitmovin?: {
@@ -997,6 +1002,34 @@ class MusoraAwardEndScreenItem extends MusoraStandardEndScreenItem {
       },
       this,
     );
+
+    // POC ONLY — remove this whole block once daily/weekly progress is wired through real
+    // IEndScreen data (see .claude/docs/planning/musoraapp-end-screen-progress-rings.md).
+    // Shows nothing but the two animating rings, full-screen, so they're easy to eyeball.
+    if (PROGRESS_RING_POC_ONLY) {
+      itemElement.css({
+        display: 'flex',
+        'flex-direction': 'row',
+        'flex-wrap': 'nowrap',
+        'align-items': 'center',
+        'justify-content': 'center',
+        gap: '32px',
+        height: '100%',
+        width: '100%',
+        'min-height': '0',
+        'min-width': '0',
+      });
+      // Demo values exceed/complete the goal so the celebration is what's on screen to review.
+      const dailyRing = new MusoraDailyProgressRing();
+      const weeklyRing = new MusoraWeeklyProgressRing({ totalSegments: 4 });
+      itemElement.append(dailyRing.getDomElement());
+      itemElement.append(weeklyRing.getDomElement());
+      setTimeout(() => {
+        dailyRing.animateProgress(0, 12 * 60 + 43, 10 * 60);
+        weeklyRing.setFilledSegments(4);
+      }, 400);
+      return itemElement;
+    }
 
     // Top row with title and close button
     const topRow = new DOM('div', {

@@ -134,6 +134,13 @@ module.exports = (env, { mode }) => {
         minify: false,
         templateParameters: htmlTemplateParameters,
       }),
+      new HtmlWebpackPlugin({
+        template: './src/html/progress-rings-test.html',
+        filename: './progress-rings-test.html',
+        inject: false,
+        minify: false,
+        templateParameters: htmlTemplateParameters,
+      }),
       {
         apply: compiler => {
           const isDevServer = process.env.WEBPACK_SERVE;
