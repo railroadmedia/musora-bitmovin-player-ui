@@ -5,8 +5,8 @@ import { UIInstanceManager } from '../UIManager';
 import { HugeReplayButton } from './buttons/HugeReplayButton';
 import { RecommendationConfig } from '../UIConfig';
 import { PlayerAPI } from 'bitmovin-player';
-import { MusoraDailyProgressRing } from './MusoraDailyProgressRing';
-import { MusoraWeeklyProgressRing } from './MusoraWeeklyProgressRing';
+import { MusoraEndScreenProgressRings } from './MusoraEndScreenProgressRings';
+import { MusoraAwardFlip } from './MusoraAwardFlip';
 
 /**
  * Overlays the player and displays recommended videos for Musora standard end screen.
@@ -977,6 +977,12 @@ class MusoraMethodSessionEndScreenItem extends MusoraStandardEndScreenItem {
 interface AwardData {
   award?: string;
   awardTemplate?: string;
+  // "Unearned"/locked and "back" faces for the award-reveal flip (Figma:
+  // Custom-Goals-On-The-End-Screens, node 10601:225 "Award (spin)"). When either is missing, the
+  // flip is skipped and the earned artwork renders statically, same as before this existed.
+  awardTemplateUnearned?: string;
+  awardBack?: string;
+  awardBackTemplate?: string;
   awardLogo?: string;
   awardBrand?: string;
   lessons: number;
@@ -1005,28 +1011,28 @@ class MusoraAwardEndScreenItem extends MusoraStandardEndScreenItem {
 
     // POC ONLY — remove this whole block once daily/weekly progress is wired through real
     // IEndScreen data (see .claude/docs/planning/musoraapp-end-screen-progress-rings.md).
-    // Shows nothing but the two animating rings, full-screen, so they're easy to eyeball.
+    // Shows nothing but the combined weekly->daily reveal sequence, full-screen, so it's easy to
+    // eyeball end to end.
     if (PROGRESS_RING_POC_ONLY) {
       itemElement.css({
         display: 'flex',
-        'flex-direction': 'row',
-        'flex-wrap': 'nowrap',
         'align-items': 'center',
         'justify-content': 'center',
-        gap: '32px',
         height: '100%',
         width: '100%',
         'min-height': '0',
         'min-width': '0',
       });
-      // Demo values exceed/complete the goal so the celebration is what's on screen to review.
-      const dailyRing = new MusoraDailyProgressRing();
-      const weeklyRing = new MusoraWeeklyProgressRing({ totalSegments: 4 });
-      itemElement.append(dailyRing.getDomElement());
-      itemElement.append(weeklyRing.getDomElement());
+      const rings = new MusoraEndScreenProgressRings({ weeklyTotalSegments: 4 });
+      itemElement.append(rings.getDomElement());
       setTimeout(() => {
-        dailyRing.animateProgress(0, 12 * 60 + 43, 10 * 60);
-        weeklyRing.setFilledSegments(4);
+        rings.playSequence({
+          weeklyFrom: 3,
+          weeklyTo: 4,
+          dailyFrom: 0,
+          dailyTo: 12 * 60 + 43,
+          dailyGoal: 10 * 60,
+        });
       }, 400);
       return itemElement;
     }
@@ -1063,32 +1069,44 @@ class MusoraAwardEndScreenItem extends MusoraStandardEndScreenItem {
     });
 
     const awardImage = this.data.award || this.data.awardTemplate;
-    const award = new DOM('div', {
-      class: this.prefixCss('award'),
-    });
 
     if (awardImage) {
-      award.css({
-        'background-image': 'url(' + awardImage + ')',
+      // Flip-capable (locked -> back -> earned) when both faces are present (Figma:
+      // Custom-Goals-On-The-End-Screens, node 10601:225 "Award (spin)"); otherwise
+      // MusoraAwardFlip.setAward lands directly on the earned face, same as the old static render.
+      const awardFlip = new MusoraAwardFlip();
+      awardFlip.setAward({
+        front: awardImage,
+        unearned: this.data.awardTemplateUnearned,
+        back: this.data.awardBack || this.data.awardBackTemplate,
+        brand: this.data.awardBrand,
       });
-    }
+      contentRow.append(awardFlip.getDomElement());
+      // Delayed so the flip plays after the end screen's own entry transition settles, not
+      // underneath it — same separation as MusoraEndScreenProgressRings' POC trigger below.
+      setTimeout(() => awardFlip.playFlip(), 400);
+    } else {
+      const award = new DOM('div', {
+        class: this.prefixCss('award'),
+      });
 
-    if (!this.data.award && this.data.awardLogo) {
-      const awardLogoClasses = [this.prefixCss('award-logo')];
-      if (this.data.awardBrand) {
-        awardLogoClasses.push(this.prefixCss(`award-logo-${this.data.awardBrand}`));
+      if (this.data.awardLogo) {
+        const awardLogoClasses = [this.prefixCss('award-logo')];
+        if (this.data.awardBrand) {
+          awardLogoClasses.push(this.prefixCss(`award-logo-${this.data.awardBrand}`));
+        }
+
+        award.append(
+          new DOM('div', {
+            class: awardLogoClasses.join(' '),
+          }).css({
+            'background-image': 'url(' + this.data.awardLogo + ')',
+          }),
+        );
       }
 
-      award.append(
-        new DOM('div', {
-          class: awardLogoClasses.join(' '),
-        }).css({
-          'background-image': 'url(' + this.data.awardLogo + ')',
-        }),
-      );
+      contentRow.append(award);
     }
-
-    contentRow.append(award);
 
     const info = new DOM('div', {
       class: this.prefixCss('info'),

@@ -93,6 +93,9 @@ $musora-practice-gold: #ffae00;
     transform-box: view-box;
     transform-origin: center;
     transform: rotate(var(--daily-ring-exceeded-rotation, 0deg));
+    // Gradient stops can't track an arc this short (0.012 of the circumference), so the sliver
+    // reads as a hard-edged block; blur softens it instead of chasing the stop math.
+    filter: blur(1.5px);
   }
 
   .#{$prefix}-daily-ring-gradient-stop {

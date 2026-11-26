@@ -5,7 +5,7 @@ import {
   IMusoraRingCelebrationHandles,
   TEXT_CROSSFADE_SWAP_AT_MS,
 } from './MusoraRingCelebration';
-import { DAILY_RING_GOLD_DISC_DATA_URI, DAILY_RING_GOLD_TRACK_DATA_URI } from './DailyProgressRingAssets';
+import { GOLD_DISC_DATA_URI, GOLD_RING_TRACK_DATA_URI } from './ProgressRingAssets';
 
 /**
  * Configuration interface for the {@link MusoraDailyProgressRing}.
@@ -27,8 +27,42 @@ declare const window: {
 
 // Matches ProgressCircle.tsx: ratios at/above this start blending in the "exceeded goal" gradient.
 const GRADIENT_THRESHOLD = 0.95;
-const FILL_EASING = 0.08;
-const SETTLE_THRESHOLD = 0.001;
+
+// A full 0 -> 1 ratio sweep takes this long; other from/to spans scale proportionally, so the fill
+// always moves at the same constant angular speed regardless of the actual minutes-practiced jump.
+const FULL_LOOP_DURATION_MS = 1000;
+
+// Base accelerate/decelerate curve. Sine (not cubic) for a visibly slower top speed.
+function easeInOutSine(x: number): number {
+  return -(Math.cos(Math.PI * x) - 1) / 2;
+}
+
+// Standard back-ease, overshoot scaled way down from the textbook ~10% to a subtle ~1%.
+const BACK_EASE_C1 = 0.5;
+const BACK_EASE_C2 = BACK_EASE_C1 * 1.525;
+
+function easeInOutBack(x: number): number {
+  return x < 0.5
+    ? (Math.pow(2 * x, 2) * ((BACK_EASE_C2 + 1) * 2 * x - BACK_EASE_C2)) / 2
+    : (Math.pow(2 * x - 2, 2) * ((BACK_EASE_C2 + 1) * (x * 2 - 2) + BACK_EASE_C2) + 2) / 2;
+}
+
+// easeInOutBack dips backward before accelerating (an "anticipation" wind-up) — not wanted. Blended
+// in only from x=0.5 onward, where it's already >= easeInOutSine, so the dip never shows but the
+// overshoot at the end survives untouched.
+const BACK_BLEND_START = 0.5;
+const BACK_BLEND_END = 0.6;
+
+function smoothstep(edge0: number, edge1: number, x: number): number {
+  const t = Math.min(1, Math.max(0, (x - edge0) / (edge1 - edge0)));
+  return t * t * (3 - 2 * t);
+}
+
+function dailyFillEase(x: number): number {
+  const base = easeInOutSine(x);
+  const weight = smoothstep(BACK_BLEND_START, BACK_BLEND_END, x);
+  return base + (easeInOutBack(x) - base) * weight;
+}
 
 // 100px inner card at a 136px ring size, with a 6px gap to the stroke.
 const INNER_CARD_RATIO = 100 / 136;
@@ -58,6 +92,9 @@ export class MusoraDailyProgressRing extends Component<MusoraDailyProgressRingCo
 
   private targetRatio = 0;
   private displayedRatio = 0;
+  private animationStartRatio = 0;
+  private animationStartTime = 0;
+  private animationDurationMs = 0;
   private goal = 0;
   private animationFrame: number | null = null;
   private timeElement: HTMLElement | null = null;
@@ -104,11 +141,19 @@ export class MusoraDailyProgressRing extends Component<MusoraDailyProgressRingCo
     const goldTrackSize = this.size * GOLD_TRACK_SIZE_RATIO;
     const goldTrackOffset = (this.size - goldTrackSize) / 2;
 
+    // prefixCss() returns the same string for every instance of this component — fine for CSS
+    // classes, but an SVG id/url(#id) pair must be unique per *instance*, or two rings on the
+    // same page resolve url(#...) to whichever instance's <defs> the browser finds first (one
+    // ring then visibly driven by the other's rotation/opacity). this.config.id is already
+    // unique per instance, so it's used here as a disambiguating suffix.
+    const gradientId = `${this.prefixCss('daily-ring-exceeded-gradient')}-${this.config.id}`;
+    const maskId = `${this.prefixCss('daily-ring-gold-blend-mask')}-${this.config.id}`;
+
     element.html(
       `<svg viewBox="0 0 ${this.size} ${this.size}" xmlns="http://www.w3.org/2000/svg" ` +
         'xmlns:xlink="http://www.w3.org/1999/xlink">' +
         '<defs>' +
-        `<linearGradient id="${this.prefixCss('daily-ring-exceeded-gradient')}" x1="0" y1="0" x2="0" y2="1">` +
+        `<linearGradient id="${gradientId}" x1="0" y1="0" x2="0" y2="1">` +
         '<stop offset="20%" stop-opacity="0" />' +
         `<stop offset="40%" class="${this.prefixCss('daily-ring-gradient-stop')}" />` +
         `<stop offset="45%" class="${this.prefixCss('daily-ring-gradient-stop')}" />` +
@@ -118,7 +163,7 @@ export class MusoraDailyProgressRing extends Component<MusoraDailyProgressRingCo
         // window shaped and rotated exactly like daily-ring-dot. Unlike a separate rotating
         // raster asset, this always samples the real track's own pixels at the current angle —
         // no seam, no baked-in shadow of its own to clash with the ring underneath it.
-        `<mask id="${this.prefixCss('daily-ring-gold-blend-mask')}">` +
+        `<mask id="${maskId}">` +
         `<circle class="${this.prefixCss('daily-ring-gold-blend-mask-shape')}" cx="${center}" cy="${center}" ` +
         `r="${this.radius}" stroke="#fff" stroke-width="${this.strokeWidth}" fill="none" stroke-linecap="round" ` +
         `stroke-dasharray="1 ${this.circumference - 1}" stroke-dashoffset="${-this.circumference}" />` +
@@ -137,8 +182,8 @@ export class MusoraDailyProgressRing extends Component<MusoraDailyProgressRingCo
         `stroke-dasharray="${this.circumference} ${this.circumference}" />` +
         `<circle class="${this.prefixCss('daily-ring-exceeded')}" cx="${center}" cy="${center}" r="${this.radius}" ` +
         `stroke-width="${this.strokeWidth}" fill="none" stroke-linecap="round" ` +
-        `stroke="url(#${this.prefixCss('daily-ring-exceeded-gradient')})" ` +
-        `stroke-dasharray="${this.circumference * 0.1} ${this.circumference * 0.9}" />` +
+        `stroke="url(#${gradientId})" ` +
+        `stroke-dasharray="${this.circumference * 0.012} ${this.circumference * 0.988}" />` +
         // Caps the fill's leading tip: its round-linecap glow can otherwise bleed past the
         // track underneath (ProgressCircle.tsx's "progress dot" fix for the same artifact).
         `<circle class="${this.prefixCss('daily-ring-dot')}" cx="${center}" cy="${center}" r="${this.radius}" ` +
@@ -147,10 +192,10 @@ export class MusoraDailyProgressRing extends Component<MusoraDailyProgressRingCo
         '</g>' +
         // Not rotated itself — only the mask's window rotates (CSS, on the mask shape above) —
         // so the texture it reveals always lines up with the identical, static goldTrack image.
-        `<image class="${this.prefixCss('daily-ring-gold-blend')}" href="${DAILY_RING_GOLD_TRACK_DATA_URI}" ` +
-        `xlink:href="${DAILY_RING_GOLD_TRACK_DATA_URI}" x="${goldTrackOffset}" y="${goldTrackOffset}" ` +
+        `<image class="${this.prefixCss('daily-ring-gold-blend')}" href="${GOLD_RING_TRACK_DATA_URI}" ` +
+        `xlink:href="${GOLD_RING_TRACK_DATA_URI}" x="${goldTrackOffset}" y="${goldTrackOffset}" ` +
         `width="${goldTrackSize}" height="${goldTrackSize}" ` +
-        `mask="url(#${this.prefixCss('daily-ring-gold-blend-mask')})" />` +
+        `mask="url(#${maskId})" />` +
         '</svg>',
     );
     element.get(0)?.style.setProperty('--daily-ring-circumference', this.circumference.toFixed(3));
@@ -158,7 +203,7 @@ export class MusoraDailyProgressRing extends Component<MusoraDailyProgressRingCo
     // Figma's illustrated gold-track ring; hidden until goal-reached. Inserted before the SVG so
     // the dot/exceeded-overlay (drawn last inside it) stay on top of it.
     const goldTrack = new DOM('div', { class: this.prefixCss('daily-ring-gold-track') }).css({
-      backgroundImage: `url(${DAILY_RING_GOLD_TRACK_DATA_URI})`,
+      backgroundImage: `url(${GOLD_RING_TRACK_DATA_URI})`,
       height: `${goldTrackSize}px`,
       width: `${goldTrackSize}px`,
     });
@@ -175,7 +220,7 @@ export class MusoraDailyProgressRing extends Component<MusoraDailyProgressRingCo
 
     // Figma's "Gold disc" — fades in on top of the card's flat navy background on goal-reached.
     const cardGold = new DOM('div', { class: this.prefixCss('daily-ring-card-gold') }).css({
-      backgroundImage: `url(${DAILY_RING_GOLD_DISC_DATA_URI})`,
+      backgroundImage: `url(${GOLD_DISC_DATA_URI})`,
       height: `${innerCardSize}px`,
       width: `${innerCardSize}px`,
     });
@@ -247,6 +292,9 @@ export class MusoraDailyProgressRing extends Component<MusoraDailyProgressRingCo
     // then instantly re-apply the achieved state if `from` is already past the goal.
     this.resetCelebration();
     this.displayedRatio = startRatio;
+    this.animationStartRatio = startRatio;
+    this.animationStartTime = Date.now();
+    this.animationDurationMs = Math.abs(this.targetRatio - startRatio) * FULL_LOOP_DURATION_MS;
     this.setRatioProperty(this.displayedRatio);
     this.setTimeText(this.displayedRatio);
 
@@ -260,21 +308,33 @@ export class MusoraDailyProgressRing extends Component<MusoraDailyProgressRingCo
       this.applyGoalReachedState(true);
     }
 
+    if (this.animationDurationMs <= 0) {
+      // Nothing to travel (from === to) — land immediately rather than starting a loop that
+      // would just divide by a zero duration below.
+      this.checkGoalReached(this.displayedRatio);
+      return;
+    }
+
     if (this.animationFrame === null) {
       this.animationFrame = window.requestAnimationFrame(this.renderFrame);
     }
   }
 
   private renderFrame = (): void => {
-    this.displayedRatio += (this.targetRatio - this.displayedRatio) * FILL_EASING;
-    const settled = Math.abs(this.targetRatio - this.displayedRatio) < SETTLE_THRESHOLD;
-    if (settled) {
-      this.displayedRatio = this.targetRatio;
-    }
+    const elapsed = Date.now() - this.animationStartTime;
+    const progress = Math.min(1, elapsed / this.animationDurationMs);
+    const settled = progress >= 1;
+    this.displayedRatio = settled
+      ? this.targetRatio
+      : this.animationStartRatio + (this.targetRatio - this.animationStartRatio) * dailyFillEase(progress);
 
     this.setRatioProperty(this.displayedRatio);
     this.setTimeText(this.displayedRatio);
-    this.checkGoalReached(this.displayedRatio);
+    // Gated on the target, not displayedRatio — the back-ease overshoot can briefly exceed 1 even
+    // when the target itself hasn't reached the goal.
+    if (this.targetRatio >= 1) {
+      this.checkGoalReached(this.displayedRatio);
+    }
 
     if (settled) {
       this.animationFrame = null;

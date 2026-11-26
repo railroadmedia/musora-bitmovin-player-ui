@@ -83,6 +83,13 @@ export { RecommendationOverlay } from './components/overlays/RecommendationOverl
 export { MusoraStandardEndScreen } from './components/MusoraStandardEndScreen';
 export { MusoraDailyProgressRing, MusoraDailyProgressRingConfig } from './components/MusoraDailyProgressRing';
 export { MusoraWeeklyProgressRing, MusoraWeeklyProgressRingConfig } from './components/MusoraWeeklyProgressRing';
+export {
+  MusoraEndScreenProgressRings,
+  MusoraEndScreenProgressRingsConfig,
+  IMusoraEndScreenProgressRingsSequence,
+} from './components/MusoraEndScreenProgressRings';
+export { MusoraAwardFlip, MusoraAwardFlipConfig, IMusoraAwardFlipImages } from './components/MusoraAwardFlip';
+export { AwardBrand, getAwardSparkColors } from './components/AwardSparkColors';
 export { RecommendationItem, RecommendationItemConfig } from './components/RecommendationItem';
 export { SeekBarLabel, SeekBarLabelConfig } from './components/seekbar/SeekBarLabel';
 export { SubtitleOverlay } from './components/overlays/SubtitleOverlay';

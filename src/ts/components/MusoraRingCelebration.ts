@@ -17,7 +17,6 @@ const CHECKMARK_DELAY_MS = 120;
 
 export const TEXT_CROSSFADE_DURATION_MS = 240;
 export const TEXT_CROSSFADE_SWAP_AT_MS = 100;
-export const COUNT_BOUNCE_DURATION_MS = 240;
 
 // Figma's "Celebration / Sparks" (10542:40925): two interleaved rings of plain dots (not a
 // single-color single-ring burst) — 12 bigger/farther-traveling dots, then 12 smaller/closer
@@ -66,6 +65,76 @@ const CHECKMARK_PATH = 'M4 12.5L9.5 18L20 6';
 // Generic 4-point sparkle/glint shape.
 const GLINT_PATH = 'M12 2L13.8 10.2L22 12L13.8 13.8L12 22L10.2 13.8L2 12L10.2 10.2Z';
 
+export interface IMusoraCelebrationSparksHandles {
+  /** Plays the burst. A transient effect — safe to call again after it's finished. */
+  play(): void;
+  /** Stops the burst immediately (e.g. for a replay), resetting back to the pre-play state. */
+  reset(): void;
+}
+
+/**
+ * Builds just the sparks burst (Figma's "Celebration / Sparks") inside `root`, at rest, and
+ * returns a handle to play/reset it. `root` must be `position: relative`. Factored out of
+ * {@link buildRingCelebration} so a consumer that only wants the sparks — not the gold disc,
+ * glints, or icon/checkmark swap — can use them standalone (e.g. {@link MusoraAwardFlip}, which
+ * needs brand-colored sparks but has no celebration-icon concept of its own).
+ *
+ * `colors` defaults to the shared gold palette; pass a brand-specific one instead (see
+ * `AwardSparkColors.ts`) where the burst should match the content's own brand, not gold.
+ */
+export function buildCelebrationSparks(
+  root: HTMLElement,
+  prefixCss: (cssClass: string) => string,
+  size: number,
+  colors: string[] = SPARK_COLORS,
+): IMusoraCelebrationSparksHandles {
+  // The ring's own outer edge (stroke included) — sparks launch from here, not the center, so
+  // the travel distance is entirely beyond the ring instead of partway still hidden under it.
+  const sparkStartRadius = size / 2;
+  const sparkContainer = new DOM('div', { class: prefixCss('celebration-sparks') });
+  let sparkIndex = 0;
+  for (const wave of SPARK_WAVES) {
+    const travel = size * wave.travelRatio;
+    // Figma fires every dot in a wave at once (no per-dot stagger within it) — only the two
+    // waves themselves are offset from each other. A per-dot delay here reads as a spiral sweep
+    // instead of a simultaneous ring burst.
+    const delay = wave.delayOffsetMs;
+    for (let i = 0; i < wave.count; i++) {
+      const angle = (360 / wave.count) * i + wave.angleOffsetDeg;
+      const color = colors[sparkIndex % colors.length];
+      const rotator = new DOM('div', { class: prefixCss('celebration-spark-rotator') }).css({
+        transform: `rotate(${angle}deg)`,
+      });
+      const spark = new DOM('div', { class: prefixCss('celebration-spark') });
+      const sparkElement = spark.get(0);
+      sparkElement?.style.setProperty('--celebration-spark-start', `${sparkStartRadius}px`);
+      sparkElement?.style.setProperty('--celebration-spark-travel', `${travel}px`);
+      sparkElement?.style.setProperty('--celebration-spark-delay', `${delay.toFixed(1)}ms`);
+      sparkElement?.style.setProperty('--celebration-spark-size', `${wave.sizePx}px`);
+      sparkElement?.style.setProperty('--celebration-spark-color', color);
+      rotator.append(spark);
+      sparkContainer.append(rotator);
+      sparkIndex++;
+    }
+  }
+  root.append(sparkContainer.get(0)!);
+
+  const playingClass = prefixCss('celebration-playing');
+  return {
+    play(): void {
+      sparkContainer.removeClass(playingClass);
+      // Forces a layout flush so a replay (play -> reset -> play) is seen as a fresh animation
+      // start, same reflow-forcing trick used elsewhere in this codebase (e.g. the weekly ring's
+      // count odometer).
+      void sparkContainer.get(0)?.offsetWidth;
+      sparkContainer.addClass(playingClass);
+    },
+    reset(): void {
+      sparkContainer.removeClass(playingClass);
+    },
+  };
+}
+
 export interface IMusoraRingCelebrationHandles {
   /**
    * Call once, when the ring first reaches its goal, to play the celebration. Pass `instant`
@@ -102,36 +171,7 @@ export function buildRingCelebration(
     root.insertBefore(goldDisc.get(0)!, root.firstChild);
   }
 
-  // The ring's own outer edge (stroke included) — sparks launch from here, not the center, so
-  // the travel distance is entirely beyond the ring instead of partway still hidden under it.
-  const sparkStartRadius = size / 2;
-  const sparkContainer = new DOM('div', { class: prefixCss('celebration-sparks') });
-  let sparkIndex = 0;
-  for (const wave of SPARK_WAVES) {
-    const travel = size * wave.travelRatio;
-    // Figma fires every dot in a wave at once (no per-dot stagger within it) — only the two
-    // waves themselves are offset from each other. A per-dot delay here reads as a spiral sweep
-    // instead of a simultaneous ring burst.
-    const delay = wave.delayOffsetMs;
-    for (let i = 0; i < wave.count; i++) {
-      const angle = (360 / wave.count) * i + wave.angleOffsetDeg;
-      const color = SPARK_COLORS[sparkIndex % SPARK_COLORS.length];
-      const rotator = new DOM('div', { class: prefixCss('celebration-spark-rotator') }).css({
-        transform: `rotate(${angle}deg)`,
-      });
-      const spark = new DOM('div', { class: prefixCss('celebration-spark') });
-      const sparkElement = spark.get(0);
-      sparkElement?.style.setProperty('--celebration-spark-start', `${sparkStartRadius}px`);
-      sparkElement?.style.setProperty('--celebration-spark-travel', `${travel}px`);
-      sparkElement?.style.setProperty('--celebration-spark-delay', `${delay.toFixed(1)}ms`);
-      sparkElement?.style.setProperty('--celebration-spark-size', `${wave.sizePx}px`);
-      sparkElement?.style.setProperty('--celebration-spark-color', color);
-      rotator.append(spark);
-      sparkContainer.append(rotator);
-      sparkIndex++;
-    }
-  }
-  root.append(sparkContainer.get(0)!);
+  const sparks = buildCelebrationSparks(root, prefixCss, size, SPARK_COLORS);
 
   const glintContainer = new DOM('div', { class: prefixCss('celebration-glints') });
   GLINT_CONFIGS.forEach((config, i) => {
@@ -182,7 +222,7 @@ export function buildRingCelebration(
       } else {
         // A transient burst that ends back at 0 opacity — instant playback would look
         // identical to never playing it, so skip it outright instead.
-        sparkContainer.addClass(prefixCss('celebration-playing'));
+        sparks.play();
         glintContainer.addClass(prefixCss('celebration-playing'));
       }
 
@@ -210,7 +250,7 @@ export function buildRingCelebration(
       const instantClass = prefixCss('celebration-instant');
       goldDisc?.removeClass(prefixCss('celebration-gold-disc-playing'));
       goldDisc?.removeClass(instantClass);
-      sparkContainer.removeClass(prefixCss('celebration-playing'));
+      sparks.reset();
       glintContainer.removeClass(prefixCss('celebration-playing'));
       iconElement?.querySelector('svg')?.classList.remove(prefixCss('celebration-icon-out'));
       iconElement?.querySelector('svg')?.classList.remove(instantClass);

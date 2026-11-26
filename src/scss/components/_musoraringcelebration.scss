@@ -262,24 +262,3 @@
     opacity: 1;
   }
 }
-
-// Weekly-only: the day-count number bounces up while recoloring, instead of a plain crossfade.
-.#{$prefix}-celebration-count-bounce {
-  animation: #{$prefix}-celebration-count-bounce 240ms cubic-bezier(0.45, 1.45, 0.8, 1) forwards;
-}
-
-@keyframes #{$prefix}-celebration-count-bounce {
-  0% {
-    color: inherit;
-    transform: translateY(0);
-  }
-
-  43% {
-    color: #4a3000;
-  }
-
-  100% {
-    color: #4a3000;
-    transform: translateY(-30px);
-  }
-}

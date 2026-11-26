@@ -1,6 +1,94 @@
 @import '../variables';
 @import '../mixins';
 
+// Award-reveal flip (Figma: Custom-Goals-On-The-End-Screens, node 10601:225 "Award (spin)") — see
+// MusoraAwardFlip.ts. Unscoped (not nested under the end-screen's own selectors) since the
+// component's root carries the `award` class wherever it's mounted, including standalone test
+// harnesses. Durations come from its own TS constants via the custom properties it sets on its
+// root, not hardcoded here.
+
+// Bare 1-class default so `position: relative` (required for the face children's `position:
+// absolute; inset: 0` to size against this box, not the viewport) and a sane standalone size
+// apply wherever MusoraAwardFlip is mounted outside the real end screen. The real end screen's
+// own `.content-row .award { ... }` rule below is more specific and overrides this there,
+// keeping its existing responsive clamp()/aspect-ratio sizing exactly as before.
+.#{$prefix}-award {
+  height: 142px;
+  aspect-ratio: 0.9;
+  position: relative;
+}
+
+.#{$prefix}-award-flip-face {
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  inset: 0;
+  opacity: 0;
+  position: absolute;
+  transform: scaleX(0);
+  transform-origin: 50% 50%;
+}
+
+.#{$prefix}-award-flip-face-unearned {
+  transform: scaleX(1);
+}
+
+.#{$prefix}-award-flip-face-visible {
+  opacity: 1;
+}
+
+// Phase 1: locked face collapses away.
+.#{$prefix}-award-flip-face-exiting {
+  transition: transform var(--award-flip-unearned-exit-duration, 545ms) ease-in;
+  transform: scaleX(0);
+}
+
+// Phase 2: back face bulges in and back out — a keyframe (not a transition), since it animates
+// away from its own end state (0 -> 1 -> 0), not toward one.
+.#{$prefix}-award-flip-face-peeking {
+  animation: #{$prefix}-award-flip-back-peek var(--award-flip-back-peek-duration, 330ms) cubic-bezier(0.5, 0, 0.5, 1);
+}
+
+// Phase 3: earned face expands in.
+.#{$prefix}-award-flip-face-entering {
+  transition: transform var(--award-flip-front-enter-duration, 545ms) ease-out;
+  transform: scaleX(1);
+}
+
+// Phase 4: landing pop, once the front face has fully expanded in.
+.#{$prefix}-award-flip-landed .#{$prefix}-award-flip-face-front {
+  animation: #{$prefix}-award-flip-landing-pop var(--award-flip-landing-pop-duration, 440ms)
+    cubic-bezier(0.5, 0, 0.5, 1) forwards;
+}
+
+@keyframes #{$prefix}-award-flip-back-peek {
+  0% {
+    transform: scaleX(0);
+  }
+
+  50% {
+    transform: scaleX(1);
+  }
+
+  100% {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes #{$prefix}-award-flip-landing-pop {
+  0% {
+    transform: scale(1);
+  }
+
+  55% {
+    transform: scale(1.1);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
 .#{$prefix}-ui-musora-standard-end-screen {
   @extend %ui-container;
 

@@ -1,0 +1,48 @@
+@import '../variables';
+@import '../mixins';
+
+// Card-flip between the weekly and daily rings (Figma: Custom-Goals-On-The-End-Screens, node
+// 10598:176). Figma's own flip is a 2D scaleX squash to 0 width then back out, not a 3D rotateY —
+// matched here rather than a perspective/backface-visibility rig, since that's not what it is.
+.#{$prefix}-ui-musora-end-screen-progress-rings {
+  position: relative;
+
+  .#{$prefix}-rings-flip-face {
+    left: 0;
+    position: absolute;
+    top: 0;
+    transform-origin: 50% 50%;
+  }
+
+  // Resting states: weekly showing full-width, daily squashed to nothing behind it.
+  .#{$prefix}-rings-flip-face-front {
+    opacity: 1;
+    transform: scaleX(1);
+    z-index: 2;
+  }
+
+  .#{$prefix}-rings-flip-face-back {
+    opacity: 0;
+    transform: scaleX(0);
+    z-index: 1;
+  }
+
+  // Weekly collapsing away — ease-in, matching Figma's authored curve for the outgoing face.
+  .#{$prefix}-rings-flip-face-front.#{$prefix}-rings-flip-face-flipping-out {
+    transition: transform var(--rings-flip-half-duration, 150ms) ease-in;
+    transform: scaleX(0);
+  }
+
+  // Snaps opacity off once fully collapsed (edge-on/invisible) — no transition on opacity itself,
+  // this just stops it from painting a moment longer than its own scaleX(0) already implies.
+  .#{$prefix}-rings-flip-face-front.#{$prefix}-rings-flip-face-hidden {
+    opacity: 0;
+  }
+
+  // Daily expanding in — ease-out, matching Figma's authored curve for the incoming face.
+  .#{$prefix}-rings-flip-face-back.#{$prefix}-rings-flip-face-flipping-in {
+    opacity: 1;
+    transition: transform var(--rings-flip-half-duration, 150ms) ease-out;
+    transform: scaleX(1);
+  }
+}
