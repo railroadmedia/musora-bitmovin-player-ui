@@ -176,6 +176,10 @@ export class SubtitleSwitchHandler {
         this.player.subtitles.enable(subtitle.id, true);
       }
     }
+
+    // A SubtitleEnabled event can arrive before this track is in the list, which makes selectItem
+    // a no-op and leaves the list showing "off" while a track is enabled. Sync now that it exists.
+    this.selectCurrentSubtitle();
   };
 
   private removeSubtitle = (event: SubtitleEvent) => {
