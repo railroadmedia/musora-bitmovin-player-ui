@@ -49,6 +49,14 @@ describe('SubtitleUtils', () => {
       playerMock.eventEmitter.fireSubtitleAddedEvent('s-3', 'S3');
       expect(listSelectorMock.addItem).toHaveBeenCalledWith('s-3', 'S3');
     });
+
+    it('and syncs the selection to an already enabled track on subtitleAdded event', () => {
+      playerMock.subtitles.list = jest.fn().mockReturnValue([{ id: 's-3', label: 'S3', enabled: true }]);
+      (listSelectorMock.selectItem as jest.Mock).mockClear();
+      playerMock.eventEmitter.fireSubtitleAddedEvent('s-3', 'S3');
+
+      expect(listSelectorMock.selectItem).toHaveBeenCalledWith('s-3');
+    });
   });
 
   describe('removes subtitles off the listSelector', () => {
